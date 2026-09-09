@@ -25,14 +25,16 @@ local BlacklistedKeys = {
     "Escape"
 }
 
-local JustAnLibrary = {}
+local JustALibrary = {
+    Tabs = {}
+}
 
-local JustAnLibraryGUI = CoreGui:FindFirstChild("JustAnLibrary")
-if JustAnLibraryGUI then JustAnLibraryGUI:Destroy() end
-JustAnLibraryGUI = Instance.new("ScreenGui",CoreGui)
-JustAnLibraryGUI.Name = "JustAnLibrary"
+local JustALibraryGUI = CoreGui:FindFirstChild("JustALibrary")
+if JustALibraryGUI then JustALibraryGUI:Destroy() end
+JustALibraryGUI = Instance.new("ScreenGui",CoreGui)
+JustALibraryGUI.Name = "JustALibrary"
 
-local NotificationsHolder = Instance.new("Frame",JustAnLibraryGUI)
+local NotificationsHolder = Instance.new("Frame",JustALibraryGUI)
 NotificationsHolder.BackgroundTransparency = 1
 NotificationsHolder.AnchorPoint = Vector2.new(1,1)
 NotificationsHolder.Position = UDim2.new(1,-10,1,-10)
@@ -51,7 +53,7 @@ NotificationsHolderList.VerticalAlignment = Enum.VerticalAlignment.Bottom
         })
     ]]
 
-function JustAnLibrary:Notify(GivenTable)
+function JustALibrary:Notify(GivenTable)
     local NotificationFakeFrame = Instance.new("Frame",NotificationsHolder)
     NotificationFakeFrame.BackgroundTransparency = 1
     NotificationFakeFrame.Size = UDim2.new(1,0,0,100)
@@ -93,8 +95,8 @@ function JustAnLibrary:Notify(GivenTable)
     task.wait(0.75);NotificationFakeFrame:Destroy()
 end
 
-function JustAnLibrary:CreateWindow(GivenTable)
-    local WindowFrame = Instance.new("Frame",JustAnLibraryGUI)
+function JustALibrary:CreateWindow(GivenTable)
+    local WindowFrame = Instance.new("Frame",JustALibraryGUI)
     WindowFrame.Name = GivenTable.Title or "Window"
     WindowFrame.Size = GivenTable.Size or UDim2.fromOffset(650,550)
     WindowFrame.Position = UDim2.new(0.5,-WindowFrame.Size.X.Offset/2,0.5,-WindowFrame.Size.Y.Offset/2)
@@ -254,7 +256,7 @@ function JustAnLibrary:CreateWindow(GivenTable)
             TabIcon.BackgroundTransparency = 1
             TabIcon.Position = UDim2.fromOffset(10,10)
             TabIcon.Size = UDim2.fromOffset(30,30)
-            TabIcon.Image = GivenTable.Icon
+            TabIcon.Image = Icons.assets[GivenTable.Icon]
         else
             TabLabel.Size = UDim2.fromOffset(130,25)
             TabLabel.Position = UDim2.fromOffset(10,12)
@@ -302,6 +304,8 @@ function JustAnLibrary:CreateWindow(GivenTable)
         SecondTabContentScrollingFrame.Name = "RightScrollingFrame"
         SecondTabContentScrollingFrame.Size = UDim2.fromScale(0.47,0.95)
         SecondTabContentScrollingFrame.Position = UDim2.fromScale(0.505,0.025)
+
+        table.insert(JustALibrary.Tabs,TabContentFrame)
 
         function TabContent:AddContentBox(GivenTable)
 
@@ -954,7 +958,6 @@ function JustAnLibrary:CreateWindow(GivenTable)
                         TweenService:Create(InputName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                         TweenService:Create(Input,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                     end
-                    ContentBox:Resize()
                 end
 
                 function InputHolder:SetVisible(Boolean)
@@ -1015,11 +1018,11 @@ function JustAnLibrary:CreateWindow(GivenTable)
                 end
 
                 local Trigger = GivenTable.Default or "None"
+                local IsDisabled = false
                 local WaitForKey
 
                 UserInputService.InputBegan:Connect(function(Key,GameProcessed)
-                    if GameProcessed then return end
-                    if Key.KeyCode.Name == Trigger and not WaitForKey then GivenTable.Callback() end
+                    if GameProcessed or IsDisabled or Key.KeyCode.Name ~= Trigger or WaitForKey then return end;GivenTable.Callback()
                 end)
 
                 KeybindButton.MouseButton1Click:Connect(function()
@@ -1027,7 +1030,7 @@ function JustAnLibrary:CreateWindow(GivenTable)
                     KeybindButton.Text = "..."
                     WaitForKey = UserInputService.InputBegan:Connect(function(Key,GameProcessed)
                         if GameProcessed then return end
-                        if not table.find(BlacklistedKeys,Key.KeyCode.Name) then
+                        if not table.find(BlacklistedKeys,Key.KeyCode.Name) and Key.UserInputType == Enum.UserInputType.Keyboard then
                             Trigger = Key.KeyCode.Name
                             KeybindButton.Text = Trigger
                             task.wait()
@@ -1038,7 +1041,35 @@ function JustAnLibrary:CreateWindow(GivenTable)
 
                 ContentBox:Resize()
 
+                function KeybindHolder:SetDisabled(Boolean)
+                    if Boolean then
+                        KeybindButton.Interactable = false
+                        IsDisabled = true
+                        TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                    else
+                        KeybindButton.Interactable = true
+                        IsDisabled = false
+                        TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                        TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                    end
+                end
+
+                function KeybindHolder:SetVisible(Boolean)
+                    KeybindFakeFrame.Visible = Boolean
+                    ContentBox:Resize()
+                end
+
+                function KeybindHolder:Destroy()
+                    KeybindFakeFrame:Destroy()
+                    ContentBox:Resize()
+                end
+
                 return KeybindHolder
+            end
+
+            function ContentBox:AddSlider(GivenTable)
+
             end
 
             return ContentBox
@@ -1049,8 +1080,33 @@ function JustAnLibrary:CreateWindow(GivenTable)
 
     end
 
+    function Window:SetBackground(GivenImage,ImageTransparency)
+        if typeof(GivenImage) ~= "string" or not writefile or not isfile or not delfile then return end
+        local Image
+        if string.find(GivenImage,"rbxassetid://",1,false) then
+            Image = GivenImage
+        else
+            local FileName = tostring(os.time())
+            writefile(FileName..".png",game:HttpGet(GivenImage))
+            Image = getcustomasset(FileName..".png")
+            if isfile(FileName..".png") then delfile(FileName..".png") end
+        end
+        for _,Tab in JustALibrary.Tabs do
+            local ImageLabel = Tab:FindFirstChild("ImageLabel")
+            if not ImageLabel then 
+                ImageLabel = Instance.new("ImageLabel",Tab)
+                ImageLabel.BackgroundTransparency = 1
+                ImageLabel.ImageTransparency = ImageTransparency or 0
+                ImageLabel.ZIndex = 0
+                ImageLabel.Size = UDim2.fromScale(1,1) 
+                local ImageCorner = Instance.new("UICorner",ImageLabel)
+            end
+            ImageLabel.Image = Image
+        end
+    end
+
     return Window
 
 end
 
-return JustAnLibrary
+return JustALibrary
