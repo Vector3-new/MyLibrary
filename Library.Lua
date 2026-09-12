@@ -668,7 +668,11 @@ function JustALibrary:CreateWindow(GivenTable)
                     local ValueFrame = Instance.new("Frame",DropdownValuesFrame)
                     ValueFrame.BackgroundTransparency = 0.6
                     ValueFrame.Size = UDim2.new(1,0,0,25)
-                    ValueFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+					if GivenTable.Default == Value then
+						ValueFrame.BackgroundColor3 = Color3.fromRGB(255,255,255)
+					else
+                   		ValueFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+					end
                     ValueFrame.Name = ValueType
                     local ValueFrameCorner = Instance.new("UICorner",ValueFrame)
                     local ValueButton = Instance.new("TextButton",ValueFrame)
