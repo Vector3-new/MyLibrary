@@ -944,6 +944,10 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 ContentBox:Resize()
 
+				function InputHolder:SetText(Text)
+                    InputName.Text = Text or "Input"
+                end
+
                 function InputHolder:SetValue(NewValue)
                     Input.Text = NewValue
                 end
@@ -1034,6 +1038,10 @@ function JustALibrary:CreateWindow(GivenTable)
                 end)
 
                 ContentBox:Resize()
+
+				function KeybindHolder:SetText(Text)
+                    KeybindName.Text = Text or "Keybind"
+                end
 
                 function KeybindHolder:SetValue(Key)
                     if WaitForKey then WaitForKey:Disconnect() end
