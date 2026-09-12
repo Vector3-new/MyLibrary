@@ -45,16 +45,6 @@ local NotificationsHolderList = Instance.new("UIListLayout",NotificationsHolder)
 NotificationsHolderList.Padding = UDim.new(0,5)
 NotificationsHolderList.VerticalAlignment = Enum.VerticalAlignment.Bottom
 
-    --[[
-        :Notify({
-            Title = "Notification",
-            Content = "Hello World!",
-            Sound = nil,
-            SoundVolume = 0.5,
-            Time = 3
-        })
-    ]]
-
 function JustALibrary:Notify(GivenTable)
     local NotificationFakeFrame = Instance.new("Frame",NotificationsHolder)
     NotificationFakeFrame.BackgroundTransparency = 1
@@ -453,13 +443,6 @@ function JustALibrary:CreateWindow(GivenTable)
 
             end
 
-            --[[
-                :AddButton({
-                    Text = "Button",
-                    Callback = function() end
-                })
-            ]]
-
             function ContentBox:AddButton(GivenTable)
                 local ButtonHolder = {}
 
@@ -510,15 +493,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 return ButtonHolder
 
             end
-
-            --[[
-                :AddToggle({
-                    Text = "Toggle",
-                    Index = "Toggle",
-                    Default = false,
-                    Callback = function() end
-                })
-            ]]
 
             function ContentBox:AddToggle(GivenTable)
                 local ToggleHolder = {Value = false}
@@ -621,18 +595,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 return ToggleHolder
 
             end
-
-            --[[
-                :AddDropdown({
-                    Text = "Dropdown",
-                    Index = "Dropdown",
-                    Values = {},
-                    Default = nil,
-                    MaxVisibleValues = 0, --or "Auto"
-                    MultiSelection = true, --returns table
-                    Callback = function() end
-                })
-            ]]
 
             function ContentBox:AddDropdown(GivenTable)
                 local DropdownHolder = {}
@@ -925,18 +887,6 @@ function JustALibrary:CreateWindow(GivenTable)
 
             end
 
-            --[[
-                :AddInput({
-                    Text = "Input",
-                    Index = "Input",
-                    Default = nil,
-                    Placeholder = nil,
-                    ClearTextOnFocus = false,
-                    Finished = false,
-                    Callback = function() end
-                })
-            ]]
-
             function ContentBox:AddInput(GivenTable)
                 local InputHolder = {Value = GivenTable.Default or ""}
 
@@ -1021,15 +971,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 return InputHolder
 
             end
-
-            --[[
-                :AddKeyPicker({
-                    Text = "Keybind",
-                    Index = "Keybind",
-                    Default = "None",
-                    Callback = function() end
-                })
-            ]]
 
             function ContentBox:AddKeyPicker(GivenTable)
                 local KeybindHolder = {}
@@ -1150,17 +1091,6 @@ function JustALibrary:CreateWindow(GivenTable)
     return Window
 
 end
-
---[[
-    :SetupSaveManager({
-        Tab = nil,
-        MainFolderName = nil,
-        SubFolderName = nil,
-        Autoload = false,
-        FilterIndexMode = "Exclude", --or "Selected"
-        FilterIndex = {}
-    })
-]]
 
 function SetupSaveManager(GivenTable)
 
