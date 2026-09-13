@@ -1107,9 +1107,10 @@ end
 function SetupSaveManager(GivenTable)
 
     local SaveManager = {}
-    local SelectedConfig
     local ConfigName = "Config"
-    
+    local ImportMode = false
+    local ImportJSONCode = nil
+    local SelectedConfig = nil
 
     if not GivenTable.Tab or not table.find(JustALibrary.Tabs,GivenTable.Tab) or not GivenTable.MainFolderName or not GivenTable.SubFolderName then return end
     local MainFolder = isfolder(GivenTable.MainFolderName)
@@ -1154,23 +1155,50 @@ function SetupSaveManager(GivenTable)
     SaveManagerContentBox:AddButton({
         Text = "Create config",
         Callback = function()
-            local Config = {}
-            for Index,Elements in JustALibrary.Elements do
-                if Index ~= "SaveManagerConfigName" and Index ~= "SaveManagerConfigsList" then
-                    if GivenTable.FilterIndexMode and GivenTable.FilterIndex then
-                        if GivenTable.FilterIndexMode == "Exclude" and not table.find(GivenTable.FilterIndex,Index) then
-                            Config[Index] = {Name = Index,Value = Elements.Value}
-                        elseif GivenTable.FilterIndexMode == "Selected" and table.find(GivenTable.FilterIndex,Index) then
+            if ImportMode and ImportJSONCode then
+                writefile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..ConfigName..".lib",ImportJSONCode)
+            else
+                local Config = {}
+                for Index,Elements in JustALibrary.Elements do
+                    if Index ~= "SaveManagerConfigName" and Index ~= "SaveManagerConfigsList" and Index ~= "SaveManagerImportMode" and Index ~= "SaveManagerJSONCode" then
+                        if GivenTable.FilterIndexMode and GivenTable.FilterIndex then
+                            if GivenTable.FilterIndexMode == "Exclude" and not table.find(GivenTable.FilterIndex,Index) then
+                                Config[Index] = {Name = Index,Value = Elements.Value}
+                            elseif GivenTable.FilterIndexMode == "Selected" and table.find(GivenTable.FilterIndex,Index) then
+                                Config[Index] = {Name = Index,Value = Elements.Value}
+                            end
+                        else
                             Config[Index] = {Name = Index,Value = Elements.Value}
                         end
-                    else
-                        Config[Index] = {Name = Index,Value = Elements.Value}
                     end
                 end
+                writefile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..ConfigName..".lib",HttpService:JSONEncode(Config))
             end
-            writefile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..ConfigName..".lib",HttpService:JSONEncode(Config))
         end
     })
+
+    SaveManagerContentBox:AddToggle({
+        Text = "Import",
+        Index = "SaveManagerImportMode",
+        Callback = function(Value)
+            ImportMode = Value
+            if ImportMode then
+                JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(true)
+            else
+                JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(false)
+            end
+        end
+    })
+
+    SaveManagerContentBox:AddInput({
+        Text = "JSON Code",
+        Index = "SaveManagerJSONCode",
+        Placeholder = "JSON here...",
+        Finished = true,
+        Callback = function(Value) ImportJSONCode = Value end
+    })
+
+    JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(false)
     
     SaveManagerContentBox:AddDivider()
 
@@ -1221,6 +1249,14 @@ function SetupSaveManager(GivenTable)
         Callback = function()
             if not SelectedConfig then return end
             writefile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/Autoload.lib","return '"..SelectedConfig.."'")
+        end
+    })
+
+    SaveManagerContentBox:AddButton({
+        Text = "Export (Copy JSON)",
+        Callback = function()
+            if not SelectedConfig or not setclipboard then return end
+            setclipboard(readfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..SelectedConfig))
         end
     })
 
