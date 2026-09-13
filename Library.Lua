@@ -540,7 +540,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 ToggleButton.MouseButton1Click:Connect(function()
                     IsToggled = not IsToggled
                     ToggleHolder.Value = IsToggled
-                    GivenTable.Callback(IsToggled)
                     if IsToggled then
                         TweenService:Create(ToggleButtonFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
                         TweenService:Create(SecondToggleButtonFrame,TweenInfo.new(0.25),{Position = UDim2.fromScale(0.5,0)}):Play()
@@ -548,6 +547,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         TweenService:Create(ToggleButtonFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                         TweenService:Create(SecondToggleButtonFrame,TweenInfo.new(0.25),{Position = UDim2.fromScale(0,0)}):Play()
                     end
+                    GivenTable.Callback(IsToggled)
                 end)
 
                 ContentBox:Resize()
