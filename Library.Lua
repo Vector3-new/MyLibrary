@@ -599,7 +599,7 @@ function JustALibrary:CreateWindow(GivenTable)
             function ContentBox:AddDropdown(GivenTable)
                 local DropdownHolder = {}
 
-                local MaxVisibleValues = 0
+                local MaxVisibleValues = 2
 
                 if GivenTable.MaxVisibleValues then
                     if GivenTable.MaxVisibleValues == "Auto" and GivenTable.Values and #GivenTable.Values > 0 then
@@ -683,34 +683,38 @@ function JustALibrary:CreateWindow(GivenTable)
                     ValueButton.TextScaled = true
                     ValueButton.MouseButton1Click:Connect(function()
                         for _,Buttons in DropdownValuesFrame:GetChildren() do
-                            if Buttons:IsA("Frame") then
+                            if Buttons:IsA("Frame") then 
                                 if not GivenTable.MultiSelection then
-                                    if Buttons.Name == ValueType and SelectedValue ~= Buttons.Name then
-                                        SelectedValue = Buttons.Name
-                                        DropdownHolder.Value = SelectedValue
-                                        GivenTable.Callback(Value)
-                                        TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
-                                    elseif Buttons.Name == ValueType and SelectedValue == Buttons.Name then
-                                        SelectedValue = nil
-                                        DropdownHolder.Value = SelectedValue
-                                        GivenTable.Callback(SelectedValue)
-                                        TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                    if Buttons.Name == ValueType then
+                                        if SelectedValue ~= Buttons.Name then
+                                            SelectedValue = Buttons.Name
+                                            DropdownHolder.Value = SelectedValue
+                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                            GivenTable.Callback(SelectedValue)
+                                        elseif SelectedValue == Buttons.Name and GivenTable.CanDeselect then
+                                            SelectedValue = nil
+                                            DropdownHolder.Value = SelectedValue
+                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                            GivenTable.Callback(SelectedValue)
+                                        end
                                     else
                                         TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                                     end
                                 elseif GivenTable.MultiSelection then
-                                    if Buttons.Name == ValueType and not table.find(SelectedValue,Buttons.Name) then
-                                        table.insert(SelectedValue,Buttons.Name)
-                                        DropdownHolder.Value = SelectedValue
-                                        GivenTable.Callback(SelectedValue)
-                                        TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
-                                    elseif Buttons.Name == ValueType and table.find(SelectedValue,Buttons.Name) then
-                                        for Index,Item in SelectedValue do
-                                            if Item == Buttons.Name then table.remove(SelectedValue,Index) end
+                                    if Buttons.Name == ValueType then
+                                        if not table.find(SelectedValue,Buttons.Name) then
+                                            table.insert(SelectedValue,Buttons.Name)
+                                            DropdownHolder.Value = SelectedValue
+                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                            GivenTable.Callback(SelectedValue)
+                                        elseif (table.find(SelectedValue,Buttons.Name) and #SelectedValue > 1) or (table.find(SelectedValue,Buttons.Name) and GivenTable.CanDeselect) then
+                                            for Index,Item in SelectedValue do
+                                                if Item == Buttons.Name then table.remove(SelectedValue,Index) end
+                                            end
+                                            DropdownHolder.Value = SelectedValue
+                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                            GivenTable.Callback(SelectedValue)
                                         end
-                                        DropdownHolder.Value = SelectedValue
-                                        GivenTable.Callback(SelectedValue)
-                                        TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                                     elseif not table.find(SelectedValue,Buttons.Name) then
                                         TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                                     end
@@ -810,33 +814,37 @@ function JustALibrary:CreateWindow(GivenTable)
                             for _,Buttons in DropdownValuesFrame:GetChildren() do
                                 if Buttons:IsA("Frame") then
                                     if not GivenTable.MultiSelection then
-                                        if Buttons.Name == ValueType and SelectedValue ~= Buttons then
-                                            SelectedValue = Buttons
-                                            DropdownHolder.Value = SelectedValue
-                                            GivenTable.Callback(SelectedValue)
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
-                                        elseif Buttons.Name == ValueType and SelectedValue == Buttons then
-                                            SelectedValue = nil
-                                            DropdownHolder.Value = SelectedValue
-                                            GivenTable.Callback(SelectedValue)
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                        if Buttons.Name == ValueType then
+                                            if SelectedValue ~= Buttons.Name then
+                                                SelectedValue = Buttons.Name
+                                                DropdownHolder.Value = SelectedValue
+                                                TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                                GivenTable.Callback(SelectedValue)
+                                            elseif SelectedValue == Buttons.Name and GivenTable.CanDeselect then
+                                                SelectedValue = nil
+                                                DropdownHolder.Value = SelectedValue
+                                                TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                                GivenTable.Callback(SelectedValue)
+                                            end
                                         else
                                             TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                                         end
                                     elseif GivenTable.MultiSelection then
-                                        if Buttons.Name == ValueType and not table.find(SelectedValue,Buttons) then
-                                            table.insert(SelectedValue,Buttons)
-                                            DropdownHolder.Value = SelectedValue
-                                            GivenTable.Callback(SelectedValue)
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
-                                        elseif Buttons.Name == ValueType and table.find(SelectedValue,Buttons) then
-                                            for Index,Item in SelectedValue do
-                                                if Item == Buttons then table.remove(SelectedValue,Index) end
+                                        if Buttons.Name == ValueType then
+                                            if not table.find(SelectedValue,Buttons.Name) then
+                                                table.insert(SelectedValue,Buttons.Name)
+                                                DropdownHolder.Value = SelectedValue
+                                                TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                                GivenTable.Callback(SelectedValue)
+                                            elseif (table.find(SelectedValue,Buttons.Name) and #SelectedValue > 1) or (table.find(SelectedValue,Buttons.Name) and GivenTable.CanDeselect) then
+                                                for Index,Item in SelectedValue do
+                                                    if Item == Buttons.Name then table.remove(SelectedValue,Index) end
+                                                end
+                                                DropdownHolder.Value = SelectedValue
+                                                TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                                GivenTable.Callback(SelectedValue)
                                             end
-                                            DropdownHolder.Value = SelectedValue
-                                            GivenTable.Callback(SelectedValue)
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
-                                        elseif not table.find(SelectedValue,Buttons) then
+                                        elseif not table.find(SelectedValue,Buttons.Name) then
                                             TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                                         end
                                     end
