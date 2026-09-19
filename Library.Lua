@@ -48,7 +48,8 @@ NotificationsHolderList.VerticalAlignment = Enum.VerticalAlignment.Bottom
 function JustALibrary:Notify(GivenTable)
     local NotificationFakeFrame = Instance.new("Frame")
     NotificationFakeFrame.BackgroundTransparency = 1
-    NotificationFakeFrame.Size = UDim2.new(1,0,0,100)
+    NotificationFakeFrame.Size = UDim2.new(1,0,0,0)
+    NotificationFakeFrameAutomaticSize = Enum.AutomaticSize.Y
     local NotificationFrame = Instance.new("Frame",NotificationFakeFrame)
     NotificationFrame.BackgroundTransparency = 0.6
     NotificationFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
@@ -79,9 +80,9 @@ function JustALibrary:Notify(GivenTable)
         if GivenTable.SoundVolume then NotificationSound.SoundVolume = GivenTable.SoundVolume end
         NotificationSound:Play()
     end
-    NotificationFrame.Size = UDim2.new(1,0,0,NotificationFrame.AbsoluteSize.Y)
-    NotificationFakeFrame.Size = NotificationFrame.Size
     NotificationFakeFrame.Parent = NotificationsHolder
+    --NotificationFrame.Size = UDim2.new(1,0,0,NotificationFrame.AbsoluteSize.Y)
+    --NotificationFakeFrame.Size = NotificationFrame.Size
     task.spawn(function()
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
         task.wait(GivenTable.Time or 3)
