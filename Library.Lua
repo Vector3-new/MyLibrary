@@ -184,7 +184,7 @@ function JustALibrary:CreateWindow(GivenTable)
 
     NotificationsHolder.ChildAdded:Connect(function(Notification)
         NewNotification = Notification:Clone()
-        if NewNotification.Frame:FindFirstChild("Sound") then NewNotification.Frame.Sound:Destroy() end
+        if NewNotification:WaitForChild("Frame"):FindFirstChild("Sound") then NewNotification.Frame.Sound:Destroy() end
         NewNotification.Parent = WindowNotificationsContentFrame
         NewNotification.LayoutOrder = #(WindowNotificationsContentFrame:GetChildren())
         NewNotification.Frame.Position = UDim2.fromScale(-1.1,0)
