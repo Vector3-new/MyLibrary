@@ -81,7 +81,7 @@ function JustALibrary:Notify(GivenTable)
     end
     NotificationFrame.Size = UDim2.new(1,0,0,NotificationFrame.AbsoluteSize.Y)
     NotificationFakeFrame.Size = NotificationFrame.Size
-    NotificationsHolder.Parent = NotificationsHolder
+    NotificationFakeFrame.Parent = NotificationsHolder
     task.spawn(function()
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
         task.wait(GivenTable.Time or 3)
@@ -529,6 +529,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 local IsToggled = false
                 if GivenTable.Default then
                     IsToggled = true
+                    ToggleButtonFrame.BackgroundColor3 = Color3.fromRGB(125,125,125)
                     SecondToggleButtonFrame.Position = UDim2.fromScale(0.5,0)
                 end
                 ToggleHolder.Value = IsToggled
