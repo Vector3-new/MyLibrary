@@ -49,7 +49,7 @@ function JustALibrary:Notify(GivenTable)
     local NotificationFakeFrame = Instance.new("Frame")
     NotificationFakeFrame.BackgroundTransparency = 1
     NotificationFakeFrame.Size = UDim2.new(1,0,0,0)
-    NotificationFakeFrameAutomaticSize = Enum.AutomaticSize.Y
+    NotificationFakeFrame.AutomaticSize = Enum.AutomaticSize.Y
     local NotificationFrame = Instance.new("Frame",NotificationFakeFrame)
     NotificationFrame.BackgroundTransparency = 0.6
     NotificationFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
