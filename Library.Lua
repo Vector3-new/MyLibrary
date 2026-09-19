@@ -46,7 +46,7 @@ NotificationsHolderList.Padding = UDim.new(0,5)
 NotificationsHolderList.VerticalAlignment = Enum.VerticalAlignment.Bottom
 
 function JustALibrary:Notify(GivenTable)
-    local NotificationFakeFrame = Instance.new("Frame",NotificationsHolder)
+    local NotificationFakeFrame = Instance.new("Frame")
     NotificationFakeFrame.BackgroundTransparency = 1
     NotificationFakeFrame.Size = UDim2.new(1,0,0,100)
     local NotificationFrame = Instance.new("Frame",NotificationFakeFrame)
@@ -81,6 +81,7 @@ function JustALibrary:Notify(GivenTable)
     end
     NotificationFrame.Size = UDim2.new(1,0,0,NotificationFrame.AbsoluteSize.Y)
     NotificationFakeFrame.Size = NotificationFrame.Size
+    NotificationsHolder.Parent = NotificationsHolder
     task.spawn(function()
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
         task.wait(GivenTable.Time or 3)
@@ -184,7 +185,7 @@ function JustALibrary:CreateWindow(GivenTable)
 
     NotificationsHolder.ChildAdded:Connect(function(Notification)
         NewNotification = Notification:Clone()
-        if NewNotification:WaitForChild("Frame"):FindFirstChild("Sound") then NewNotification.Frame.Sound:Destroy() end
+        if NewNotification.Frame:FindFirstChild("Sound") then NewNotification.Frame.Sound:Destroy() end
         NewNotification.Parent = WindowNotificationsContentFrame
         NewNotification.LayoutOrder = #(WindowNotificationsContentFrame:GetChildren())
         NewNotification.Frame.Position = UDim2.fromScale(-1.1,0)
