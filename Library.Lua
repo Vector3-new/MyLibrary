@@ -45,12 +45,12 @@ local Cursor = Instance.new("Frame",JustALibraryGUI)
 Cursor.BackgroundColor3 = Color3.fromRGB(0,0,0)
 Cursor.Position = UDim2.fromOffset(Mouse.X,Mouse.Y)
 Cursor.Size = UDim2.fromOffset(5,5)
-Cursor.ZIndex = -999
+Cursor.ZIndex = 999
 local CursorCorner = Instance.new("UICorner",Cursor)
 local CursorStroke = Instance.new("UIStroke",Cursor)
 CursorStroke.Color = Color3.fromRGB(255,255,255)
 CursorStroke.Thickness = 2
-Mouse.Move:Connect(function() Cursor.Position = UDim2.fromOffset(Mouse.X,Mouse.Y) UserInputService.MouseIconEnabled = false end)
+Mouse.Move:Connect(function() Cursor.Position = UDim2.fromOffset(Mouse.X,Mouse.Y) end)
 
 local NotificationsHolder = Instance.new("Frame",JustALibraryGUI)
 NotificationsHolder.BackgroundTransparency = 1
