@@ -3,6 +3,7 @@ while not game:IsLoaded() do task.wait() end
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
+UserInputService.MouseIconEnabled = true
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local P = game:GetService("Players")
@@ -86,8 +87,6 @@ function JustALibrary:Notify(GivenTable)
         NotificationSound:Play()
     end
     NotificationFakeFrame.Parent = NotificationsHolder
-    --NotificationFrame.Size = UDim2.new(1,0,0,NotificationFrame.AbsoluteSize.Y)
-    --NotificationFakeFrame.Size = NotificationFrame.Size
     task.spawn(function()
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
         task.wait(GivenTable.Time or 3)
@@ -1115,6 +1114,7 @@ function JustALibrary:CreateWindow(GivenTable)
     function Window:ToggleVisible()
         WindowFrame.Visible = not WindowFrame.Visible
         ModalElement.Visible = WindowFrame.Visible
+        UserInputService.MouseIconEnabled = WindowFrame.Visible
     end
 
     return Window
