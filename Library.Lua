@@ -3,7 +3,6 @@ while not game:IsLoaded() do task.wait() end
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
-UserInputService.MouseIconEnabled = true
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local P = game:GetService("Players")
@@ -41,6 +40,17 @@ local ModalElement = Instance.new("TextButton",JustALibraryGUI)
 ModalElement.BackgroundTransparency = 1
 ModalElement.ZIndex = -999
 ModalElement.Modal = true
+
+local Cursor = Instance.new("Frame",JustALibraryGUI)
+Cursor.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Cursor.Position = UDim2.fromOffset(Mouse.X,Mouse.Y)
+Cursor.Size = UDim2.fromOffset(5,5)
+Cursor.ZIndex = -999
+local CursorCorner = Instance.new("UICorner",Cursor)
+local CursorStroke = Instance.new("UISrtoke",Cursor)
+CursorStroke.Color = Color3.fromRGB(255,255,255)
+CursorStroke.Thickness = 2
+Mouse.Move:Connect(function() Cursor.Position = UDim2.fromOffset(Mouse.X,Mouse.Y) UserInputService.MouseIconEnabled = false end)
 
 local NotificationsHolder = Instance.new("Frame",JustALibraryGUI)
 NotificationsHolder.BackgroundTransparency = 1
@@ -1114,7 +1124,7 @@ function JustALibrary:CreateWindow(GivenTable)
     function Window:ToggleVisible()
         WindowFrame.Visible = not WindowFrame.Visible
         ModalElement.Visible = WindowFrame.Visible
-        UserInputService.MouseIconEnabled = WindowFrame.Visible
+        Cursor.Visible = WindowFrame.Visible
     end
 
     return Window
