@@ -773,7 +773,6 @@ function JustALibrary:CreateWindow(GivenTable)
                                     if Buttons.Name == ValueType then
                                         table.insert(SelectedValue,Buttons.Name)
                                         DropdownHolder.Value = SelectedValue
-                                        GivenTable.Callback(SelectedValue)
                                         TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
                                     elseif not table.find(SelectedValue,Buttons.Name) then
                                         TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
@@ -781,6 +780,7 @@ function JustALibrary:CreateWindow(GivenTable)
                                 end
                             end
                         end
+                        GivenTable.Callback(SelectedValue)
                     elseif not GivenTable.MultiSelection then
                         local ValueType
                         if typeof(Value) == "string" then ValueType = Value else ValueType = Value.Name end
@@ -789,13 +789,13 @@ function JustALibrary:CreateWindow(GivenTable)
                                 if Buttons.Name == ValueType then
                                     SelectedValue = Buttons.Name
                                     DropdownHolder.Value = SelectedValue
-                                    GivenTable.Callback(Value)
                                     TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
                                 else
                                     TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                                 end
                             end
                         end
+                        GivenTable.Callback(Value)
                     end
                 end
 
