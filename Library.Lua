@@ -36,6 +36,11 @@ if JustALibraryGUI then JustALibraryGUI:Destroy() end
 JustALibraryGUI = Instance.new("ScreenGui",CoreGui)
 JustALibraryGUI.Name = "JustALibrary"
 
+local ModalElement = Instance.new("TextButton",JustALibraryGUI)
+ModalElement.BackgroundTransparency = 1
+ModalElement.ZIndex = -999
+ModalElement.Modal = true
+
 local NotificationsHolder = Instance.new("Frame",JustALibraryGUI)
 NotificationsHolder.BackgroundTransparency = 1
 NotificationsHolder.AnchorPoint = Vector2.new(1,1)
@@ -1109,6 +1114,7 @@ function JustALibrary:CreateWindow(GivenTable)
 
     function Window:ToggleVisible()
         WindowFrame.Visible = not WindowFrame.Visible
+        ModalElement.Visible = WindowFrame.Visible
     end
 
     return Window
