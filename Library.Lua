@@ -1,5 +1,6 @@
 while not game:IsLoaded() do task.wait() end
 local Icons = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vector3-new/MyLibrary/refs/heads/main/Icons.Lua"))()
+local Lighting = game:GetService("Lighting")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
@@ -33,158 +34,128 @@ if JustALibraryGUI then JustALibraryGUI:Destroy() end
 JustALibraryGUI = Instance.new("ScreenGui",CoreGui)
 JustALibraryGUI.Name = "JustALibrary"
 
-local function NewFrame(GivenConfig)
+local LibraryBlur = Lighting:FindFirstChild("LibraryBlur")
+if LibraryBlur then LibraryBlur:Destroy() end
+LibraryBlur = Instance.new("BlurEffect",Lighting)
+LibraryBlur.Name = "LibraryBlur"
+LibraryBlur.Size = 0
+TweenService:Create(LibraryBlur,TweenInfo.new(0.25,Enum.EasingStyle.Linear),{Size = 12}):Play()
+
+local function NewFrame(GivenTable)
     local Frame
-    local Config = { 
-        Parent = GivenConfig.Parent or nil, 
-        BackgroundColor3 = GivenConfig.BackgroundColor3 or Color3.fromRGB(0,0,0), 
-        BackgroundTransparency = GivenConfig.BackgroundTransparency or 1,
-        AnchorPoint = GivenConfig.AnchorPoint or Vector2.new(0,0),
-        Size = GivenConfig.Size or UDim2.new(0,0,0,0),
-        AutomaticSize = GivenConfig.AutomaticSize or Enum.AutomaticSize.None,
-        Position = GivenConfig.Position or UDim2.new(0,0,0,0),
-        LayoutOrder = GivenConfig.LayoutOrder or 0,
-        ZIndex = GivenConfig.ZIndex or 0,
-        CornerRadius = GivenConfig.CornerRadius or false,
-        Padding = GivenConfig.Padding or false,
-        ListLayoutConfig = GivenConfig.ListLayoutConfig or nil,
-        ScrollingConfig = GivenConfig.ScrollingConfig or false
-    } 
-    if Config.ScrollingConfig then 
-        Frame = Instance.new("ScrollingFrame",Config.Parent)
+    local ScrollingConfig = GivenTable.ScrollingConfig or false
+    local Parent = GivenTable.Parent or nil
+    if ScrollingConfig then 
+        Frame = Instance.new("ScrollingFrame",Parent)
         Frame.ScrollBarThickness = 0
         Frame.CanvasSize = UDim2.new(0,0,0,0)
-        Frame.ScrollingDirection = Enum.ScrollingDirection[Config.ScrollingConfig.ScrollingDirection] or Enum.ScrollingDirection.Y
-        Frame.AutomaticCanvasSize = Enum.AutomaticSize[Config.ScrollingConfig.ScrollingDirection] or Enum.AutomaticSize.Y
+        Frame.ScrollingDirection = Enum.ScrollingDirection[ScrollingConfig.ScrollingDirection] or Enum.ScrollingDirection.Y
+        Frame.AutomaticCanvasSize = Enum.AutomaticSize[ScrollingConfig.ScrollingDirection] or Enum.AutomaticSize.Y
     else
-        Frame = Instance.new("Frame",Config.Parent) 
+        Frame = Instance.new("Frame",Parent) 
     end 
-    Frame.BackgroundColor3 = Config.BackgroundColor3 
-    Frame.BackgroundTransparency = Config.BackgroundTransparency
-    Frame.AnchorPoint = Config.AnchorPoint
-    Frame.Size = Config.Size
-    Frame.AutomaticSize = Config.AutomaticSize
-    Frame.Position = Config.Position
-    Frame.LayoutOrder = Config.LayoutOrder
-    Frame.ZIndex = Config.ZIndex
-    if Config.CornerRadius then
+    Frame.Name = GivenTable.Name or Frame.ClassName
+    Frame.Visible = GivenTable.Visible
+    Frame.BackgroundColor3 = GivenTable.BackgroundColor3 or Color3.fromRGB(0,0,0) 
+    Frame.BackgroundTransparency = GivenTable.BackgroundTransparency or 1
+    Frame.AnchorPoint = GivenTable.AnchorPoint or Vector2.new(0,0)
+    Frame.Size = GivenTable.Size or UDim2.new(0,0,0,0)
+    Frame.AutomaticSize = GivenTable.AutomaticSize or Enum.AutomaticSize.None
+    Frame.Position = GivenTable.Position or UDim2.new(0,0,0,0)
+    Frame.LayoutOrder = GivenTable.LayoutOrder or 0
+    Frame.ZIndex = GivenTable.ZIndex or 0
+    if GivenTable.CornerRadius then
         local UICorner = Instance.new("UICorner",Frame)
-        UICorner.CornerRadius = UDim.new(0,Config.CornerRadius)
+        UICorner.CornerRadius = UDim.new(0,GivenTable.CornerRadius)
     end
-    if Config.Padding then
+    if GivenTable.Padding then
         local UIPadding = Instance.new("UIPadding",Frame)
-        UIPadding.PaddingBottom = UDim.new(0,Config.Padding)
+        UIPadding.PaddingBottom = UDim.new(0,GivenTable.Padding)
     end
-    if Config.ListLayoutConfig then
+    local ListLayoutConfig = GivenTable.ListLayoutConfig
+    if ListLayoutConfig then
         local UIListLayout = Instance.new("UIListLayout",Frame)
-        UIListLayout.Padding = Config.ListLayoutConfig.Padding or UDim.new(0,0)
-        UIListLayout.FillDirection = Config.ListLayoutConfig.FillDirection or Enum.FillDirection.Vertical
-        UIListLayout.SortOrder = Config.ListLayoutConfig.SortOrder or Enum.SortOrder.LayoutOrder
-        UIListLayout.HorizontalAlignment = Config.ListLayoutConfig.HorizontalAlignment or Enum.HorizontalAlignment.Left
-        UIListLayout.VerticalAlignment = Config.ListLayoutConfig.VerticalAlignment or Enum.VerticalAlignment.Top
+        UIListLayout.Padding = ListLayoutConfig.Padding or UDim.new(0,0)
+        UIListLayout.FillDirection = ListLayoutConfig.FillDirection or Enum.FillDirection.Vertical
+        UIListLayout.SortOrder = ListLayoutConfig.SortOrder or Enum.SortOrder.LayoutOrder
+        UIListLayout.HorizontalAlignment = ListLayoutConfig.HorizontalAlignment or Enum.HorizontalAlignment.Left
+        UIListLayout.VerticalAlignment = ListLayoutConfig.VerticalAlignment or Enum.VerticalAlignment.Top
     end
     return Frame
 end
 
-local function NewText(GivenConfig)
-    local Config = {
-        Parent = GivenConfig.Parent or nil,
-        Text = GivenConfig.Text or "Text",
-        TextColor3 = GivenConfig.TextColor3 or Color3.fromRGB(255,255,255),
-        TextSize = GivenConfig.TextSize or 8,
-        TextWrapped = GivenConfig.TextWrapped or false,
-        TextScaled = GivenConfig.TextScaled or false,
-        TextXAlignment = GivenConfig.TextXAlignment or Enum.TextXAlignment.Center,
-        TextYAlignment = GivenConfig.TextYAlignment or Enum.TextYAlignment.Center,
-        BackgroundTransparency = GivenConfig.BackgroundTransparency or 1,
-        BackgroundColor3 = GivenConfig.BackgroundColor3 or Color3.fromRGB(0,0,0),
-        Size = GivenConfig.Size or UDim2.new(0,0,0,0),
-        Position = GivenConfig.Position or UDim2.new(0,0,0,0),
-        AutomaticSize = GivenConfig.AutomaticSize or Enum.AutomaticSize.None,
-        LayoutOrder = GivenConfig.LayoutOrder or 0,
-        CornerRadius = GivenConfig.CornerRadius or false,
-        Padding = GivenConfig.Padding or false
-    }
-    local TextLabel = Instance.new("TextLabel",Config.Parent)
-    TextLabel.BackgroundTransparency = Config.BackgroundTransparency
-    TextLabel.BackgroundColor3 = Config.BackgroundColor3
-    TextLabel.AutomaticSize = Config.AutomaticSize
-    TextLabel.Size = Config.Size
-    TextLabel.Position = Config.Position
-    TextLabel.LayoutOrder = Config.LayoutOrder
-    TextLabel.Text = Config.Text
-    TextLabel.TextColor3 = Config.TextColor3
-    TextLabel.TextSize = Config.TextSize
-    TextLabel.TextScaled = Config.TextScaled
-    TextLabel.TextWrapped = Config.TextWrapped
-    TextLabel.TextXAlignment = Config.TextXAlignment
-    TextLabel.TextYAlignment = Config.TextYAlignment
-    if Config.CornerRadius then
+local function NewText(GivenTable)
+    local TextLabel = Instance.new("TextLabel",GivenTable.Parent or nil)
+    TextLabel.Name = GivenTable.Name or TextLabel.ClassName
+    TextLabel.Visible = GivenTable.Visible
+    TextLabel.BackgroundTransparency = GivenTable.BackgroundTransparency or 1
+    TextLabel.BackgroundColor3 = GivenTable.BackgroundColor3 or Color3.fromRGB(0,0,0)
+    TextLabel.AutomaticSize = GivenTable.AutomaticSize or Enum.AutomaticSize.None
+    TextLabel.Size = GivenTable.Size or UDim2.new(0,0,0,0)
+    TextLabel.Position = GivenTable.Position or UDim2.new(0,0,0,0)
+    TextLabel.LayoutOrder = GivenTable.LayoutOrder or 0
+    TextLabel.Text = GivenTable.Text or "Text"
+    TextLabel.TextColor3 = GivenTable.TextColor3 or Color3.fromRGB(255,255,255)
+    TextLabel.TextSize = GivenTable.TextSize or 8
+    TextLabel.TextWrapped = GivenTable.TextWrapped or false
+    TextLabel.TextScaled = GivenTable.TextScaled or false
+    TextLabel.TextXAlignment = GivenTable.TextXAlignment or Enum.TextXAlignment.Center
+    TextLabel.TextYAlignment = GivenTable.TextYAlignment or Enum.TextYAlignment.Center
+    if GivenTable.CornerRadius then
         local UICorner = Instance.new("UICorner",TextLabel)
-        UICorner.CornerRadius = UDim.new(0,Config.CornerRadius)
+        UICorner.CornerRadius = UDim.new(0,GivenTable.CornerRadius)
     end
-    if Config.Padding then
+    if GivenTable.Padding then
         local UIPadding = Instance.new("UIPadding",TextLabel)
-        UIPadding.PaddingBottom = UDim.new(0,Config.Padding)
+        UIPadding.PaddingBottom = UDim.new(0,GivenTable.Padding)
     end
     return TextLabel
 end
 
-local function NewButton(GivenConfig)
-    local Config = {
-        Parent = GivenConfig.Parent or nil,
-        Text = GivenConfig.Text or "Button",
-        TextColor3 = GivenConfig.TextColor3 or Color3.fromRGB(255,255,255),
-        TextWrapped = GivenConfig.TextWrapped or false,
-        TextScaled = GivenConfig.TextScaled or false,
-        TextXAlignment = GivenConfig.TextXAlignment or Enum.TextXAlignment.Center,
-        TextYAlignment = GivenConfig.TextYAlignment or Enum.TextYAlignment.Center,
-        BackgroundTransparency = GivenConfig.BackgroundTransparency or 0,
-        BackgroundColor3 = GivenConfig.BackgroundColor3 or Color3.fromRGB(50,50,50),
-        Size = GivenConfig.Size or UDim2.new(0,0,0,0),
-        Position = GivenConfig.Position or UDim2.new(0,0,0,0),
-        AutomaticSize = GivenConfig.AutomaticSize or Enum.AutomaticSize.None,
-        LayoutOrder = GivenConfig.LayoutOrder or 0,
-        ZIndex = GivenConfig.ZIndex or 0,
-        CornerRadius = GivenConfig.CornerRadius or false
-    }
-    local TextButton = Instance.new("TextButton",Config.Parent)
-    TextButton.Text = Config.Text
-    TextButton.TextColor3 = Config.TextColor3
-    TextButton.TextScaled = Config.TextScaled
-    TextButton.TextWrapped = Config.TextWrapped
-    TextButton.TextXAlignment = Config.TextXAlignment
-    TextButton.TextYAlignment = Config.TextYAlignment
-    TextButton.BackgroundTransparency = Config.BackgroundTransparency
-    TextButton.BackgroundColor3 = Config.BackgroundColor3
-    TextButton.AutomaticSize = Config.AutomaticSize
-    TextButton.Size = Config.Size
-    TextButton.Position = Config.Position
-    TextButton.LayoutOrder = Config.LayoutOrder
-    TextButton.ZIndex = Config.ZIndex
-    if Config.CornerRadius then
+local function NewButton(GivenTable)
+    local TextButton = Instance.new("TextButton",GivenTable.Parent or nil)
+    TextButton.Name = GivenTable.Name or TextButton.ClassName
+    TextButton.Visible = GivenTable.Visible
+    TextButton.Text = GivenTable.Text or "Button"
+    TextButton.TextColor3 = GivenTable.TextColor3 or Color3.fromRGB(255,255,255)
+    TextButton.TextWrapped = GivenTable.TextWrapped or false
+    TextButton.TextScaled = GivenTable.TextScaled or false
+    TextButton.TextXAlignment = GivenTable.TextXAlignment or Enum.TextXAlignment.Center
+    TextButton.TextYAlignment = GivenTable.TextYAlignment or Enum.TextYAlignment.Center
+    TextButton.BackgroundTransparency = GivenTable.BackgroundTransparency or 0
+    TextButton.BackgroundColor3 = GivenTable.BackgroundColor3 or Color3.fromRGB(50,50,50)
+    TextButton.AutomaticSize = GivenTable.AutomaticSize or Enum.AutomaticSize.None
+    TextButton.Size = GivenTable.Size or UDim2.new(0,0,0,0)
+    TextButton.Position = GivenTable.Position or UDim2.new(0,0,0,0)
+    TextButton.LayoutOrder = GivenTable.LayoutOrder or 0
+    TextButton.ZIndex = GivenTable.ZIndex or 0
+    if GivenTable.CornerRadius then
         local UICorner = Instance.new("UICorner",TextButton)
-        UICorner.CornerRadius = UDim.new(0,Config.CornerRadius)
+        UICorner.CornerRadius = UDim.new(0,GivenTable.CornerRadius)
     end
     return TextButton
 end
 
 local ModalElement = NewButton({
     Parent = JustALibraryGUI,
+    Name = "ModalElement",
     BackgroundTransparency = 1,
     ZIndex = -999,
-    Text = ""
+    Text = "",
+    Visible = true
 })
 ModalElement.Modal = true
 
 local Cursor = NewFrame({
     Parent = JustALibraryGUI,
+    Name = "Cursor",
     BackgroundColor3 = Color3.fromRGB(255,255,255),
     BackgroundTransparency = 0,
-    Position = UDim2.fromOffset(Mouse.X, Mouse.Y),
-    Size = UDim2.fromOffset(5, 5),
+    Position = UDim2.fromOffset(Mouse.X,Mouse.Y),
+    Size = UDim2.fromOffset(5,5),
     ZIndex = 999,
-    CornerRadius = 8
+    CornerRadius = 8,
+    Visible = true
 })
 local CursorStroke = Instance.new("UIStroke",Cursor)
 CursorStroke.Color = Color3.fromRGB(0,0,0)
@@ -193,6 +164,7 @@ Mouse.Move:Connect(function() Cursor.Position = UDim2.fromOffset(Mouse.X,Mouse.Y
 
 local NotificationsHolder = NewFrame({
     Parent = JustALibraryGUI,
+    Name = "NotificationsHolder",
     BackgroundTransparency = 1,
     AnchorPoint = Vector2.new(1,1),
     Position = UDim2.new(1,-10,1,-10),
@@ -200,17 +172,21 @@ local NotificationsHolder = NewFrame({
     ListLayoutConfig = {
         Padding = UDim.new(0,5),
         VerticalAlignment = Enum.VerticalAlignment.Bottom
-    }
+    },
+    Visible = true
 })
 
 function JustALibrary:Notify(GivenTable)
     local NotificationFakeFrame = NewFrame({
+        Name = "NotificationFakeFrame",
         BackgroundTransparency = 1,
         Size = UDim2.new(1,0,0,0),
-        AutomaticSize = Enum.AutomaticSize.Y
+        AutomaticSize = Enum.AutomaticSize.Y,
+        Visible = true
     })
     local NotificationFrame = NewFrame({
         Parent = NotificationFakeFrame,
+        Name = "NotificationFrame",
         BackgroundColor3 = Color3.fromRGB(0,0,0),
         BackgroundTransparency = 0.4,
         Position = UDim2.fromScale(1.1,0),
@@ -218,20 +194,24 @@ function JustALibrary:Notify(GivenTable)
         AutomaticSize = Enum.AutomaticSize.Y,
         CornerRadius = 8,
         Padding = 5,
-        ListLayoutConfig = {SortOrder = Enum.SortOrder.LayoutOrder,HorizontalAlignment = Enum.HorizontalAlignment.Center}
+        ListLayoutConfig = {SortOrder = Enum.SortOrder.LayoutOrder,HorizontalAlignment = Enum.HorizontalAlignment.Center},
+        Visible = true
     })
     local NotificationTitle = NewText({
         Parent = NotificationFrame,
+        Name = "NotificationTitle",
         BackgroundTransparency = 1,
         Size = UDim2.fromOffset(280,25),
         LayoutOrder = #(NotificationFrame:GetChildren()),
         TextColor3 = Color3.fromRGB(255,255,255),
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Text = GivenTable.Title or "Notification"
+        Text = GivenTable.Title or "Notification",
+        Visible = true
     })
     local NotificationContent = NewText({
         Parent = NotificationFrame,
+        Name = "NotificationContent",
         BackgroundTransparency = 1,
         LayoutOrder = #(NotificationFrame:GetChildren()),
         Size = UDim2.fromOffset(280,0),
@@ -240,15 +220,18 @@ function JustALibrary:Notify(GivenTable)
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
         Text = GivenTable.Content or "Hello World!",
-        Padding = 3
+        Padding = 3,
+        Visible = true
     })
     local NotificationTimeFrame = NewFrame({
         Parent = NotificationFrame,
+        Name = "NotificationTime",
         BackgroundColor3 = Color3.fromRGB(255,255,255),
         BackgroundTransparency = 0,
         LayoutOrder = #(NotificationFrame:GetChildren()),
         Size = UDim2.new(0,0,0,3),
-        CornerRadius = 8
+        CornerRadius = 8,
+        Visible = true
     })
     if GivenTable.Sound then
         local NotificationSound = Instance.new("Sound",NotificationFrame)
@@ -271,217 +254,288 @@ function JustALibrary:CreateWindow(GivenTable)
 
     local Window = {}
 
-    local WindowFrame = Instance.new("Frame",JustALibraryGUI)
-    WindowFrame.Name = GivenTable.Title or "Window"
-    WindowFrame.Size = GivenTable.Size or UDim2.fromOffset(650,550)
-    WindowFrame.Position = UDim2.new(0.5,-WindowFrame.Size.X.Offset/2,0.5,-WindowFrame.Size.Y.Offset/2)
-    WindowFrame.BackgroundTransparency = 1
-    local WindowCorner = Instance.new("UICorner",WindowFrame)
+    local WindowSize = GivenTable.Size or UDim2.fromOffset(650,550)
+    local WindowFrame = NewFrame({
+        Parent = JustALibraryGUI,
+        Name = "WindowFrame",
+        Size = WindowSize,
+        Position = UDim2.new(0.5,-WindowSize.X.Offset/2,0.5,-WindowSize.Y.Offset/2),
+        BackgroundTransparency = 1,
+        CornerRadius = 8,
+        Visible = true
+    })
 
-    local WindowTabsDividerFrame = Instance.new("Frame",WindowFrame)
-    WindowTabsDividerFrame.Name = "TabsDivider"
-    WindowTabsDividerFrame.Position = UDim2.new(0.26,0,0,-60)
-    WindowTabsDividerFrame.Size = UDim2.new(0.01,0,0,50)
-    WindowTabsDividerFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    WindowTabsDividerFrame.BackgroundTransparency = 0.6
-    local WindowTitleCorner = Instance.new("UICorner",WindowTabsDividerFrame)
+    local WindowTitle = NewFrame({
+        Parent = WindowFrame,
+        Name = "WindowTitle",
+        Size = UDim2.new(0.2,0,0,50),
+        Position = UDim2.new(0,0,0,-60),
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        BackgroundTransparency = 0.6,
+        CornerRadius = 8,
+        Visible = true
+    })
+    local WindowTitleText = NewText({
+        Parent = WindowTitle,
+        Name = "WindowTitleText",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(0.9,0.9),
+        Position = UDim2.fromScale(0.05,0.05),
+        TextScaled = true,
+        TextColor3 = Color3.fromRGB(255,255,255),
+        Text = GivenTable.Title or "Window",
+        Visible = true
+    })
+    local WindowTitleButton = NewButton({
+        Parent = WindowTitle,
+        Name = "WindowTitleButton",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1,1),
+        Text = "",
+        Visible = true
+    })
 
-    local SecondWindowTabsDividerFrame = WindowTabsDividerFrame:Clone()
-    SecondWindowTabsDividerFrame.Parent = WindowFrame
-    SecondWindowTabsDividerFrame.Name = "SecondTabsDivider"
-    SecondWindowTabsDividerFrame.Position = UDim2.new(0.89,0,0,-60)
+    local TabsDivider = NewFrame({
+        Parent = WindowFrame,
+        Name = "TabsDivider",
+        Position = UDim2.new(0.21,0,0,-60),
+        Size = UDim2.new(0.01,0,0,50),
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        BackgroundTransparency = 0.6,
+        CornerRadius = 8,
+        Visible = true
+    })
+    local TabsFrame = NewFrame({
+        Parent = WindowFrame,
+        Name = "TabsFrame",
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0.23,0,0,-60),
+        Size = UDim2.new(0.54,0,0,50),
+        ScrollingConfig = {
+            ScrollingDirection = "X"
+        },
+        ListLayoutConfig = {
+            Padding = UDim.new(0,10),
+            FillDirection = Enum.FillDirection.Horizontal,
+            SortOrder = Enum.SortOrder.LayoutOrder
+        },
+        Visible = true
+    })
+    local SecondTabsDivider = NewFrame({
+        Parent = WindowFrame,
+        Name = "SecondTabsDivider",
+        Position = UDim2.new(0.78,0,0,-60),
+        Size = UDim2.new(0.01,0,0,50),
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        BackgroundTransparency = 0.6,
+        CornerRadius = 8,
+        Visible = true
+    })
 
-    local WindowTabsFrame = Instance.new("ScrollingFrame",WindowFrame)
-    WindowTabsFrame.Name = "TabsFrame"
-    WindowTabsFrame.BackgroundTransparency = 1
-    WindowTabsFrame.Position = UDim2.new(0.28,0,0,-60)
-    WindowTabsFrame.Size = UDim2.new(0.6,0,0,50)
-    WindowTabsFrame.ScrollBarThickness = 0
-    WindowTabsFrame.AutomaticCanvasSize = Enum.AutomaticSize.X
-    WindowTabsFrame.ScrollingDirection = Enum.ScrollingDirection.X
-    local WindowTabsListLayout = Instance.new("UIListLayout",WindowTabsFrame)
-    WindowTabsListLayout.Padding = UDim.new(0,10)
-    WindowTabsListLayout.FillDirection = Enum.FillDirection.Horizontal
-    WindowTabsListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    
-    local WindowTitleFrame = Instance.new("Frame",WindowFrame)
-    WindowTitleFrame.Name = "Title"
-    WindowTitleFrame.Size = UDim2.new(0.25,0,0,50)
-    WindowTitleFrame.Position = UDim2.new(0,0,0,-60)
-    WindowTitleFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    WindowTitleFrame.BackgroundTransparency = 0.6
-    local WindowTitleCorner = Instance.new("UICorner",WindowTitleFrame)
+    local NotificationsFrame = NewFrame({
+        Parent = WindowFrame,
+        Name = "NotificationsFrame",
+        Size = UDim2.new(0.2,0,0,50),
+        Position = UDim2.new(0.8,0,0,-60),
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        BackgroundTransparency = 0.6,
+        CornerRadius = 8,
+        Visible = true
+    })
+    local NotificationsFrameText = NewText({
+        Parent = NotificationsFrame,
+        Name = "NotificationsFrameText",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(0.9,0.9),
+        Position = UDim2.fromScale(0.05,0.05),
+        TextScaled = true,
+        TextColor3 = Color3.fromRGB(255,255,255),
+        Text = "Notifications",
+        Visible = true
+    })
+    local NotificationsFrameButton = NewButton({
+        Parent = NotificationsFrame,
+        Name = "NotificationsFrameButton",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1,1),
+        Text = "",
+        Visible = true
+    })
+    local NotificationsContentFrame = NewFrame({
+        Parent = WindowFrame,
+        Name = "NotificationsContentFrame",
+        Size = UDim2.fromOffset(200,WindowFrame.Size.Y.Offset-50),
+        Position = UDim2.fromOffset(WindowFrame.Size.X.Offset+10,0),
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        BackgroundTransparency = 0.6,
+        CornerRadius = 8,
+        Visible = false,
+        ScrollingConfig = {
+            ScrollingDirection = "Y"
+        },
+        ListLayoutConfig = {
+            Padding = UDim.new(0,5),
+            SortOrder = Enum.SortOrder.LayoutOrder
+        }
+    })
+    local NotificationsClearAllButton = NewButton({
+        Parent = WindowFrame,
+        Name = "NotificationsClearAllButton",
+        BackgroundTransparency = 0.6,
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        Size = UDim2.fromOffset(200,40),
+        Position = UDim2.fromOffset(WindowFrame.Size.X.Offset+10,WindowFrame.Size.Y.Offset-40),
+        TextScaled = true,
+        TextColor3 = Color3.fromRGB(255,255,255),
+        Text = "Clear All",
+        CornerRadius = 8,
+        Visible = false
+    })
 
-    local WindowTitleLabel = Instance.new("TextLabel",WindowTitleFrame)
-    WindowTitleLabel.BackgroundTransparency = 1
-    WindowTitleLabel.Size = UDim2.fromScale(1,1)
-    WindowTitleLabel.TextScaled = true
-    WindowTitleLabel.TextColor3 = Color3.fromRGB(255,255,255)
-    WindowTitleLabel.Text = GivenTable.Title or "Window"
-
-    local WindowTitleButton = Instance.new("TextButton",WindowTitleFrame)
-    WindowTitleButton.BackgroundTransparency = 1
-    WindowTitleButton.TextTransparency = 1
-    WindowTitleButton.Size = UDim2.fromScale(1,1)
     WindowTitleButton.MouseButton1Click:Connect(function()
-        for _,TabFrames in WindowTabsFrame:GetChildren() do
+        for _,TabFrames in TabsFrame:GetChildren() do
             if TabFrames:IsA("Frame") then
                 WindowFrame[TabFrames.Name].Visible = false
                 TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
             end
         end
-        TweenService:Create(WindowTitleFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
+        TweenService:Create(WindowTitle,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
         task.wait(0.3)
-        TweenService:Create(WindowTitleFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+        TweenService:Create(WindowTitle,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
     end)
 
-    local WindowNotificationsFrame = WindowTitleFrame:Clone()
-    WindowNotificationsFrame.TextLabel.Text = "Notifications"
-    WindowNotificationsFrame.TextLabel.Size = UDim2.fromScale(0.9,0.9)
-    WindowNotificationsFrame.TextLabel.Position = UDim2.fromScale(0.05,0.05)
-    WindowNotificationsFrame.Parent = WindowFrame
-    WindowNotificationsFrame.Name = "Notifications"
-    WindowNotificationsFrame.Size = UDim2.new(0.09,0,0,50)
-    WindowNotificationsFrame.Position = UDim2.new(0.91,0,0,-60)
-
-    local WindowNotificationsContentFrame = Instance.new("ScrollingFrame",WindowFrame)
-    WindowNotificationsContentFrame.Name = "NotificationsFrame"
-    WindowNotificationsContentFrame.Size = UDim2.fromOffset(200,WindowFrame.Size.Y.Offset-50)
-    WindowNotificationsContentFrame.Position = UDim2.fromOffset(WindowFrame.Size.X.Offset+10,0)
-    WindowNotificationsContentFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    WindowNotificationsContentFrame.BackgroundTransparency = 0.6
-    WindowNotificationsContentFrame.ScrollBarThickness = 0
-    WindowNotificationsContentFrame.CanvasSize = UDim2.fromScale(0,0)
-    WindowNotificationsContentFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    WindowNotificationsContentFrame.ScrollingDirection = Enum.ScrollingDirection.Y
-    WindowNotificationsContentFrame.Visible = false
-    local WindowNotificationsContentCorner = Instance.new("UICorner",WindowNotificationsContentFrame)
-    local WindowNotificationsContentListLayout = Instance.new("UIListLayout",WindowNotificationsContentFrame)
-    WindowNotificationsContentListLayout.Padding = UDim.new(0,5)
-    WindowNotificationsContentListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-
-    NotificationsHolder.ChildAdded:Connect(function(Notification)
-        NewNotification = Notification:Clone()
-        if NewNotification.Frame:FindFirstChild("Sound") then NewNotification.Frame.Sound:Destroy() end
-        if NewNotification.Frame:FindFirstChild("Frame") then NewNotification.Frame.Frame:Destroy() end
-        if NewNotification.Frame:FindFirstChild("UIPadding") then NewNotification.Frame.UIPadding:Destroy() end
-        NewNotification.Parent = WindowNotificationsContentFrame
-        NewNotification.LayoutOrder = #(WindowNotificationsContentFrame:GetChildren())
-        NewNotification.Frame.Position = UDim2.fromScale(-1.1,0)
-        for _,Labels in NewNotification.Frame:GetChildren() do if Labels:IsA("TextLabel") then Labels.Size = UDim2.fromOffset(180,25) end end
-        NewNotification.Frame.Size = UDim2.fromScale(1,1)
-        NewNotification.Size = UDim2.new(1,0,0,NewNotification.Frame.AbsoluteSize.Y)
-        TweenService:Create(NewNotification.Frame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
-    end)
-
-    local WindowNotificationsClearAllButton = Instance.new("TextButton",WindowFrame)
-    WindowNotificationsClearAllButton.BackgroundTransparency = 0.6
-    WindowNotificationsClearAllButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    WindowNotificationsClearAllButton.Visible = false
-    WindowNotificationsClearAllButton.Size = UDim2.fromOffset(200,40)
-    WindowNotificationsClearAllButton.Position = UDim2.fromOffset(WindowFrame.Size.X.Offset+10,WindowFrame.Size.Y.Offset-40)
-    WindowNotificationsClearAllButton.TextScaled = true
-    WindowNotificationsClearAllButton.TextColor3 = Color3.fromRGB(255,255,255)
-    WindowNotificationsClearAllButton.Text = "Clear All"
-    local WindowNotificationsClearAllCorner = Instance.new("UICorner",WindowNotificationsClearAllButton)
-
-    local NotifyMenuVisible = false
-
-    WindowNotificationsFrame.TextButton.MouseButton1Click:Connect(function()
-        if NotifyMenuVisible then
-            NotifyMenuVisible = false
-            WindowNotificationsContentFrame.Visible = false
-            WindowNotificationsClearAllButton.Visible = false
-            TweenService:Create(WindowNotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+    NotificationsFrameButton.MouseButton1Click:Connect(function()
+        if  NotificationsContentFrame.Visible then
+            NotificationsContentFrame.Visible = false NotificationsClearAllButton.Visible = false
+            TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
         else
-            NotifyMenuVisible = true
-            WindowNotificationsContentFrame.Visible = true
-            WindowNotificationsClearAllButton.Visible = true
-            TweenService:Create(WindowNotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
+            NotificationsContentFrame.Visible = true NotificationsClearAllButton.Visible = true
+            TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
         end
     end)
-
-    WindowNotificationsClearAllButton.MouseButton1Click:Connect(function()
-        for _,Notifications in WindowNotificationsContentFrame:GetChildren() do
+    
+    NotificationsClearAllButton.MouseButton1Click:Connect(function()
+        for _,Notifications in NotificationsContentFrame:GetChildren() do
             if Notifications:IsA("Frame") then
-                TweenService:Create(Notifications.Frame,TweenInfo.new(0.5,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position = UDim2.fromScale(1.5,0)}):Play()
-                task.spawn(function() task.wait(0.75);Notifications:Destroy() end);task.wait(0.05)
+                TweenService:Create(Notifications.NotificationFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position = UDim2.fromScale(1.5,0)}):Play()
+                task.spawn(function() task.wait(0.6) Notifications:Destroy() end) task.wait(0.05)
             end
         end
+    end)
+    
+    NotificationsHolder.ChildAdded:Connect(function(Notification)
+        local NewNotification = Notification:Clone()
+        if NewNotification.NotificationFrame:FindFirstChild("Sound") then NewNotification.NotificationFrame.Sound:Destroy() end
+        if NewNotification.NotificationFrame:FindFirstChild("NotificationTime") then NewNotification.NotificationFrame.NotificationTime:Destroy() end
+        if NewNotification.NotificationFrame:FindFirstChild("UIPadding") then NewNotification.NotificationFrame.UIPadding:Destroy() end
+        NewNotification.Parent = NotificationsContentFrame
+        NewNotification.LayoutOrder = #(NotificationsContentFrame:GetChildren())
+        NewNotification.NotificationFrame.Position = UDim2.fromScale(-1.1,0)
+        for _,Labels in NewNotification.NotificationFrame:GetChildren() do if Labels:IsA("TextLabel") then Labels.Size = UDim2.fromOffset(180,25) end end
+        NewNotification.NotificationFrame.Size = UDim2.fromScale(1,1)
+        NewNotification.Size = UDim2.new(1,0,0,NewNotification.NotificationFrame.AbsoluteSize.Y)
+        TweenService:Create(NewNotification.NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
     end)
 
     function Window:AddTab(GivenTable)
 
         local Tab = {}
 
-        local TabFrame = Instance.new("Frame",WindowTabsFrame)
-        TabFrame.Name = GivenTable.Name or "Tab"
-        TabFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-        TabFrame.BackgroundTransparency = 0.6
-        TabFrame.Size = UDim2.fromOffset(150,50)
-        TabFrame.LayoutOrder = #(WindowTabsFrame:GetChildren())
+        local TabFrame = NewFrame({
+            Parent = TabsFrame,
+            Name = GivenTable.Name or "Tab",
+            BackgroundColor3 = Color3.fromRGB(0,0,0),
+            BackgroundTransparency = 0.6,
+            Size = UDim2.fromOffset(150,50),
+            LayoutOrder = #(TabsFrame:GetChildren()),
+            CornerRadius = 8,
+            Visible = true
+        })
 
-        local TabLabel = Instance.new("TextLabel",TabFrame)
-        TabLabel.BackgroundTransparency = 1
-        TabLabel.TextColor3 = Color3.fromRGB(255,255,255)
-        TabLabel.TextScaled = true
-        TabLabel.Text = GivenTable.Name or "Tab"
+        local TabLabel = NewText({
+            Parent = TabFrame,
+            Name = "TabLabel",
+            BackgroundTransparency = 1,
+            TextColor3 = Color3.fromRGB(255,255,255),
+            TextScaled = true,
+            Text = GivenTable.Name or "Tab",
+            Size = GivenTable.Icon and UDim2.fromOffset(90,25) or UDim2.fromOffset(130,25),
+            Position = GivenTable.Icon and UDim2.fromOffset(45,12) or UDim2.fromOffset(10,12),
+            Visible = true
+        })
+
         if GivenTable.Icon then
-            TabLabel.Size = UDim2.fromOffset(90,25)
-            TabLabel.Position = UDim2.fromOffset(45,12)
             local TabIcon = Instance.new("ImageLabel",TabFrame)
-            TabIcon.Name = "Icon"
             TabIcon.BackgroundTransparency = 1
             TabIcon.Position = UDim2.fromOffset(10,10)
             TabIcon.Size = UDim2.fromOffset(30,30)
             TabIcon.Image = Icons.assets[GivenTable.Icon]
-        else
-            TabLabel.Size = UDim2.fromOffset(130,25)
-            TabLabel.Position = UDim2.fromOffset(10,12)
         end
 
-        local TabCorner = Instance.new("UICorner",TabFrame)
-        local TabContentFrame = Instance.new("Frame",WindowFrame)
-        TabContentFrame.Name = GivenTable.Name or "Tab"
-        TabContentFrame.BackgroundTransparency = 0.6
-        TabContentFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-        TabContentFrame.Size = UDim2.fromScale(1,1)
-        TabContentFrame.Visible = false
-        local TabContentCorner = Instance.new("UICorner",TabContentFrame)
+        local TabContentFrame = NewFrame({
+            Parent = WindowFrame,
+            Name = GivenTable.Name or "Tab",
+            BackgroundTransparency = 0.6,
+            BackgroundColor3 = Color3.fromRGB(0,0,0),
+            Size = UDim2.fromScale(1,1),
+            CornerRadius = 8,
+            Visible = false
+        })
 
-        local TabButton = Instance.new("TextButton",TabFrame)
-        TabButton.BackgroundTransparency = 1
-        TabButton.TextTransparency = 1
-        TabButton.Size = UDim2.fromScale(1,1)
+        local TabButton = NewButton({
+            Parent = TabFrame,
+            Name = "TabButton",
+            BackgroundTransparency = 1,
+            Size = UDim2.fromScale(1,1),
+            Text = "",
+            Visible = true
+        })
+
         TabButton.MouseButton1Click:Connect(function()
-            for _,TabFrames in WindowTabsFrame:GetChildren() do
-                if TabFrames:IsA("Frame") and TabFrames == TabButton.Parent then
-                    WindowFrame[TabFrames.Name].Visible = true
-                    TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
-                elseif TabFrames:IsA("Frame") then
-                    WindowFrame[TabFrames.Name].Visible = false
-                    TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+            for _,TabFrames in TabsFrame:GetChildren() do
+                if TabFrames:IsA("Frame") then
+                    if TabFrames == TabFrame then
+                        WindowFrame[TabFrames.Name].Visible = true
+                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
+                    else
+                        WindowFrame[TabFrames.Name].Visible = false
+                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                    end
                 end
             end
         end)
 
-        local TabContentScrollingFrame = Instance.new("ScrollingFrame",TabContentFrame)
-        TabContentScrollingFrame.Name = "LeftScrollingFrame"
-        TabContentScrollingFrame.Size = UDim2.fromScale(0.47,0.95)
-        TabContentScrollingFrame.Position = UDim2.fromScale(0.025,0.025)
-        TabContentScrollingFrame.BackgroundTransparency = 1
-        TabContentScrollingFrame.ScrollBarThickness = 0
-        TabContentScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y
-        TabContentScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-        TabContentScrollingFrame.CanvasSize = UDim2.fromScale(0,0)
-        local TabContentScrollingLayout = Instance.new("UIListLayout",TabContentScrollingFrame)
-        TabContentScrollingLayout.Padding = UDim.new(0,8)
-        TabContentScrollingLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        local SecondTabContentScrollingFrame = TabContentScrollingFrame:Clone()
-        SecondTabContentScrollingFrame.Parent = TabContentFrame
-        SecondTabContentScrollingFrame.Name = "RightScrollingFrame"
-        SecondTabContentScrollingFrame.Size = UDim2.fromScale(0.47,0.95)
-        SecondTabContentScrollingFrame.Position = UDim2.fromScale(0.505,0.025)
+        local TabContentScrollingFrame = NewFrame({
+            Parent = TabContentFrame,
+            Name = "TabContentScrollingFrame",
+            Size = UDim2.fromScale(0.47,0.95),
+            Position = UDim2.fromScale(0.025,0.025),
+            BackgroundTransparency = 1,
+            ScrollingConfig = {
+                ScrollingDirection = "Y"
+            },
+            ListLayoutConfig = {
+                Padding = UDim.new(0,8),
+                SortOrder = Enum.SortOrder.LayoutOrder
+            },
+            Visible = true
+        })
+
+        local SecondTabContentScrollingFrame = NewFrame({
+            Parent = TabContentFrame,
+            Name = "SecondTabContentScrollingFrame",
+            Size = UDim2.fromScale(0.47,0.95),
+            Position = UDim2.fromScale(0.505,0.025),
+            BackgroundTransparency = 1,
+            ScrollingConfig = {
+                ScrollingDirection = "Y"
+            },
+            ListLayoutConfig = {
+                Padding = UDim.new(0,8),
+                SortOrder = Enum.SortOrder.LayoutOrder
+            },
+            Visible = true
+        })
 
         function Tab:AddContentBox(GivenTable)
 
@@ -1289,6 +1343,11 @@ function JustALibrary:CreateWindow(GivenTable)
         WindowFrame.Visible = not WindowFrame.Visible
         ModalElement.Visible = WindowFrame.Visible
         Cursor.Visible = WindowFrame.Visible
+        if WindowFrame.Visible then
+            TweenService:Create(LibraryBlur,TweenInfo.new(0.1,Enum.EasingStyle.Linear),{Size = 12}):Play()
+        else
+            TweenService:Create(LibraryBlur,TweenInfo.new(0.25,Enum.EasingStyle.Linear),{Size = 0}):Play()
+        end
     end
 
     return Window
