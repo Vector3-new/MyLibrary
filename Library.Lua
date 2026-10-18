@@ -41,102 +41,73 @@ LibraryBlur.Name = "LibraryBlur"
 LibraryBlur.Size = 0
 TweenService:Create(LibraryBlur,TweenInfo.new(0.25,Enum.EasingStyle.Linear),{Size = 12}):Play()
 
-local function NewFrame(GivenTable)
-    local Frame
-    local ScrollingConfig = GivenTable.ScrollingConfig or false
-    local Parent = GivenTable.Parent or nil
-    if ScrollingConfig then 
-        Frame = Instance.new("ScrollingFrame",Parent)
-        Frame.ScrollBarThickness = 0
-        Frame.CanvasSize = UDim2.new(0,0,0,0)
-        Frame.ScrollingDirection = Enum.ScrollingDirection[ScrollingConfig.ScrollingDirection] or Enum.ScrollingDirection.Y
-        Frame.AutomaticCanvasSize = Enum.AutomaticSize[ScrollingConfig.ScrollingDirection] or Enum.AutomaticSize.Y
+local function New(GivenTable)
+
+    local Object
+
+    if (GivenTable.ClassName or "Frame") == "Frame" and GivenTable.ScrollingConfig then
+        Object = Instance.new("ScrollingFrame",GivenTable.Parent)
+        Object.ScrollBarThickness = 0
+        Object.CanvasSize = UDim2.new(0,0,0,0)
+        Object.ScrollingDirection = Enum.ScrollingDirection[GivenTable.ScrollingConfig.ScrollingDirection] or Enum.ScrollingDirection.Y
+        Object.AutomaticCanvasSize = Enum.AutomaticSize[GivenTable.ScrollingConfig.ScrollingDirection] or Enum.AutomaticSize.Y
     else
-        Frame = Instance.new("Frame",Parent) 
-    end 
-    Frame.Name = GivenTable.Name or Frame.ClassName
-    Frame.Visible = GivenTable.Visible
-    Frame.BackgroundColor3 = GivenTable.BackgroundColor3 or Color3.fromRGB(0,0,0) 
-    Frame.BackgroundTransparency = GivenTable.BackgroundTransparency or 1
-    Frame.AnchorPoint = GivenTable.AnchorPoint or Vector2.new(0,0)
-    Frame.Size = GivenTable.Size or UDim2.new(0,0,0,0)
-    Frame.AutomaticSize = GivenTable.AutomaticSize or Enum.AutomaticSize.None
-    Frame.Position = GivenTable.Position or UDim2.new(0,0,0,0)
-    Frame.LayoutOrder = GivenTable.LayoutOrder or 0
-    Frame.ZIndex = GivenTable.ZIndex or 0
+        Object = Instance.new(GivenTable.ClassName or "Frame",GivenTable.Parent)
+    end
+
+    Object.Name = GivenTable.Name or Object.ClassName
+    Object.Visible = GivenTable.Visible
+    Object.BackgroundColor3 = GivenTable.BackgroundColor3 or Color3.fromRGB(0,0,0)
+    Object.BackgroundTransparency = GivenTable.BackgroundTransparency or 1
+    Object.AnchorPoint = GivenTable.AnchorPoint or Vector2.new(0,0)
+    Object.Size = GivenTable.Size or UDim2.new(0,0,0,0)
+    Object.AutomaticSize = GivenTable.AutomaticSize or Enum.AutomaticSize.None
+    Object.Position = GivenTable.Position or UDim2.new(0,0,0,0)
+    Object.LayoutOrder = GivenTable.LayoutOrder or 0
+    Object.ZIndex = GivenTable.ZIndex or 0
+
+    if GivenTable.ClassName == "TextLabel" or GivenTable.ClassName == "TextButton" then
+        Object.Text = GivenTable.Text or (GivenTable.ClassName == "TextLabel" and "Text" or "Button")
+        Object.TextColor3 = GivenTable.TextColor3 or Color3.fromRGB(255,255,255)
+        Object.TextSize = GivenTable.TextSize or 8
+        Object.TextWrapped = GivenTable.TextWrapped or false
+        Object.TextScaled = GivenTable.TextScaled or false
+        Object.TextTransparency = GivenTable.TextTransparency or 0
+        Object.TextXAlignment = GivenTable.TextXAlignment or Enum.TextXAlignment.Center
+        Object.TextYAlignment = GivenTable.TextYAlignment or Enum.TextYAlignment.Center
+    end
+
+    if GivenTable.ClassName == "ImageLabel" then
+        Object.Image = GivenTable.Image or ""
+        Object.ImageColor3 = GivenTable.ImageColor3 or Color3.fromRGB(255,255,255)
+        Object.ImageTransparency = GivenTable.ImageTransparency or 0
+    end
+
     if GivenTable.CornerRadius then
-        local UICorner = Instance.new("UICorner",Frame)
+        local UICorner = Instance.new("UICorner",Object)
         UICorner.CornerRadius = UDim.new(0,GivenTable.CornerRadius)
     end
+
     if GivenTable.Padding then
-        local UIPadding = Instance.new("UIPadding",Frame)
+        local UIPadding = Instance.new("UIPadding",Object)
         UIPadding.PaddingBottom = UDim.new(0,GivenTable.Padding)
     end
-    local ListLayoutConfig = GivenTable.ListLayoutConfig
-    if ListLayoutConfig then
-        local UIListLayout = Instance.new("UIListLayout",Frame)
-        UIListLayout.Padding = ListLayoutConfig.Padding or UDim.new(0,0)
-        UIListLayout.FillDirection = ListLayoutConfig.FillDirection or Enum.FillDirection.Vertical
-        UIListLayout.SortOrder = ListLayoutConfig.SortOrder or Enum.SortOrder.LayoutOrder
-        UIListLayout.HorizontalAlignment = ListLayoutConfig.HorizontalAlignment or Enum.HorizontalAlignment.Left
-        UIListLayout.VerticalAlignment = ListLayoutConfig.VerticalAlignment or Enum.VerticalAlignment.Top
+
+    if GivenTable.ListLayoutConfig then
+        local UIListLayout = Instance.new("UIListLayout",Object)
+        UIListLayout.Padding = GivenTable.ListLayoutConfig.Padding or UDim.new(0,0)
+        UIListLayout.FillDirection = GivenTable.ListLayoutConfig.FillDirection or Enum.FillDirection.Vertical
+        UIListLayout.SortOrder = GivenTable.ListLayoutConfig.SortOrder or Enum.SortOrder.LayoutOrder
+        UIListLayout.HorizontalAlignment = GivenTable.ListLayoutConfig.HorizontalAlignment or Enum.HorizontalAlignment.Left
+        UIListLayout.VerticalAlignment = GivenTable.ListLayoutConfig.VerticalAlignment or Enum.VerticalAlignment.Top
     end
-    return Frame
+
+    return Object
+
 end
 
-local function NewText(GivenTable)
-    local TextLabel = Instance.new("TextLabel",GivenTable.Parent or nil)
-    TextLabel.Name = GivenTable.Name or TextLabel.ClassName
-    TextLabel.Visible = GivenTable.Visible
-    TextLabel.BackgroundTransparency = GivenTable.BackgroundTransparency or 1
-    TextLabel.BackgroundColor3 = GivenTable.BackgroundColor3 or Color3.fromRGB(0,0,0)
-    TextLabel.AutomaticSize = GivenTable.AutomaticSize or Enum.AutomaticSize.None
-    TextLabel.Size = GivenTable.Size or UDim2.new(0,0,0,0)
-    TextLabel.Position = GivenTable.Position or UDim2.new(0,0,0,0)
-    TextLabel.LayoutOrder = GivenTable.LayoutOrder or 0
-    TextLabel.Text = GivenTable.Text or "Text"
-    TextLabel.TextColor3 = GivenTable.TextColor3 or Color3.fromRGB(255,255,255)
-    TextLabel.TextSize = GivenTable.TextSize or 8
-    TextLabel.TextWrapped = GivenTable.TextWrapped or false
-    TextLabel.TextScaled = GivenTable.TextScaled or false
-    TextLabel.TextXAlignment = GivenTable.TextXAlignment or Enum.TextXAlignment.Center
-    TextLabel.TextYAlignment = GivenTable.TextYAlignment or Enum.TextYAlignment.Center
-    if GivenTable.CornerRadius then
-        local UICorner = Instance.new("UICorner",TextLabel)
-        UICorner.CornerRadius = UDim.new(0,GivenTable.CornerRadius)
-    end
-    if GivenTable.Padding then
-        local UIPadding = Instance.new("UIPadding",TextLabel)
-        UIPadding.PaddingBottom = UDim.new(0,GivenTable.Padding)
-    end
-    return TextLabel
-end
-
-local function NewButton(GivenTable)
-    local TextButton = Instance.new("TextButton",GivenTable.Parent or nil)
-    TextButton.Name = GivenTable.Name or TextButton.ClassName
-    TextButton.Visible = GivenTable.Visible
-    TextButton.Text = GivenTable.Text or "Button"
-    TextButton.TextColor3 = GivenTable.TextColor3 or Color3.fromRGB(255,255,255)
-    TextButton.TextWrapped = GivenTable.TextWrapped or false
-    TextButton.TextScaled = GivenTable.TextScaled or false
-    TextButton.TextXAlignment = GivenTable.TextXAlignment or Enum.TextXAlignment.Center
-    TextButton.TextYAlignment = GivenTable.TextYAlignment or Enum.TextYAlignment.Center
-    TextButton.BackgroundTransparency = GivenTable.BackgroundTransparency or 0
-    TextButton.BackgroundColor3 = GivenTable.BackgroundColor3 or Color3.fromRGB(50,50,50)
-    TextButton.AutomaticSize = GivenTable.AutomaticSize or Enum.AutomaticSize.None
-    TextButton.Size = GivenTable.Size or UDim2.new(0,0,0,0)
-    TextButton.Position = GivenTable.Position or UDim2.new(0,0,0,0)
-    TextButton.LayoutOrder = GivenTable.LayoutOrder or 0
-    TextButton.ZIndex = GivenTable.ZIndex or 0
-    if GivenTable.CornerRadius then
-        local UICorner = Instance.new("UICorner",TextButton)
-        UICorner.CornerRadius = UDim.new(0,GivenTable.CornerRadius)
-    end
-    return TextButton
-end
-
-local ModalElement = NewButton({
+local ModalElement = New({
+    ClassName = "TextButton",
     Parent = JustALibraryGUI,
     Name = "ModalElement",
     BackgroundTransparency = 1,
@@ -146,7 +117,8 @@ local ModalElement = NewButton({
 })
 ModalElement.Modal = true
 
-local Cursor = NewFrame({
+local Cursor = New({
+    ClassName = "Frame",
     Parent = JustALibraryGUI,
     Name = "Cursor",
     BackgroundColor3 = Color3.fromRGB(255,255,255),
@@ -162,7 +134,8 @@ CursorStroke.Color = Color3.fromRGB(0,0,0)
 CursorStroke.Thickness = 1
 Mouse.Move:Connect(function() Cursor.Position = UDim2.fromOffset(Mouse.X,Mouse.Y) end)
 
-local NotificationsHolder = NewFrame({
+local NotificationsHolder = New({
+    ClassName = "Frame",
     Parent = JustALibraryGUI,
     Name = "NotificationsHolder",
     BackgroundTransparency = 1,
@@ -177,14 +150,16 @@ local NotificationsHolder = NewFrame({
 })
 
 function JustALibrary:Notify(GivenTable)
-    local NotificationFakeFrame = NewFrame({
+    local NotificationFakeFrame = New({
+        ClassName = "Frame",
         Name = "NotificationFakeFrame",
         BackgroundTransparency = 1,
         Size = UDim2.new(1,0,0,0),
         AutomaticSize = Enum.AutomaticSize.Y,
         Visible = true
     })
-    local NotificationFrame = NewFrame({
+    local NotificationFrame = New({
+        ClassName = "Frame",
         Parent = NotificationFakeFrame,
         Name = "NotificationFrame",
         BackgroundColor3 = Color3.fromRGB(0,0,0),
@@ -197,7 +172,8 @@ function JustALibrary:Notify(GivenTable)
         ListLayoutConfig = {SortOrder = Enum.SortOrder.LayoutOrder,HorizontalAlignment = Enum.HorizontalAlignment.Center},
         Visible = true
     })
-    local NotificationTitle = NewText({
+    local NotificationTitle = New({
+        ClassName = "TextLabel",
         Parent = NotificationFrame,
         Name = "NotificationTitle",
         BackgroundTransparency = 1,
@@ -209,7 +185,8 @@ function JustALibrary:Notify(GivenTable)
         Text = GivenTable.Title or "Notification",
         Visible = true
     })
-    local NotificationContent = NewText({
+    local NotificationContent = New({
+        ClassName = "TextLabel",
         Parent = NotificationFrame,
         Name = "NotificationContent",
         BackgroundTransparency = 1,
@@ -223,7 +200,8 @@ function JustALibrary:Notify(GivenTable)
         Padding = 3,
         Visible = true
     })
-    local NotificationTimeFrame = NewFrame({
+    local NotificationTimeFrame = New({
+        ClassName = "Frame",
         Parent = NotificationFrame,
         Name = "NotificationTime",
         BackgroundColor3 = Color3.fromRGB(255,255,255),
@@ -255,7 +233,8 @@ function JustALibrary:CreateWindow(GivenTable)
     local Window = {}
 
     local WindowSize = GivenTable.Size or UDim2.fromOffset(650,550)
-    local WindowFrame = NewFrame({
+    local WindowFrame = New({
+        ClassName = "Frame",
         Parent = JustALibraryGUI,
         Name = "WindowFrame",
         Size = WindowSize,
@@ -265,7 +244,8 @@ function JustALibrary:CreateWindow(GivenTable)
         Visible = true
     })
 
-    local WindowTitle = NewFrame({
+    local WindowTitle = New({
+        ClassName = "Frame",
         Parent = WindowFrame,
         Name = "WindowTitle",
         Size = UDim2.new(0.2,0,0,50),
@@ -275,7 +255,8 @@ function JustALibrary:CreateWindow(GivenTable)
         CornerRadius = 8,
         Visible = true
     })
-    local WindowTitleText = NewText({
+    local WindowTitleText = New({
+        ClassName = "TextLabel",
         Parent = WindowTitle,
         Name = "WindowTitleText",
         BackgroundTransparency = 1,
@@ -286,7 +267,8 @@ function JustALibrary:CreateWindow(GivenTable)
         Text = GivenTable.Title or "Window",
         Visible = true
     })
-    local WindowTitleButton = NewButton({
+    local WindowTitleButton = New({
+        ClassName = "TextButton",
         Parent = WindowTitle,
         Name = "WindowTitleButton",
         BackgroundTransparency = 1,
@@ -295,7 +277,8 @@ function JustALibrary:CreateWindow(GivenTable)
         Visible = true
     })
 
-    local TabsDivider = NewFrame({
+    local TabsDivider = New({
+        ClassName = "Frame",
         Parent = WindowFrame,
         Name = "TabsDivider",
         Position = UDim2.new(0.21,0,0,-60),
@@ -305,7 +288,8 @@ function JustALibrary:CreateWindow(GivenTable)
         CornerRadius = 8,
         Visible = true
     })
-    local TabsFrame = NewFrame({
+    local TabsFrame = New({
+        ClassName = "Frame",
         Parent = WindowFrame,
         Name = "TabsFrame",
         BackgroundTransparency = 1,
@@ -321,7 +305,8 @@ function JustALibrary:CreateWindow(GivenTable)
         },
         Visible = true
     })
-    local SecondTabsDivider = NewFrame({
+    local SecondTabsDivider = New({
+        ClassName = "Frame",
         Parent = WindowFrame,
         Name = "SecondTabsDivider",
         Position = UDim2.new(0.78,0,0,-60),
@@ -332,7 +317,8 @@ function JustALibrary:CreateWindow(GivenTable)
         Visible = true
     })
 
-    local NotificationsFrame = NewFrame({
+    local NotificationsFrame = New({
+        ClassName = "Frame",
         Parent = WindowFrame,
         Name = "NotificationsFrame",
         Size = UDim2.new(0.2,0,0,50),
@@ -342,7 +328,8 @@ function JustALibrary:CreateWindow(GivenTable)
         CornerRadius = 8,
         Visible = true
     })
-    local NotificationsFrameText = NewText({
+    local NotificationsFrameText = New({
+        ClassName = "TextLabel",
         Parent = NotificationsFrame,
         Name = "NotificationsFrameText",
         BackgroundTransparency = 1,
@@ -353,7 +340,8 @@ function JustALibrary:CreateWindow(GivenTable)
         Text = "Notifications",
         Visible = true
     })
-    local NotificationsFrameButton = NewButton({
+    local NotificationsFrameButton = New({
+        ClassName = "TextButton",
         Parent = NotificationsFrame,
         Name = "NotificationsFrameButton",
         BackgroundTransparency = 1,
@@ -361,7 +349,8 @@ function JustALibrary:CreateWindow(GivenTable)
         Text = "",
         Visible = true
     })
-    local NotificationsContentFrame = NewFrame({
+    local NotificationsContentFrame = New({
+        ClassName = "Frame",
         Parent = WindowFrame,
         Name = "NotificationsContentFrame",
         Size = UDim2.fromOffset(200,WindowFrame.Size.Y.Offset-50),
@@ -378,7 +367,8 @@ function JustALibrary:CreateWindow(GivenTable)
             SortOrder = Enum.SortOrder.LayoutOrder
         }
     })
-    local NotificationsClearAllButton = NewButton({
+    local NotificationsClearAllButton = New({
+        ClassName = "TextButton",
         Parent = WindowFrame,
         Name = "NotificationsClearAllButton",
         BackgroundTransparency = 0.6,
@@ -392,20 +382,23 @@ function JustALibrary:CreateWindow(GivenTable)
         Visible = false
     })
 
-    WindowTitleButton.MouseButton1Click:Connect(function()
-        for _,TabFrames in TabsFrame:GetChildren() do
-            if TabFrames:IsA("Frame") then
-                WindowFrame[TabFrames.Name].Visible = false
-                TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
-            end
+    function Window:ToggleVisible()
+        WindowFrame.Visible = not WindowFrame.Visible
+        ModalElement.Visible = WindowFrame.Visible
+        Cursor.Visible = WindowFrame.Visible
+        if WindowFrame.Visible then
+            TweenService:Create(LibraryBlur,TweenInfo.new(0.1,Enum.EasingStyle.Linear),{Size = 12}):Play()
+        else
+            TweenService:Create(LibraryBlur,TweenInfo.new(0.25,Enum.EasingStyle.Linear),{Size = 0}):Play()
         end
-        TweenService:Create(WindowTitle,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
-        task.wait(0.3)
-        TweenService:Create(WindowTitle,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+    end
+
+    WindowTitleButton.MouseButton1Click:Connect(function()
+        Window:ToggleVisible()
     end)
 
     NotificationsFrameButton.MouseButton1Click:Connect(function()
-        if  NotificationsContentFrame.Visible then
+        if NotificationsContentFrame.Visible then
             NotificationsContentFrame.Visible = false NotificationsClearAllButton.Visible = false
             TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
         else
@@ -413,7 +406,7 @@ function JustALibrary:CreateWindow(GivenTable)
             TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
         end
     end)
-    
+
     NotificationsClearAllButton.MouseButton1Click:Connect(function()
         for _,Notifications in NotificationsContentFrame:GetChildren() do
             if Notifications:IsA("Frame") then
@@ -422,7 +415,7 @@ function JustALibrary:CreateWindow(GivenTable)
             end
         end
     end)
-    
+
     NotificationsHolder.ChildAdded:Connect(function(Notification)
         local NewNotification = Notification:Clone()
         if NewNotification.NotificationFrame:FindFirstChild("Sound") then NewNotification.NotificationFrame.Sound:Destroy() end
@@ -441,7 +434,8 @@ function JustALibrary:CreateWindow(GivenTable)
 
         local Tab = {}
 
-        local TabFrame = NewFrame({
+        local TabFrame = New({
+            ClassName = "Frame",
             Parent = TabsFrame,
             Name = GivenTable.Name or "Tab",
             BackgroundColor3 = Color3.fromRGB(0,0,0),
@@ -452,7 +446,8 @@ function JustALibrary:CreateWindow(GivenTable)
             Visible = true
         })
 
-        local TabLabel = NewText({
+        local TabLabel = New({
+            ClassName = "TextLabel",
             Parent = TabFrame,
             Name = "TabLabel",
             BackgroundTransparency = 1,
@@ -465,14 +460,19 @@ function JustALibrary:CreateWindow(GivenTable)
         })
 
         if GivenTable.Icon then
-            local TabIcon = Instance.new("ImageLabel",TabFrame)
-            TabIcon.BackgroundTransparency = 1
-            TabIcon.Position = UDim2.fromOffset(10,10)
-            TabIcon.Size = UDim2.fromOffset(30,30)
-            TabIcon.Image = Icons.assets[GivenTable.Icon]
+            local TabIcon = New({
+                ClassName = "ImageLabel",
+                Parent = TabFrame,
+                BackgroundTransparency = 1,
+                Position = UDim2.fromOffset(10,10),
+                Size = UDim2.fromOffset(30,30),
+                Image = Icons.assets[GivenTable.Icon],
+                Visible = true
+            })
         end
 
-        local TabContentFrame = NewFrame({
+        local TabContentFrame = New({
+            ClassName = "Frame",
             Parent = WindowFrame,
             Name = GivenTable.Name or "Tab",
             BackgroundTransparency = 0.6,
@@ -482,7 +482,8 @@ function JustALibrary:CreateWindow(GivenTable)
             Visible = false
         })
 
-        local TabButton = NewButton({
+        local TabButton = New({
+            ClassName = "TextButton",
             Parent = TabFrame,
             Name = "TabButton",
             BackgroundTransparency = 1,
@@ -505,7 +506,8 @@ function JustALibrary:CreateWindow(GivenTable)
             end
         end)
 
-        local TabContentScrollingFrame = NewFrame({
+        local TabContentScrollingFrame = New({
+            ClassName = "Frame",
             Parent = TabContentFrame,
             Name = "TabContentScrollingFrame",
             Size = UDim2.fromScale(0.47,0.95),
@@ -521,7 +523,8 @@ function JustALibrary:CreateWindow(GivenTable)
             Visible = true
         })
 
-        local SecondTabContentScrollingFrame = NewFrame({
+        local SecondTabContentScrollingFrame = New({
+            ClassName = "Frame",
             Parent = TabContentFrame,
             Name = "SecondTabContentScrollingFrame",
             Size = UDim2.fromScale(0.47,0.95),
@@ -540,73 +543,82 @@ function JustALibrary:CreateWindow(GivenTable)
         function Tab:AddContentBox(GivenTable)
 
             local ContentBox = {}
+            local GivenParent = GivenTable.Side == "Right" and SecondTabContentScrollingFrame or TabContentScrollingFrame
 
-            local ContentBoxFrame = Instance.new("Frame")
-            ContentBoxFrame.Name = GivenTable.Name
-            ContentBoxFrame.Size = UDim2.new(1,0,0,50)
-            ContentBoxFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-            ContentBoxFrame.BackgroundTransparency = 0.6
-            if GivenTable.Side == "Right" then
-                ContentBoxFrame.Parent = SecondTabContentScrollingFrame
-            elseif GivenTable.Side == "Left" then
-                ContentBoxFrame.Parent = TabContentScrollingFrame
-            end
-            ContentBoxFrame.LayoutOrder = #(ContentBoxFrame.Parent:GetChildren())
-            local ContentBoxCorner = Instance.new("UICorner",ContentBoxFrame)
-            local ContentBoxLayout = Instance.new("UIListLayout",ContentBoxFrame)
-            ContentBoxLayout.Padding = UDim.new(0,8)
-            ContentBoxLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            local ContentBoxFrame = New({
+                ClassName = "Frame",
+                Parent = GivenParent,
+                Name = GivenTable.Name,
+                Size = UDim2.new(1,0,0,0),
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundColor3 = Color3.fromRGB(0,0,0),
+                BackgroundTransparency = 0.6,
+                CornerRadius = 8,
+                Padding = 8,
+                LayoutOrder = #(GivenParent:GetChildren()),
+                ListLayoutConfig = {
+                    Padding = UDim.new(0,8),
+                    SortOrder = Enum.SortOrder.LayoutOrder
+                },
+                Visible = true
+            })
 
-            local ContentBoxTitle = Instance.new("TextLabel",ContentBoxFrame)
-            ContentBoxTitle.BackgroundColor3 = Color3.fromRGB(0,0,0)
-            ContentBoxTitle.BackgroundTransparency = 0.6
-            ContentBoxTitle.Size = UDim2.new(1,0,0,25)
-            ContentBoxTitle.TextScaled = true
-            ContentBoxTitle.TextColor3 = Color3.fromRGB(255,255,255)
-            ContentBoxTitle.Text = GivenTable.Name or "ContentBox"
-            ContentBoxTitle.LayoutOrder = -1
-            local ContentBoxTitleCorner = Instance.new("UICorner",ContentBoxTitle)
-
-            function ContentBox:Resize()
-                local TotalSize = 0
-                for _, Elements in ContentBoxFrame:GetChildren() do
-                    if (Elements:IsA("Frame") or Elements:IsA("TextLabel")) and Elements.Visible then TotalSize += Elements.Size.Y.Offset + 8 end
-                end
-                ContentBoxFrame.Size = UDim2.new(1,0,0,TotalSize)
-            end
+            local ContentBoxTitle = New({
+                ClassName = "TextLabel",
+                Parent = ContentBoxFrame,
+                Name = "ContentBoxTitle",
+                BackgroundColor3 = Color3.fromRGB(0,0,0),
+                BackgroundTransparency = 0.6,
+                Size = UDim2.new(1,0,0,25),
+                TextScaled = true,
+                TextColor3 = Color3.fromRGB(255,255,255),
+                Text = GivenTable.Name or "ContentBox",
+                LayoutOrder = -1,
+                CornerRadius = 8,
+                Visible = true
+            })
 
             function ContentBox:AddLabel(Text)
+
                 local LabelHolder = {}
 
-                local LabelFrame = Instance.new("Frame",ContentBoxFrame)
-                LabelFrame.BackgroundTransparency = 1
-                LabelFrame.Size = UDim2.new(1,0,0,25)
-                LabelFrame.LayoutOrder = #(ContentBoxFrame:GetChildren())
+                local LabelFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "LabelFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,0),
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
 
-                local Label = Instance.new("TextLabel",LabelFrame)
-                Label.BackgroundTransparency = 1
-                Label.Size = UDim2.new(0.9,0,0,25)
-                Label.Position = UDim2.fromScale(0.05,0)
-                Label.TextScaled = true
-                Label.RichText = true
-                Label.TextColor3 = Color3.fromRGB(255,255,255)
-                Label.TextXAlignment = Enum.TextXAlignment.Left
-                Label.Text = Text or "Label"
-
-                ContentBox:Resize()
+                local LabelText = New({
+                    ClassName = "TextLabel",
+                    Parent = LabelFrame,
+                    Name = "LabelText",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.9,0,0,0),
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    Position = UDim2.fromScale(0.05,0),
+                    TextWrapped = true,
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextSize = 12,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Text = Text or "Label",
+                    Visible = true
+                })
 
                 function LabelHolder:SetText(Text)
-                    Label.Text = Text or "Label"
+                    LabelText.Text = Text or "Label"
                 end
 
                 function LabelHolder:SetVisible(Boolean)
                     LabelFrame.Visible = Boolean
-                    ContentBox:Resize()
                 end
 
                 function LabelHolder:Destroy()
                     LabelFrame:Destroy()
-                    ContentBox:Resize()
                 end
 
                 return LabelHolder
@@ -614,31 +626,37 @@ function JustALibrary:CreateWindow(GivenTable)
             end
 
             function ContentBox:AddDivider()
+
                 local DividerHolder = {}
 
-                local DividerFrame = Instance.new("Frame",ContentBoxFrame)
-                DividerFrame.BackgroundTransparency = 1
-                DividerFrame.Size = UDim2.new(1,0,0,5)
-                DividerFrame.LayoutOrder = #(ContentBoxFrame:GetChildren())
+                local DividerFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "DividerFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,5),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
 
-                local Divider = Instance.new("Frame",DividerFrame)
-                Divider.BackgroundTransparency = 0.6
-                Divider.BackgroundColor3 = Color3.fromRGB(0,0,0)
-                Divider.Size = UDim2.new(0.9,0,0,5)
-                Divider.Position = UDim2.fromScale(0.05,0)
-
-                local DividerCorner = Instance.new("UICorner",Divider)
-
-                ContentBox:Resize()
+                local Divider = New({
+                    ClassName = "Frame",
+                    Parent = DividerFrame,
+                    Name = "Divider",
+                    BackgroundTransparency = 0.6,
+                    BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    Size = UDim2.new(0.9,0,0,5),
+                    Position = UDim2.fromScale(0.05,0),
+                    CornerRadius = 8,
+                    Visible = true
+                })
 
                 function DividerHolder:SetVisible(Boolean)
                     DividerFrame.Visible = Boolean
-                    ContentBox:Resize()
                 end
 
                 function DividerHolder:Destroy()
                     DividerFrame:Destroy()
-                    ContentBox:Resize()
                 end
 
                 return DividerHolder
@@ -646,31 +664,38 @@ function JustALibrary:CreateWindow(GivenTable)
             end
 
             function ContentBox:AddImage(GivenTable)
+
                 local ImageHolder = {}
 
-                local ImageFrame = Instance.new("Frame",ContentBoxFrame)
-                ImageFrame.BackgroundTransparency = 1
-                ImageFrame.Size = UDim2.new(1,0,0,GivenTable.ImageHeight or 230)
-                ImageFrame.LayoutOrder = #(ContentBoxFrame:GetChildren())
+                local ImageFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "ImageFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,GivenTable.ImageHeight or 230),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
 
-                local ImageLabel = Instance.new("ImageLabel",ImageFrame)
-                ImageLabel.BackgroundTransparency = 0.6
-                ImageLabel.BackgroundColor3 = Color3.fromRGB(0,0,0)
-                ImageLabel.Size = UDim2.fromScale(0.9,1)
-                ImageLabel.Position = UDim2.fromScale(0.05,0)
-                ImageLabel.Image = GivenTable.Image
-                local ImageLabelCorner = Instance.new("UICorner",ImageLabel)
-
-                ContentBox:Resize()
+                local ImageLabel = New({
+                    ClassName = "ImageLabel",
+                    Parent = ImageFrame,
+                    Name = "ImageLabel",
+                    BackgroundTransparency = 0.6,
+                    BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    Size = UDim2.fromScale(0.9,1),
+                    Position = UDim2.fromScale(0.05,0),
+                    Image = GivenTable.Image,
+                    CornerRadius = 8,
+                    Visible = true
+                })
 
                 function ImageHolder:SetVisible(Boolean)
                     ImageLabel.Visible = Boolean
-                    ContentBox:Resize()
                 end
 
                 function ImageHolder:Destroy()
                     ImageLabel:Destroy()
-                    ContentBox:Resize()
                 end
 
                 return ImageHolder
@@ -680,25 +705,32 @@ function JustALibrary:CreateWindow(GivenTable)
             function ContentBox:AddButton(GivenTable)
                 local ButtonHolder = {}
 
-                local ButtonFrame = Instance.new("Frame",ContentBoxFrame)
-                ButtonFrame.BackgroundTransparency = 1
-                ButtonFrame.Size = UDim2.new(1,0,0,25)
-                ButtonFrame.LayoutOrder = #(ContentBoxFrame:GetChildren())
+                local ButtonFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "ButtonFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,25),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
 
-                local Button = Instance.new("TextButton",ButtonFrame)
-                Button.BackgroundTransparency = 0.6
-                Button.BackgroundColor3 = Color3.fromRGB(0,0,0)
-                Button.Size = UDim2.new(0.9,0,0,25)
-                Button.Position = UDim2.fromScale(0.05,0)
-                Button.TextScaled = true
-                Button.TextColor3 = Color3.fromRGB(255,255,255)
-                Button.Text = GivenTable.Text or "Label"
-
-                local ButtonCorner = Instance.new("UICorner",Button)
+                local Button = New({
+                    ClassName = "TextButton",
+                    Parent = ButtonFrame,
+                    Name = "Button",
+                    BackgroundTransparency = 0.6,
+                    BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    Size = UDim2.new(0.9,0,0,25),
+                    Position = UDim2.fromScale(0.05,0),
+                    TextScaled = true,
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    Text = GivenTable.Text or "Label",
+                    CornerRadius = 8,
+                    Visible = true
+                })
 
                 Button.MouseButton1Click:Connect(GivenTable.Callback)
-
-                ContentBox:Resize()
 
                 function ButtonHolder:SetText(Text)
                     Button.Text = Text or "Button"
@@ -716,12 +748,10 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 function ButtonHolder:SetVisible(Boolean)
                     ButtonFrame.Visible = Boolean
-                    ContentBox:Resize()
                 end
 
                 function ButtonHolder:Destroy()
                     ButtonFrame:Destroy()
-                    ContentBox:Resize()
                 end
 
                 return ButtonHolder
@@ -729,48 +759,76 @@ function JustALibrary:CreateWindow(GivenTable)
             end
 
             function ContentBox:AddToggle(GivenTable)
+
                 local ToggleHolder = {Value = false}
 
-                local ToggleFrame = Instance.new("Frame",ContentBoxFrame)
-                ToggleFrame.BackgroundTransparency = 1
-                ToggleFrame.Size = UDim2.new(1,0,0,25)
-                ToggleFrame.LayoutOrder = #(ContentBoxFrame:GetChildren())
+                local ToggleFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "ToggleFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,25),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
 
-                local ToggleText = Instance.new("TextLabel",ToggleFrame)
-                ToggleText.BackgroundTransparency = 1
-                ToggleText.Size = UDim2.fromScale(0.7,1)
-                ToggleText.Position = UDim2.fromScale(0.05,0)
-                ToggleText.TextColor3 = Color3.fromRGB(255,255,255)
-                ToggleText.TextScaled = true
-                ToggleText.Text = GivenTable.Text or "Toggle"
-                ToggleText.TextXAlignment = Enum.TextXAlignment.Left
+                local ToggleText = New({
+                    ClassName = "TextLabel",
+                    Parent = ToggleFrame,
+                    Name = "ToggleText",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.fromScale(0.675,1),
+                    Position = UDim2.fromScale(0.05,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true,
+                    Text = GivenTable.Text or "Toggle",
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Visible = true
+                })
 
-                local ToggleButtonFrame = Instance.new("Frame",ToggleFrame)
-                ToggleButtonFrame.BackgroundTransparency = 0.6
-                ToggleButtonFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-                ToggleButtonFrame.Size = UDim2.new(0.2,0,0,25)
-                ToggleButtonFrame.Position = UDim2.fromScale(0.75,0)
-                local ToggleButtonFrameCorner = Instance.new("UICorner",ToggleButtonFrame)
+                local ToggleButtonFrame = New({
+                    ClassName = "Frame",
+                    Parent = ToggleFrame,
+                    Name = "ToggleButtonFrame",
+                    BackgroundTransparency = 0.6,
+                    BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    Size = UDim2.new(0.2,0,0,25),
+                    Position = UDim2.fromScale(0.75,0),
+                    CornerRadius = 20,
+                    Visible = true
+                })
 
-                local SecondToggleButtonFrame = ToggleButtonFrame:Clone()
-                SecondToggleButtonFrame.Parent = ToggleButtonFrame
-                SecondToggleButtonFrame.Size = UDim2.fromScale(0.5,1)
-                SecondToggleButtonFrame.Position = UDim2.fromScale(0,0)
-                SecondToggleButtonFrame.BackgroundTransparency = 0
-                SecondToggleButtonFrame.BackgroundColor3 = Color3.fromRGB(255,255,255)
+                local SecondToggleButtonFrame = New({
+                    ClassName = "Frame",
+                    Parent = ToggleButtonFrame,
+                    Name = "SecondToggleButtonFrame",
+                    BackgroundTransparency = 0,
+                    BackgroundColor3 = Color3.fromRGB(255,255,255),
+                    Size = UDim2.fromScale(0.5,1),
+                    Position = UDim2.fromScale(0,0),
+                    CornerRadius = 20,
+                    Visible = true
+                })
 
                 local IsToggled = false
+
                 if GivenTable.Default then
                     IsToggled = true
                     ToggleButtonFrame.BackgroundColor3 = Color3.fromRGB(125,125,125)
                     SecondToggleButtonFrame.Position = UDim2.fromScale(0.5,0)
                 end
+
                 ToggleHolder.Value = IsToggled
 
-                local ToggleButton = Instance.new("TextButton",ToggleButtonFrame)
-                ToggleButton.BackgroundTransparency = 1
-                ToggleButton.TextTransparency = 1
-                ToggleButton.Size = UDim2.fromScale(1,1)
+                local ToggleButton = New({
+                    ClassName = "TextButton",
+                    Parent = ToggleButtonFrame,
+                    Name = "ToggleButton",
+                    BackgroundTransparency = 1,
+                    Text = "",
+                    Size = UDim2.fromScale(1,1),
+                    Visible = true
+                })
 
                 ToggleButton.MouseButton1Click:Connect(function()
                     IsToggled = not IsToggled
@@ -785,15 +843,12 @@ function JustALibrary:CreateWindow(GivenTable)
                     GivenTable.Callback(IsToggled)
                 end)
 
-                ContentBox:Resize()
-
                 function ToggleHolder:SetText(Text)
                     ToggleText.Text = Text or "Toggle"
                 end
 
                 function ToggleHolder:SetValue(Boolean)
                     IsToggled = Boolean
-                    GivenTable.Callback(IsToggled)
                     if IsToggled then
                         TweenService:Create(ToggleButtonFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
                         TweenService:Create(SecondToggleButtonFrame,TweenInfo.new(0.25),{Position = UDim2.fromScale(0.5,0)}):Play()
@@ -801,6 +856,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         TweenService:Create(ToggleButtonFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                         TweenService:Create(SecondToggleButtonFrame,TweenInfo.new(0.25),{Position = UDim2.fromScale(0,0)}):Play()
                     end
+                    GivenTable.Callback(IsToggled)
                 end
 
                 function ToggleHolder:SetDisabled(Boolean)
@@ -817,12 +873,10 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 function ToggleHolder:SetVisible(Boolean)
                     ToggleFrame.Visible = Boolean
-                    ContentBox:Resize()
                 end
 
                 function ToggleHolder:Destroy()
                     ToggleFrame:Destroy()
-                    ContentBox:Resize()
                 end
 
                 JustALibrary.Elements[GivenTable.Index or "Toggle"] = ToggleHolder
@@ -963,17 +1017,17 @@ function JustALibrary:CreateWindow(GivenTable)
                     if DropdownValuesFrame.Visible then
                         DropdownValuesFrame.Visible = false
                         FakeDropdownFrame.Visible = false
-                        ContentBox:Resize()
+                        
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 0}):Play()
                     else
                         DropdownValuesFrame.Visible = true
                         FakeDropdownFrame.Visible = true
-                        ContentBox:Resize()
+                        
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 180}):Play()
                     end
                 end)
 
-                ContentBox:Resize()
+                
 
                 function DropdownHolder:SetText(Text)
                     DropdownText.Text = Text or "Dropdown"
@@ -1111,7 +1165,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{ImageColor3 = Color3.fromRGB(255,255,255)}):Play()
                         TweenService:Create(DropdownText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(225,225,225)}):Play()
                     end
-                    ContentBox:Resize()
+                    
                 end
 
                 function DropdownHolder:SetVisible(Boolean)
@@ -1119,13 +1173,13 @@ function JustALibrary:CreateWindow(GivenTable)
                     DropdownValuesFrame.Visible = false
                     FakeDropdownFrame.Visible = false
                     TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 0}):Play()
-                    ContentBox:Resize()
+                    
                 end
 
                 function DropdownHolder:Destroy()
                     DropdownFrame:Destroy()
                     FakeDropdownFrame:Destroy()
-                    ContentBox:Resize()
+                    
                 end
 
                 JustALibrary.Elements[GivenTable.Index or "Dropdown"] = DropdownHolder
@@ -1185,7 +1239,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     end
                 end)
 
-                ContentBox:Resize()
+                
 
 				function InputHolder:SetText(Text)
                     InputName.Text = Text or "Input"
@@ -1209,12 +1263,12 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 function InputHolder:SetVisible(Boolean)
                     InputFakeFrame.Visible = Boolean
-                    ContentBox:Resize()
+                    
                 end
 
                 function InputHolder:Destroy()
                     InputFakeFrame:Destroy()
-                    ContentBox:Resize()
+                    
                 end
 
                 JustALibrary.Elements[GivenTable.Index or "Input"] = InputHolder
@@ -1280,7 +1334,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     end)
                 end)
 
-                ContentBox:Resize()
+                
 
 				function KeybindHolder:SetText(Text)
                     KeybindName.Text = Text or "Keybind"
@@ -1312,12 +1366,12 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 function KeybindHolder:SetVisible(Boolean)
                     KeybindFakeFrame.Visible = Boolean
-                    ContentBox:Resize()
+                    
                 end
 
                 function KeybindHolder:Destroy()
                     KeybindFakeFrame:Destroy()
-                    ContentBox:Resize()
+                    
                 end
 
                 JustALibrary.Elements[GivenTable.Index or "Keybind"] = KeybindHolder
@@ -1337,17 +1391,6 @@ function JustALibrary:CreateWindow(GivenTable)
 
         return Tab
 
-    end
-
-    function Window:ToggleVisible()
-        WindowFrame.Visible = not WindowFrame.Visible
-        ModalElement.Visible = WindowFrame.Visible
-        Cursor.Visible = WindowFrame.Visible
-        if WindowFrame.Visible then
-            TweenService:Create(LibraryBlur,TweenInfo.new(0.1,Enum.EasingStyle.Linear),{Size = 12}):Play()
-        else
-            TweenService:Create(LibraryBlur,TweenInfo.new(0.25,Enum.EasingStyle.Linear),{Size = 0}):Play()
-        end
     end
 
     return Window
