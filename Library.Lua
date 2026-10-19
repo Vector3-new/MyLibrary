@@ -899,114 +899,173 @@ function JustALibrary:CreateWindow(GivenTable)
                     end
                 end
 
-                local DropdownFrame = Instance.new("Frame",ContentBoxFrame)
-                DropdownFrame.BackgroundTransparency = 1
-                DropdownFrame.Size = UDim2.new(1,0,0,25)
-                DropdownFrame.LayoutOrder = #(ContentBoxFrame:GetChildren())
+                local DropdownFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "DropdownFrame",
+                    BackgroundTransparency = 1,
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    Size = UDim2.new(1,0,0,25),
+                    Visible = true
+                })
 
-                local DropdownText = Instance.new("TextLabel",DropdownFrame)
-                DropdownText.BackgroundTransparency = 1
-                DropdownText.Size = UDim2.fromScale(0.9,1)
-                DropdownText.Position = UDim2.fromScale(0.075,0)
-                DropdownText.TextColor3 = Color3.fromRGB(255,255,255)
-                DropdownText.TextScaled = true
-                DropdownText.Text = GivenTable.Text or "Dropdown"
-                DropdownText.TextXAlignment = Enum.TextXAlignment.Left
-                DropdownText.ZIndex = 2
+                local DropdownText = New({
+                    ClassName = "TextLabel",
+                    Parent = DropdownFrame,
+                    Name = "DropdownText",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.75,0,0,25),
+                    Position = UDim2.fromScale(0.075,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true,
+                    Text = GivenTable.Text or "Dropdown",
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    ZIndex = 2,
+                    Visible = true
+                })
 
-                local DropdownButton = Instance.new("TextButton",DropdownFrame)
-                DropdownButton.BackgroundTransparency = 0.6
-                DropdownButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
-                DropdownButton.Size = UDim2.new(0.9,0,0,25)
-                DropdownButton.Position = UDim2.fromScale(0.05,0)
-                DropdownButton.TextTransparency = 1
-                local DropdownButtonCorner = Instance.new("UICorner",DropdownButton)
+                local DropdownButton = New({
+                    ClassName = "TextButton",
+                    Parent = DropdownFrame,
+                    Name = "DropdownButton",
+                    BackgroundTransparency = 0.6,
+                    BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    Size = UDim2.new(0.9,0,0,25),
+                    Position = UDim2.fromScale(0.05,0),
+                    Text = "",
+                    TextTransparency = 1,
+                    CornerRadius = 8,
+                    Visible = true
+                })
 
-                local DropdownIcon = Instance.new("ImageLabel",DropdownButton)
-                DropdownIcon.BackgroundTransparency = 1
-                DropdownIcon.Size = UDim2.new(0.1,0,0,25)
-                DropdownIcon.Position = UDim2.fromScale(0.89,0)
-                DropdownIcon.Image = Icons.assets["lucide-chevron-down"]
+                local DropdownIcon = New({
+                    ClassName = "ImageLabel",
+                    Parent = DropdownButton,
+                    Name = "DropdownIcon",
+                    BackgroundTransparency = 1,
+                    AnchorPoint = Vector2.new(1,0),
+                    Size = UDim2.new(0,25,0,25),
+                    Position = UDim2.fromScale(0.99,0),
+                    Image = Icons.assets["lucide-chevron-down"],
+                    Visible = true
+                })
 
-                local DropdownValuesFrame = Instance.new("ScrollingFrame",DropdownFrame)
-                DropdownValuesFrame.Size = UDim2.new(0.9,0,0,(MaxVisibleValues)*25+(MaxVisibleValues)*3)
-                DropdownValuesFrame.Position = UDim2.fromScale(0.05,1.15)
-                DropdownValuesFrame.BackgroundTransparency = 1
-                DropdownValuesFrame.ScrollBarThickness = 0
-                DropdownValuesFrame.ScrollingDirection = Enum.ScrollingDirection.Y
-                DropdownValuesFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-                DropdownValuesFrame.CanvasSize = UDim2.fromScale(0,0)
-                DropdownValuesFrame.Visible = false
-                local DropdownValuesCorner = Instance.new("UICorner",DropdownValuesFrame)
-                local DropdownValuesListLayout = Instance.new("UIListLayout",DropdownValuesFrame)
-                DropdownValuesListLayout.Padding = UDim.new(0,3)
-                DropdownValuesListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                local DropdownValuesFrame = New({
+                    ClassName = "Frame",
+                    Parent = DropdownFrame,
+                    Name = "DropdownValuesFrame",
+                    BackgroundTransparency = 0.6,
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    Size = UDim2.new(0.9,0,0,0),
+                    Position = UDim2.new(0.05,0,0,30),
+                    CornerRadius = 8,
+                    ListLayoutConfig = {
+                        Padding = UDim.new(0,5),
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        HorizontalAlignment = Enum.HorizontalAlignment.Center
+                    },
+                    Visible = false
+                })
+                local DropdownValuesPadding = Instance.new("UIPadding",DropdownValuesFrame)
+                DropdownValuesPadding.PaddingTop = UDim.new(0,5)
+                DropdownValuesPadding.PaddingBottom = UDim.new(0,5)
+                DropdownValuesPadding.PaddingLeft = UDim.new(0,5)
+                DropdownValuesPadding.PaddingRight = UDim.new(0,5)
 
-                local FakeDropdownFrame = Instance.new("Frame",ContentBoxFrame)
-                FakeDropdownFrame.BackgroundTransparency = 1
-                FakeDropdownFrame.Size = UDim2.new(1,0,0,(MaxVisibleValues)*25+(MaxVisibleValues)*3)
-                FakeDropdownFrame.LayoutOrder = DropdownFrame.LayoutOrder+1
-                FakeDropdownFrame.Visible = false
+                local function CreateValue(GivenName,Selected)
+                    local ValueFrame = New({
+                        ClassName = "Frame",
+                        Parent = DropdownValuesFrame,
+                        Name = GivenName,
+                        BackgroundTransparency = 1,
+                        Size = UDim2.new(1,0,0,25),
+                        Visible = true
+                    })
+                    local ValueText = New({
+                        ClassName = "TextLabel",
+                        Parent = ValueFrame,
+                        Name = "ValueText",
+                        BackgroundTransparency = 1,
+                        Size = UDim2.new(0.85,0,0,25),
+                        TextColor3 = Selected and Color3.fromRGB(255,255,255) or Color3.fromRGB(75,75,75),
+                        TextScaled = true,
+                        Text = GivenName,
+                        TextXAlignment = Enum.TextXAlignment.Left,
+                        Visible = true
+                    })
+                    local ValueButton = New({
+                        ClassName = "TextButton",
+                        Parent = ValueFrame,
+                        Name = "ValueButton",
+                        BackgroundTransparency = 0.6,
+                        BackgroundColor3 = Color3.fromRGB(100,100,100),
+                        AnchorPoint = Vector2.new(1,0),
+                        Size = UDim2.fromOffset(25,25),
+                        Position = UDim2.fromScale(0.99,0),
+                        Text = "",
+                        CornerRadius = 20,
+                        Visible = true
+                    })
+                    local ValueIcon = New({
+                        ClassName = "ImageLabel",
+                        Parent = ValueButton,
+                        Name = "ValueIcon",
+                        BackgroundTransparency = 1,
+                        ImageTransparency = Selected and 0 or 1,
+                        AnchorPoint = Vector2.new(0.5,0.5),
+                        Size = UDim2.new(0,20,0,20),
+                        Position = UDim2.fromScale(0.5,0.5),
+                        Image = Icons.assets["lucide-check"],
+                        Visible = true
+                    })
+                    return ValueFrame
+                end
 
                 local SelectedValue
                 if GivenTable.MultiSelection then SelectedValue = {} end
                 DropdownHolder.Value = SelectedValue
 
                 for _,Value in GivenTable.Values or {} do
-                    local ValueType
-                    if typeof(Value) == "string" then ValueType = Value else ValueType = Value.Name end
-                    local ValueFrame = Instance.new("Frame",DropdownValuesFrame)
-                    ValueFrame.BackgroundTransparency = 0.6
-                    ValueFrame.Size = UDim2.new(1,0,0,25)
-					if GivenTable.Default == Value then
-						ValueFrame.BackgroundColor3 = Color3.fromRGB(255,255,255)
-					else
-                   		ValueFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-					end
-                    ValueFrame.Name = ValueType
-                    local ValueFrameCorner = Instance.new("UICorner",ValueFrame)
-                    local ValueButton = Instance.new("TextButton",ValueFrame)
-                    ValueButton.BackgroundTransparency = 1
-                    ValueButton.Size = UDim2.fromScale(1,1)
-                    ValueButton.Text = ValueType
-                    ValueButton.TextColor3 = Color3.fromRGB(255,255,255)
-                    ValueButton.TextScaled = true
-                    ValueButton.MouseButton1Click:Connect(function()
-                        for _,Buttons in DropdownValuesFrame:GetChildren() do
-                            if Buttons:IsA("Frame") then 
+                    local ValueName
+                    if typeof(Value) == "string" then ValueName = Value else ValueName = Value.Name end
+                    local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value)
+                    ValueFrame.ValueButton.MouseButton1Click:Connect(function()
+                        for _,Button in DropdownValuesFrame:GetChildren() do
+                            if Button:IsA("Frame") then 
                                 if not GivenTable.MultiSelection then
-                                    if Buttons.Name == ValueType then
-                                        if SelectedValue ~= Buttons.Name then
-                                            SelectedValue = Buttons.Name
-                                            DropdownHolder.Value = SelectedValue
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                    if Button.Name == ValueName then
+                                        if SelectedValue ~= Button.Name then
+                                            SelectedValue = Button.Name
+                                            TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                            TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                             GivenTable.Callback(SelectedValue)
-                                        elseif SelectedValue == Buttons.Name and GivenTable.CanDeselect then
+                                        elseif SelectedValue == Button.Name and GivenTable.CanDeselect then
                                             SelectedValue = nil
-                                            DropdownHolder.Value = SelectedValue
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                            TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                            TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                             GivenTable.Callback(SelectedValue)
                                         end
                                     else
-                                        TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                        TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                        TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                     end
                                 elseif GivenTable.MultiSelection then
-                                    if Buttons.Name == ValueType then
-                                        if not table.find(SelectedValue,Buttons.Name) then
-                                            table.insert(SelectedValue,Buttons.Name)
-                                            DropdownHolder.Value = SelectedValue
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                    if Button.Name == ValueName then
+                                        if not table.find(SelectedValue,Button.Name) then
+                                            table.insert(SelectedValue,Button.Name)
+                                            TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                            TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                             GivenTable.Callback(SelectedValue)
-                                        elseif (table.find(SelectedValue,Buttons.Name) and #SelectedValue > 1) or (table.find(SelectedValue,Buttons.Name) and GivenTable.CanDeselect) then
-                                            for Index,Item in SelectedValue do
-                                                if Item == Buttons.Name then table.remove(SelectedValue,Index) end
-                                            end
-                                            DropdownHolder.Value = SelectedValue
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                        elseif (table.find(SelectedValue,Button.Name) and #SelectedValue > 1) or (table.find(SelectedValue,Button.Name) and GivenTable.CanDeselect) then
+                                            local Index = table.find(SelectedValue,Button.Name)
+                                            if Index then table.remove(SelectedValue,Index) end
+                                            TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                            TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                             GivenTable.Callback(SelectedValue)
                                         end
-                                    elseif not table.find(SelectedValue,Buttons.Name) then
-                                        TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                    elseif not table.find(SelectedValue,Button.Name) then
+                                        TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                        TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                     end
                                 end
                             end
@@ -1017,18 +1076,12 @@ function JustALibrary:CreateWindow(GivenTable)
                 DropdownButton.MouseButton1Click:Connect(function()
                     if DropdownValuesFrame.Visible then
                         DropdownValuesFrame.Visible = false
-                        FakeDropdownFrame.Visible = false
-                        
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 0}):Play()
                     else
                         DropdownValuesFrame.Visible = true
-                        FakeDropdownFrame.Visible = true
-                        
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 180}):Play()
                     end
                 end)
-
-                
 
                 function DropdownHolder:SetText(Text)
                     DropdownText.Text = Text or "Dropdown"
@@ -1037,34 +1090,35 @@ function JustALibrary:CreateWindow(GivenTable)
                 function DropdownHolder:SetValue(Value)
                     if typeof(Value) == "table" and GivenTable.MultiSelection then
                         table.clear(SelectedValue)
-                        DropdownHolder.Value = SelectedValue
                         for _,Values in Value do
-                            local ValueType
-                            if typeof(Values) == "string" then ValueType = Values else ValueType = Values.Name end
-                            for _,Buttons in DropdownValuesFrame:GetChildren() do
-                                if Buttons:IsA("Frame") then
-                                    if Buttons.Name == ValueType then
-                                        table.insert(SelectedValue,Buttons.Name)
-                                        DropdownHolder.Value = SelectedValue
-                                        TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
-                                    elseif not table.find(SelectedValue,Buttons.Name) then
-                                        TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                            local ValueName
+                            if typeof(Values) == "string" then ValueName = Values else ValueName = Values.Name end
+                            for _,Button in DropdownValuesFrame:GetChildren() do
+                                if Button:IsA("Frame") then
+                                    if Button.Name == ValueName then
+                                        table.insert(SelectedValue,Button.Name)
+                                        TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                        TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+                                    elseif not table.find(SelectedValue,Button.Name) then
+                                        TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                        TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                     end
                                 end
                             end
                         end
                         GivenTable.Callback(SelectedValue)
                     elseif not GivenTable.MultiSelection then
-                        local ValueType
-                        if typeof(Value) == "string" then ValueType = Value else ValueType = Value.Name end
-                        for _,Buttons in DropdownValuesFrame:GetChildren() do
-                            if Buttons:IsA("Frame") then
-                                if Buttons.Name == ValueType then
-                                    SelectedValue = Buttons.Name
-                                    DropdownHolder.Value = SelectedValue
-                                    TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                        local ValueName
+                        if typeof(Value) == "string" then ValueName = Value else ValueName = Value.Name end
+                        for _,Button in DropdownValuesFrame:GetChildren() do
+                            if Button:IsA("Frame") then
+                                if Button.Name == ValueName then
+                                    SelectedValue = Button.Name
+                                    TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                    TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                 else
-                                    TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                    TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                    TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                 end
                             end
                         end
@@ -1075,78 +1129,61 @@ function JustALibrary:CreateWindow(GivenTable)
                 function DropdownHolder:ReplaceValues(NewValues)
                     if GivenTable.MultiSelection then
                         table.clear(SelectedValue)
-                        DropdownHolder.Value = SelectedValue
                         GivenTable.Callback(SelectedValue)
                     else
                         SelectedValue = nil
-                        DropdownHolder.Value = SelectedValue
                         GivenTable.Callback(SelectedValue)
                     end
-                    for _,Buttons in DropdownValuesFrame:GetChildren() do
-                        if Buttons:IsA("Frame") then Buttons:Destroy() end
+                    for _,Button in DropdownValuesFrame:GetChildren() do
+                        if Button:IsA("Frame") then Button:Destroy() end
                     end
                     for _,Value in NewValues do
-                        local ValueType
-                        if typeof(Value) == "string" then ValueType = Value else ValueType = Value.Name end
-                        local ValueFrame = Instance.new("Frame",DropdownValuesFrame)
-                        ValueFrame.BackgroundTransparency = 0.6
-                        ValueFrame.Size = UDim2.new(1,0,0,25)
-                        ValueFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-                        ValueFrame.Name = ValueType
-                        local ValueFrameCorner = Instance.new("UICorner",ValueFrame)
-                        local ValueButton = Instance.new("TextButton",ValueFrame)
-                        ValueButton.BackgroundTransparency = 1
-                        ValueButton.Size = UDim2.fromScale(1,1)
-                        ValueButton.Text = ValueType
-                        ValueButton.TextColor3 = Color3.fromRGB(255,255,255)
-                        ValueButton.TextScaled = true
-                        ValueButton.MouseButton1Click:Connect(function()
-                            for _,Buttons in DropdownValuesFrame:GetChildren() do
-                                if Buttons:IsA("Frame") then
+                        local ValueName
+                        if typeof(Value) == "string" then ValueName = Value else ValueName = Value.Name end
+                        local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value)
+                        ValueFrame.ValueButton.MouseButton1Click:Connect(function()
+                            for _,Button in DropdownValuesFrame:GetChildren() do
+                                if Button:IsA("Frame") then 
                                     if not GivenTable.MultiSelection then
-                                        if Buttons.Name == ValueType then
-                                            if SelectedValue ~= Buttons.Name then
-                                                SelectedValue = Buttons.Name
-                                                DropdownHolder.Value = SelectedValue
-                                                TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                        if Button.Name == ValueName then
+                                            if SelectedValue ~= Button.Name then
+                                                SelectedValue = Button.Name
+                                                TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                                TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                                 GivenTable.Callback(SelectedValue)
-                                            elseif SelectedValue == Buttons.Name and GivenTable.CanDeselect then
+                                            elseif SelectedValue == Button.Name and GivenTable.CanDeselect then
                                                 SelectedValue = nil
-                                                DropdownHolder.Value = SelectedValue
-                                                TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                                TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                                TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                                 GivenTable.Callback(SelectedValue)
                                             end
                                         else
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                            TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                            TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                         end
                                     elseif GivenTable.MultiSelection then
-                                        if Buttons.Name == ValueType then
-                                            if not table.find(SelectedValue,Buttons.Name) then
-                                                table.insert(SelectedValue,Buttons.Name)
-                                                DropdownHolder.Value = SelectedValue
-                                                TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                        if Button.Name == ValueName then
+                                            if not table.find(SelectedValue,Button.Name) then
+                                                table.insert(SelectedValue,Button.Name)
+                                                TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                                                TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                                 GivenTable.Callback(SelectedValue)
-                                            elseif (table.find(SelectedValue,Buttons.Name) and #SelectedValue > 1) or (table.find(SelectedValue,Buttons.Name) and GivenTable.CanDeselect) then
-                                                for Index,Item in SelectedValue do
-                                                    if Item == Buttons.Name then table.remove(SelectedValue,Index) end
-                                                end
-                                                DropdownHolder.Value = SelectedValue
-                                                TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                            elseif (table.find(SelectedValue,Button.Name) and #SelectedValue > 1) or (table.find(SelectedValue,Button.Name) and GivenTable.CanDeselect) then
+                                                local Index = table.find(SelectedValue,Button.Name)
+                                                if Index then table.remove(SelectedValue,Index) end
+                                                TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                                TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                                 GivenTable.Callback(SelectedValue)
                                             end
-                                        elseif not table.find(SelectedValue,Buttons.Name) then
-                                            TweenService:Create(Buttons,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                                        elseif not table.find(SelectedValue,Button.Name) then
+                                            TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
+                                            TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                         end
                                     end
                                 end
                             end
                         end)
                     end
-                    if GivenTable.MaxVisibleValues and GivenTable.MaxVisibleValues == "Auto" then
-                        MaxVisibleValues = #NewValues
-                    end
-                    DropdownValuesFrame.Size = UDim2.new(0.9,0,0,(MaxVisibleValues)*25+(MaxVisibleValues)*3)
-                    FakeDropdownFrame.Size = UDim2.new(1,0,0,(MaxVisibleValues)*25+(MaxVisibleValues)*3)
                 end
 
                 function DropdownHolder:GetActiveValues()
@@ -1155,7 +1192,6 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 function DropdownHolder:SetDisabled(Boolean)
                     DropdownValuesFrame.Visible = false
-                    FakeDropdownFrame.Visible = false
                     if Boolean then
                         DropdownButton.Interactable = false
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 0}):Play()
@@ -1171,16 +1207,11 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 function DropdownHolder:SetVisible(Boolean)
                     DropdownFrame.Visible = Boolean
-                    DropdownValuesFrame.Visible = false
-                    FakeDropdownFrame.Visible = false
                     TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 0}):Play()
-                    
                 end
 
                 function DropdownHolder:Destroy()
                     DropdownFrame:Destroy()
-                    FakeDropdownFrame:Destroy()
-                    
                 end
 
                 JustALibrary.Elements[GivenTable.Index or "Dropdown"] = DropdownHolder
