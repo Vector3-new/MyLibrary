@@ -777,7 +777,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = ToggleFrame,
                     Name = "ToggleText",
                     BackgroundTransparency = 1,
-                    Size = UDim2.fromScale(0.675,1),
+                    Size = UDim2.fromScale(0.7,1),
                     Position = UDim2.fromScale(0.05,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextScaled = true,
@@ -792,8 +792,9 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "ToggleButtonFrame",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.new(0.2,0,0,25),
-                    Position = UDim2.fromScale(0.75,0),
+                    AnchorPoint = Vector2.new(1,0),
+                    Size = UDim2.new(0,50,0,25),
+                    Position = UDim2.fromScale(0.95,0),
                     CornerRadius = 20,
                     Visible = true
                 })
