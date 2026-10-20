@@ -889,16 +889,6 @@ function JustALibrary:CreateWindow(GivenTable)
             function ContentBox:AddDropdown(GivenTable)
                 local DropdownHolder = {}
 
-                local MaxVisibleValues = 2
-
-                if GivenTable.MaxVisibleValues then
-                    if GivenTable.MaxVisibleValues == "Auto" and GivenTable.Values and #GivenTable.Values > 0 then
-                        MaxVisibleValues = #GivenTable.Values
-                    elseif typeof(GivenTable.MaxVisibleValues) == "number" then
-                        MaxVisibleValues = GivenTable.MaxVisibleValues
-                    end
-                end
-
                 local DropdownFrame = New({
                     ClassName = "Frame",
                     Parent = ContentBoxFrame,
@@ -906,6 +896,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     BackgroundTransparency = 1,
                     AutomaticSize = Enum.AutomaticSize.Y,
                     Size = UDim2.new(1,0,0,25),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
 
@@ -979,6 +970,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         Name = GivenName,
                         BackgroundTransparency = 1,
                         Size = UDim2.new(1,0,0,25),
+                        LayoutOrder = #(DropdownValuesFrame:GetChildren()),
                         Visible = true
                     })
                     local ValueText = New({
