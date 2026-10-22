@@ -106,6 +106,26 @@ local function New(GivenTable)
 
 end
 
+local function MakeDraggable(GivenFrame)
+    local IsDragging,CursorPosition,FramePosition,Offset = false
+    GivenFrame.InputBegan:Connect(function(Input,GameProcessed)
+        if not GameProcessed and GivenFrame.Visible and (Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch) then
+            CursorPosition = Input.Position
+            FramePosition = GivenFrame.AbsolutePosition
+            IsDragging = true
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(Input)
+        if IsDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+            Offset = Input.Position-CursorPosition
+            TweenService:Create(GivenFrame,TweenInfo.new(0.05),{Position = UDim2.fromOffset(FramePosition.X+Offset.X,FramePosition.Y+Offset.Y)}):Play()
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then IsDragging = false end
+    end)
+end
+
 local ModalElement = New({
     ClassName = "TextButton",
     Parent = JustALibraryGUI,
@@ -156,6 +176,7 @@ function JustALibrary:Notify(GivenTable)
         BackgroundTransparency = 1,
         Size = UDim2.new(1,0,0,0),
         AutomaticSize = Enum.AutomaticSize.Y,
+        ZIndex = 999,
         Visible = true
     })
     local NotificationFrame = New({
@@ -228,6 +249,41 @@ function JustALibrary:Notify(GivenTable)
     end)
 end
 
+function JustALibrary:CreateDraggableLabel(GivenText)
+    local DraggableLabelHolder = {}
+    local DraggableLabelFrame = New({
+        ClassName = "Frame",
+        Name = "DraggableLabel",
+        Parent = JustALibraryGUI,
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        BackgroundTransparency = 0.4,
+        Size = UDim2.fromOffset(30,30),
+        AutomaticSize = Enum.AutomaticSize.X,
+        CornerRadius = 8,
+        Visible = true
+    })
+    local DraggableLabelText = New({
+        ClassName = "TextLabel",
+        Parent = DraggableLabelFrame,
+        Name = "DraggableLabelText",
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1,0,0,30),
+        AutomaticSize = Enum.AutomaticSize.X,
+        TextColor3 = Color3.fromRGB(255,255,255),
+        TextScaled = true,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Text = GivenText or "Hello World!",
+        Visible = true
+    })
+    local TextPadding = Instance.new("UIPadding",DraggableLabelText)
+    TextPadding.PaddingTop = UDim.new(0,5)
+    TextPadding.PaddingBottom = UDim.new(0,5)
+    TextPadding.PaddingLeft = UDim.new(0,5)
+    TextPadding.PaddingRight = UDim.new(0,5)
+    MakeDraggable(DraggableLabelFrame)
+    return DraggableLabelHolder
+end
+
 function JustALibrary:CreateWindow(GivenTable)
 
     local Window = {}
@@ -241,8 +297,11 @@ function JustALibrary:CreateWindow(GivenTable)
         Position = UDim2.new(0.5,-WindowSize.X.Offset/2,0.5,-WindowSize.Y.Offset/2),
         BackgroundTransparency = 1,
         CornerRadius = 8,
+        Active = true,
         Visible = true
     })
+
+    MakeDraggable(WindowFrame)
 
     local WindowTitle = New({
         ClassName = "Frame",
