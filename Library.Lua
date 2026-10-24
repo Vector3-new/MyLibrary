@@ -1541,7 +1541,7 @@ function SetupSaveManager(GivenTable)
                 if string.match(Path,"([^/\\]+)$") == AutoloadConfigName then
                     local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..AutoloadConfigName))
                     for Index,Elements in JustALibrary.Elements do
-                        if ConfigData[Index] and ConfigData[Index].Name == Index then pcall(function() Elements:SetValue(ConfigData[Index].Value) end) end
+                        if ConfigData[Index] and ConfigData[Index].Name == Index then Elements:SetValue(ConfigData[Index].Value) end
                     end
                     JustALibrary:Notify({
                         Title = "Save manager",
