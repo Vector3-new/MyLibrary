@@ -1056,7 +1056,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 DropdownValuesPadding.PaddingLeft = UDim.new(0,8)
                 DropdownValuesPadding.PaddingRight = UDim.new(0,5)
 
-                local SelectedValue = nil if GivenTable.MultiSelection then SelectedValue = {} end
+                local SelectedValue = "" if GivenTable.MultiSelection then SelectedValue = {} end
                 DropdownHolder.Value = SelectedValue
                 local function CreateValue(GivenName,Selected)
                     local ValueFrame = New({
@@ -1105,7 +1105,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         Image = Icons.assets["lucide-check"],
                         Visible = true
                     })
-                    if Selected then if GivenTable.MultiSelection then table.insert(SelectedValue,GivenName) else SelectedValue = GivenName end end
+                    if Selected then if GivenTable.MultiSelection then table.insert(SelectedValue,GivenName) else SelectedValue = GivenName end DropdownHolder.Value = SelectedValue end 
                     return ValueFrame
                 end
 
