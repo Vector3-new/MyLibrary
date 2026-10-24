@@ -1377,6 +1377,7 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 function InputHolder:SetValue(NewValue)
                     Input.Text = NewValue
+                    GivenTable.Callback(Input.Text)
                 end
 
                 function InputHolder:SetDisabled(Boolean)
