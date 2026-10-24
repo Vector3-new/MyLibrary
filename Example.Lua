@@ -1,4 +1,4 @@
-local JustALibrary = loadfile("JustALibrary.Lua")()
+local JustALibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vector3-new/MyLibrary/refs/heads/main/Library.Lua"))()
 
 local MainWindow = JustALibrary:CreateWindow({
     Title = "Example",
