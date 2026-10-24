@@ -14,7 +14,6 @@ local JustALibrary = {
     Elements = {},
     Connections = {}
 }
-
 local BlacklistedKeys = {
 	"Unknown",
     "W",
@@ -29,7 +28,6 @@ local BlacklistedKeys = {
     "Backspace",
     "Escape"
 }
-
 local JustALibraryGUI = CoreGui:FindFirstChild("JustALibrary")
 if JustALibraryGUI then JustALibraryGUI:Destroy() end
 JustALibraryGUI = Instance.new("ScreenGui",CoreGui)
@@ -43,9 +41,7 @@ LibraryBlur.Size = 0
 TweenService:Create(LibraryBlur,TweenInfo.new(0.25,Enum.EasingStyle.Linear),{Size = 12}):Play()
 
 local function New(GivenTable)
-
     local Object
-
     if (GivenTable.ClassName or "Frame") == "Frame" and GivenTable.ScrollingConfig then
         Object = Instance.new("ScrollingFrame",GivenTable.Parent)
         Object.ScrollBarThickness = 0
@@ -55,7 +51,6 @@ local function New(GivenTable)
     else
         Object = Instance.new(GivenTable.ClassName or "Frame",GivenTable.Parent)
     end
-
     Object.Name = GivenTable.Name or Object.ClassName
     Object.Visible = GivenTable.Visible
     Object.BackgroundColor3 = GivenTable.BackgroundColor3 or Color3.fromRGB(0,0,0)
@@ -66,9 +61,8 @@ local function New(GivenTable)
     Object.Position = GivenTable.Position or UDim2.new(0,0,0,0)
     Object.LayoutOrder = GivenTable.LayoutOrder or 0
     Object.ZIndex = GivenTable.ZIndex or 0
-
-    if GivenTable.ClassName == "TextLabel" or GivenTable.ClassName == "TextButton" then
-        Object.Text = GivenTable.Text or (GivenTable.ClassName == "TextLabel" and "Text" or "Button")
+    if GivenTable.ClassName == "TextLabel" or GivenTable.ClassName == "TextButton" or GivenTable.ClassName == "TextBox" then
+        Object.Text = GivenTable.Text or (GivenTable.ClassName == "TextLabel" and "Text" or GivenTable.ClassName == "TextBox" and "" or "Button")
         Object.TextColor3 = GivenTable.TextColor3 or Color3.fromRGB(255,255,255)
         Object.TextSize = GivenTable.TextSize or 8
         Object.TextWrapped = GivenTable.TextWrapped or false
@@ -78,23 +72,24 @@ local function New(GivenTable)
         Object.TextXAlignment = GivenTable.TextXAlignment or Enum.TextXAlignment.Center
         Object.TextYAlignment = GivenTable.TextYAlignment or Enum.TextYAlignment.Center
     end
-
+    if GivenTable.ClassName == "TextBox" then
+        Object.PlaceholderText = GivenTable.PlaceholderText or ""
+        Object.ClearTextOnFocus = GivenTable.ClearTextOnFocus or false
+        Object.TextEditable = GivenTable.TextEditable or true
+    end
     if GivenTable.ClassName == "ImageLabel" or GivenTable.ClassName == "ImageButton" then
         Object.Image = GivenTable.Image or ""
         Object.ImageColor3 = GivenTable.ImageColor3 or Color3.fromRGB(255,255,255)
         Object.ImageTransparency = GivenTable.ImageTransparency or 0
     end
-
     if GivenTable.CornerRadius then
         local UICorner = Instance.new("UICorner",Object)
         UICorner.CornerRadius = UDim.new(0,GivenTable.CornerRadius)
     end
-
     if GivenTable.Padding then
         local UIPadding = Instance.new("UIPadding",Object)
         UIPadding.PaddingBottom = UDim.new(0,GivenTable.Padding)
     end
-
     if GivenTable.ListLayoutConfig then
         local UIListLayout = Instance.new("UIListLayout",Object)
         UIListLayout.Padding = GivenTable.ListLayoutConfig.Padding or UDim.new(0,0)
@@ -103,9 +98,7 @@ local function New(GivenTable)
         UIListLayout.HorizontalAlignment = GivenTable.ListLayoutConfig.HorizontalAlignment or Enum.HorizontalAlignment.Left
         UIListLayout.VerticalAlignment = GivenTable.ListLayoutConfig.VerticalAlignment or Enum.VerticalAlignment.Top
     end
-
     return Object
-
 end
 
 local function RemoveConnections(Element)
@@ -296,10 +289,9 @@ function JustALibrary:CreateDraggableLabel(GivenText)
 end
 
 function JustALibrary:CreateWindow(GivenTable)
-
     local Window = {}
-
     local WindowSize = GivenTable.Size or UDim2.fromOffset(650,550)
+
     local WindowFrame = New({
         ClassName = "Frame",
         Parent = JustALibraryGUI,
@@ -307,11 +299,9 @@ function JustALibrary:CreateWindow(GivenTable)
         Size = WindowSize,
         Position = UDim2.new(0.5,-WindowSize.X.Offset/2,0.5,-WindowSize.Y.Offset/2),
         BackgroundTransparency = 1,
-        CornerRadius = 8,
         Active = true,
         Visible = true
     })
-
     MakeDraggable(WindowFrame)
 
     local WindowTitle = New({
@@ -462,7 +452,6 @@ function JustALibrary:CreateWindow(GivenTable)
             TweenService:Create(LibraryBlur,TweenInfo.new(0.25,Enum.EasingStyle.Linear),{Size = 0}):Play()
         end
     end
-
     WindowTitleButton.MouseButton1Click:Connect(function()
         Window:ToggleVisible()
     end)
@@ -501,7 +490,6 @@ function JustALibrary:CreateWindow(GivenTable)
     end)
 
     function Window:AddTab(GivenTable)
-
         local Tab = {}
 
         local TabFrame = New({
@@ -515,7 +503,6 @@ function JustALibrary:CreateWindow(GivenTable)
             CornerRadius = 8,
             Visible = true
         })
-
         local TabLabel = New({
             ClassName = "TextLabel",
             Parent = TabFrame,
@@ -528,7 +515,6 @@ function JustALibrary:CreateWindow(GivenTable)
             Position = GivenTable.Icon and UDim2.fromOffset(45,12) or UDim2.fromOffset(10,12),
             Visible = true
         })
-
         if GivenTable.Icon then
             local TabIcon = New({
                 ClassName = "ImageLabel",
@@ -551,31 +537,6 @@ function JustALibrary:CreateWindow(GivenTable)
             CornerRadius = 8,
             Visible = false
         })
-
-        local TabButton = New({
-            ClassName = "TextButton",
-            Parent = TabFrame,
-            Name = "TabButton",
-            BackgroundTransparency = 1,
-            Size = UDim2.fromScale(1,1),
-            Text = "",
-            Visible = true
-        })
-
-        TabButton.MouseButton1Click:Connect(function()
-            for _,TabFrames in TabsFrame:GetChildren() do
-                if TabFrames:IsA("Frame") then
-                    if TabFrames == TabFrame then
-                        WindowFrame[TabFrames.Name].Visible = true
-                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
-                    else
-                        WindowFrame[TabFrames.Name].Visible = false
-                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
-                    end
-                end
-            end
-        end)
-
         local TabContentScrollingFrame = New({
             ClassName = "Frame",
             Parent = TabContentFrame,
@@ -592,7 +553,6 @@ function JustALibrary:CreateWindow(GivenTable)
             },
             Visible = true
         })
-
         local SecondTabContentScrollingFrame = New({
             ClassName = "Frame",
             Parent = TabContentFrame,
@@ -610,8 +570,30 @@ function JustALibrary:CreateWindow(GivenTable)
             Visible = true
         })
 
-        function Tab:AddContentBox(GivenTable)
+        local TabButton = New({
+            ClassName = "TextButton",
+            Parent = TabFrame,
+            Name = "TabButton",
+            BackgroundTransparency = 1,
+            Size = UDim2.fromScale(1,1),
+            Text = "",
+            Visible = true
+        })
+        TabButton.MouseButton1Click:Connect(function()
+            for _,TabFrames in TabsFrame:GetChildren() do
+                if TabFrames:IsA("Frame") then
+                    if TabFrames == TabFrame then
+                        WindowFrame[TabFrames.Name].Visible = true
+                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
+                    else
+                        WindowFrame[TabFrames.Name].Visible = false
+                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                    end
+                end
+            end
+        end)
 
+        function Tab:AddContentBox(GivenTable)
             local ContentBox = {HiddenElements = {}}
             local GivenParent = GivenTable.Side == "Right" and SecondTabContentScrollingFrame or TabContentScrollingFrame
 
@@ -632,7 +614,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 },
                 Visible = true
             })
-
             local ContentBoxTitleFrame = New({
                 ClassName = "Frame",
                 Parent = ContentBoxFrame,
@@ -643,7 +624,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 CornerRadius = 8,
                 Visible = true
             })
-
             local ContentBoxTitle = New({
                 ClassName = "TextLabel",
                 Parent = ContentBoxTitleFrame,
@@ -658,7 +638,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 Text = GivenTable.Name or "ContentBox",
                 Visible = true
             })
-
             local ContentBoxPopOut = New({
                 ClassName = "ImageButton",
                 Parent = ContentBoxTitleFrame,
@@ -670,7 +649,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 Image = Icons.assets["lucide-external-link"],
                 Visible = true
             })
-
             local ContentBoxMinimize = New({
                 ClassName = "ImageButton",
                 Parent = ContentBoxTitleFrame,
@@ -684,7 +662,6 @@ function JustALibrary:CreateWindow(GivenTable)
             })
 
             local IsMinimized = false
-
             ContentBoxMinimize.MouseButton1Click:Connect(function()
                 IsMinimized = not IsMinimized
                 for _,Element in ContentBoxFrame:GetChildren() do
@@ -716,7 +693,6 @@ function JustALibrary:CreateWindow(GivenTable)
             end)
 
             function ContentBox:AddLabel(Text)
-
                 local LabelHolder = {}
 
                 local LabelFrame = New({
@@ -729,7 +705,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
-
                 local LabelText = New({
                     ClassName = "TextLabel",
                     Parent = LabelFrame,
@@ -760,11 +735,9 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 return LabelHolder
-
             end
 
             function ContentBox:AddDivider()
-
                 local DividerHolder = {}
 
                 local DividerFrame = New({
@@ -776,7 +749,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
-
                 local Divider = New({
                     ClassName = "Frame",
                     Parent = DividerFrame,
@@ -799,11 +771,9 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 return DividerHolder
-
             end
 
             function ContentBox:AddImage(GivenTable)
-
                 local ImageHolder = {}
 
                 local ImageFrame = New({
@@ -815,7 +785,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
-
                 local ImageLabel = New({
                     ClassName = "ImageLabel",
                     Parent = ImageFrame,
@@ -839,7 +808,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 return ImageHolder
-
             end
 
             function ContentBox:AddButton(GivenTable)
@@ -854,7 +822,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
-
                 local Button = New({
                     ClassName = "TextButton",
                     Parent = ButtonFrame,
@@ -869,7 +836,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     CornerRadius = 8,
                     Visible = true
                 })
-
                 Button.MouseButton1Click:Connect(GivenTable.Callback)
 
                 function ButtonHolder:SetText(Text)
@@ -896,11 +862,9 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 return ButtonHolder
-
             end
 
             function ContentBox:AddToggle(GivenTable)
-
                 local ToggleHolder = {Value = false}
 
                 local ToggleFrame = New({
@@ -912,7 +876,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
-
                 local ToggleText = New({
                     ClassName = "TextLabel",
                     Parent = ToggleFrame,
@@ -926,7 +889,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Visible = true
                 })
-
                 local ToggleButtonFrame = New({
                     ClassName = "Frame",
                     Parent = ToggleFrame,
@@ -939,7 +901,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     CornerRadius = 20,
                     Visible = true
                 })
-
                 local SecondToggleButtonFrame = New({
                     ClassName = "Frame",
                     Parent = ToggleButtonFrame,
@@ -953,13 +914,11 @@ function JustALibrary:CreateWindow(GivenTable)
                 })
 
                 local IsToggled = false
-
                 if GivenTable.Default then
                     IsToggled = true
                     ToggleButtonFrame.BackgroundColor3 = Color3.fromRGB(125,125,125)
                     SecondToggleButtonFrame.Position = UDim2.fromScale(0.5,0)
                 end
-
                 ToggleHolder.Value = IsToggled
 
                 local ToggleButton = New({
@@ -971,7 +930,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     Size = UDim2.fromScale(1,1),
                     Visible = true
                 })
-
                 ToggleButton.MouseButton1Click:Connect(function()
                     IsToggled = not IsToggled
                     ToggleHolder.Value = IsToggled
@@ -1025,7 +983,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 JustALibrary.Elements[GivenTable.Index or "Toggle"] = ToggleHolder
 
                 return ToggleHolder
-
             end
 
             function ContentBox:AddDropdown(GivenTable)
@@ -1041,7 +998,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
-
                 local DropdownText = New({
                     ClassName = "TextLabel",
                     Parent = DropdownFrame,
@@ -1056,7 +1012,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     ZIndex = 2,
                     Visible = true
                 })
-
                 local DropdownButton = New({
                     ClassName = "TextButton",
                     Parent = DropdownFrame,
@@ -1070,7 +1025,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     CornerRadius = 8,
                     Visible = true
                 })
-
                 local DropdownIcon = New({
                     ClassName = "ImageLabel",
                     Parent = DropdownButton,
@@ -1082,7 +1036,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     Image = Icons.assets["lucide-chevron-down"],
                     Visible = true
                 })
-
                 local DropdownValuesFrame = New({
                     ClassName = "Frame",
                     Parent = DropdownFrame,
@@ -1102,9 +1055,12 @@ function JustALibrary:CreateWindow(GivenTable)
                 local DropdownValuesPadding = Instance.new("UIPadding",DropdownValuesFrame)
                 DropdownValuesPadding.PaddingTop = UDim.new(0,5)
                 DropdownValuesPadding.PaddingBottom = UDim.new(0,5)
-                DropdownValuesPadding.PaddingLeft = UDim.new(0,5)
+                DropdownValuesPadding.PaddingLeft = UDim.new(0,8)
                 DropdownValuesPadding.PaddingRight = UDim.new(0,5)
 
+                local SelectedValue
+                if GivenTable.MultiSelection then SelectedValue = {} end
+                DropdownHolder.Value = SelectedValue
                 local function CreateValue(GivenName,Selected)
                     local ValueFrame = New({
                         ClassName = "Frame",
@@ -1152,17 +1108,14 @@ function JustALibrary:CreateWindow(GivenTable)
                         Image = Icons.assets["lucide-check"],
                         Visible = true
                     })
+                    if Selected then if GivenTable.MultiSelection then table.insert(SelectedValue,GivenName) else SelectedValue = GivenName end end
                     return ValueFrame
                 end
-
-                local SelectedValue
-                if GivenTable.MultiSelection then SelectedValue = {} end
-                DropdownHolder.Value = SelectedValue
 
                 for _,Value in GivenTable.Values or {} do
                     local ValueName
                     if typeof(Value) == "string" then ValueName = Value else ValueName = Value.Name end
-                    local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value)
+                    local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value or typeof(GivenTable.Default) == "table" and table.find(GivenTable.Default,Value))
                     ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                         for _,Button in DropdownValuesFrame:GetChildren() do
                             if Button:IsA("Frame") then 
@@ -1352,47 +1305,62 @@ function JustALibrary:CreateWindow(GivenTable)
                 JustALibrary.Elements[GivenTable.Index or "Dropdown"] = DropdownHolder
 
                 return DropdownHolder
-
             end
 
             function ContentBox:AddInput(GivenTable)
                 local InputHolder = {Value = GivenTable.Default or ""}
 
-                local InputFakeFrame = Instance.new("Frame",ContentBoxFrame)
-                InputFakeFrame.BackgroundTransparency = 1
-                InputFakeFrame.Size = UDim2.new(1,0,0,50)
-                InputFakeFrame.LayoutOrder = #(ContentBoxFrame:GetChildren())
-
-                local InputName = Instance.new("TextLabel",InputFakeFrame)
-                InputName.BackgroundTransparency = 1
-                InputName.Size = UDim2.new(0.9,0,0,25)
-                InputName.Position = UDim2.new(0.05,0,0,0)
-                InputName.TextColor3 = Color3.fromRGB(255,255,255)
-                InputName.TextScaled = true
-                InputName.TextXAlignment = Enum.TextXAlignment.Left
-                InputName.Text = GivenTable.Text
-
-                local InputFrame = Instance.new("Frame",InputFakeFrame)
-                InputFrame.BackgroundTransparency = 0.6
-                InputFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-                InputFrame.Size = UDim2.new(0.9,0,0,25)
-                InputFrame.Position = UDim2.new(0.05,0,0,25)
-                local InputFrameCorner = Instance.new("UICorner",InputFrame)
-
-                local Input = Instance.new("TextBox",InputFrame)
-                Input.BackgroundTransparency = 1
-                Input.Size = UDim2.new(0.9,0,0,25)
-                Input.Position = UDim2.new(0.05,0,0,0)
-                Input.ClearTextOnFocus = GivenTable.ClearTextOnFocus or false
-                Input.TextColor3 = Color3.fromRGB(255,255,255)
-                Input.TextWrap = true
-                Input.TextTruncate = Enum.TextTruncate.AtEnd
-                Input.PlaceholderText = GivenTable.Placeholder or ""
-                Input.TextXAlignment = Enum.TextXAlignment.Left
-                Input.Text = GivenTable.Default or ""
+                local InputFakeFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "InputFakeFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,50),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
+                local InputName = New({
+                    ClassName = "TextLabel",
+                    Parent = InputFakeFrame,
+                    Name = "InputName",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.9,0,0,25),
+                    Position = UDim2.new(0.05,0,0,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Text = GivenTable.Text,
+                    Visible = true
+                })
+                local InputFrame = New({
+                    ClassName = "Frame",
+                    Parent = InputFakeFrame,
+                    Name = "InputFrame",
+                    BackgroundTransparency = 0.6,
+                    BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    Size = UDim2.new(0.9,0,0,25),
+                    Position = UDim2.new(0.05,0,0,25),
+                    CornerRadius = 8,
+                    Visible = true
+                })
+                local Input = New({
+                    ClassName = "TextBox",
+                    Parent = InputFrame,
+                    Name = "Input",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.9,0,0,25),
+                    Position = UDim2.new(0.05,0,0,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextWrapped = true,
+                    TextTruncate = Enum.TextTruncate.AtEnd,
+                    PlaceholderText = GivenTable.Placeholder or "",
+                    ClearTextOnFocus = GivenTable.ClearTextOnFocus or false,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Text = GivenTable.Default or "",
+                    Visible = true
+                })
 
                 local WaitingForFinish = false
-
                 Input:GetPropertyChangedSignal("Text"):Connect(function()
                     if not GivenTable.Finished then
                         InputHolder.Value = Input.Text
@@ -1438,7 +1406,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 JustALibrary.Elements[GivenTable.Index or "Input"] = InputHolder
 
                 return InputHolder
-
             end
 
             function ContentBox:AddKeyPicker(GivenTable)
