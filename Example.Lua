@@ -1,9 +1,11 @@
-local JustALibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vector3-new/MyLibrary/refs/heads/main/Library.Lua"))()
+local JustALibrary = loadfile("JustALibrary.Lua")()
 
 local MainWindow = JustALibrary:CreateWindow({
     Title = "Example",
     Size = UDim2.fromOffset(550,450) -- or UDim2.fromOffset(650,550)
 })
+
+local Watermark = JustALibrary:CreateDraggableLabel()
 
 local Main = MainWindow:AddTab({Name = "Home"})
 local Settings = MainWindow:AddTab({Name = "Settings",Icon = "lucide-cog"})
@@ -124,20 +126,20 @@ Contentbox1:AddToggle({
 Contentbox1:AddDropdown({
     Text = "Single Dropdown",
     Index = "Drop1",
-    Values = {"wan","tu","tri"},
-    Default = "wan",
-    MaxVisibleValues = "Auto",
+    Values = {"I","II","III"},
+    Default = "I",
     MultiSelection = false,
+		CanDeselect = true,
     Callback = function(Value) print(Value) end
 })
 
 Contentbox1:AddDropdown({
     Text = "Multi Dropdown",
     Index = "Drop2",
-    Values = {"for","fiv","ix"},
-    Default = "fiv",
-    MaxVisibleValues = 2,
+    Values = {"IV","V","VI"},
+    Default = {"IV","V"},
     MultiSelection = true,
+		CanDeselect = true,
     Callback = function(Value) for Index,Item in Value do print(Index,Item) end end
 })
 
