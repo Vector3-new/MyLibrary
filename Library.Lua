@@ -24,9 +24,7 @@ local BlacklistedKeys = {
     "Left",
     "Down",
     "Right",
-    "Slash",
-    "Backspace",
-    "Escape"
+    "Slash"
 }
 local JustALibraryGUI = CoreGui:FindFirstChild("JustALibrary")
 if JustALibraryGUI then JustALibraryGUI:Destroy() end
@@ -1058,8 +1056,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 DropdownValuesPadding.PaddingLeft = UDim.new(0,8)
                 DropdownValuesPadding.PaddingRight = UDim.new(0,5)
 
-                local SelectedValue
-                if GivenTable.MultiSelection then SelectedValue = {} end
+                local SelectedValue = nil if GivenTable.MultiSelection then SelectedValue = {} end
                 DropdownHolder.Value = SelectedValue
                 local function CreateValue(GivenName,Selected)
                     local ValueFrame = New({
@@ -1113,9 +1110,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 for _,Value in GivenTable.Values or {} do
-                    local ValueName
-                    if typeof(Value) == "string" then ValueName = Value else ValueName = Value.Name end
-                    local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value or typeof(GivenTable.Default) == "table" and table.find(GivenTable.Default,Value))
+                    local ValueName if typeof(Value) == "string" then ValueName = Value elseif typeof(Value) == "Instance" then ValueName = Value.Name end
+                    local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value or typeof(GivenTable.Default) == "table" and GivenTable.MultiSelection and table.find(GivenTable.Default,Value))
                     ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                         for _,Button in DropdownValuesFrame:GetChildren() do
                             if Button:IsA("Frame") then 
@@ -1123,11 +1119,13 @@ function JustALibrary:CreateWindow(GivenTable)
                                     if Button.Name == ValueName then
                                         if SelectedValue ~= Button.Name then
                                             SelectedValue = Button.Name
+                                            DropdownHolder.Value = SelectedValue
                                             TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                             TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                             GivenTable.Callback(SelectedValue)
                                         elseif SelectedValue == Button.Name and GivenTable.CanDeselect then
                                             SelectedValue = nil
+                                            DropdownHolder.Value = SelectedValue
                                             TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
                                             TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                             GivenTable.Callback(SelectedValue)
@@ -1143,7 +1141,7 @@ function JustALibrary:CreateWindow(GivenTable)
                                             TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                             TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                             GivenTable.Callback(SelectedValue)
-                                        elseif (table.find(SelectedValue,Button.Name) and #SelectedValue > 1) or (table.find(SelectedValue,Button.Name) and GivenTable.CanDeselect) then
+                                        elseif (table.find(SelectedValue,Button.Name) and #SelectedValue>1) or (table.find(SelectedValue,Button.Name) and GivenTable.CanDeselect) then
                                             local Index = table.find(SelectedValue,Button.Name)
                                             if Index then table.remove(SelectedValue,Index) end
                                             TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
@@ -1175,11 +1173,9 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function DropdownHolder:SetValue(Value)
-                    if typeof(Value) == "table" and GivenTable.MultiSelection then
-                        table.clear(SelectedValue)
+                    if Value and typeof(Value) == "table" and GivenTable.MultiSelection then table.clear(SelectedValue)
                         for _,Values in Value do
-                            local ValueName
-                            if typeof(Values) == "string" then ValueName = Values else ValueName = Values.Name end
+                            local ValueName if typeof(Values) == "string" then ValueName = Values elseif typeof(Values) == "Instance" then ValueName = Values.Name end
                             for _,Button in DropdownValuesFrame:GetChildren() do
                                 if Button:IsA("Frame") then
                                     if Button.Name == ValueName then
@@ -1195,12 +1191,12 @@ function JustALibrary:CreateWindow(GivenTable)
                         end
                         GivenTable.Callback(SelectedValue)
                     elseif not GivenTable.MultiSelection then
-                        local ValueName
-                        if typeof(Value) == "string" then ValueName = Value else ValueName = Value.Name end
+                        local ValueName if typeof(Value) == "string" then ValueName = Value elseif typeof(Value) == "Instance" then ValueName = Value.Name end
                         for _,Button in DropdownValuesFrame:GetChildren() do
                             if Button:IsA("Frame") then
                                 if Button.Name == ValueName then
                                     SelectedValue = Button.Name
+                                    DropdownHolder.Value = SelectedValue
                                     TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                     TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                 else
@@ -1225,8 +1221,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         if Button:IsA("Frame") then Button:Destroy() end
                     end
                     for _,Value in NewValues do
-                        local ValueName
-                        if typeof(Value) == "string" then ValueName = Value else ValueName = Value.Name end
+                        local ValueName if typeof(Value) == "string" then ValueName = Value elseif typeof(Value) == "Instance" then ValueName = Value.Name end
                         local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value)
                         ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                             for _,Button in DropdownValuesFrame:GetChildren() do
@@ -1235,11 +1230,13 @@ function JustALibrary:CreateWindow(GivenTable)
                                         if Button.Name == ValueName then
                                             if SelectedValue ~= Button.Name then
                                                 SelectedValue = Button.Name
+                                                DropdownHolder.Value = SelectedValue
                                                 TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                                 TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                                 GivenTable.Callback(SelectedValue)
                                             elseif SelectedValue == Button.Name and GivenTable.CanDeselect then
                                                 SelectedValue = nil
+                                                DropdownHolder.Value = SelectedValue
                                                 TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
                                                 TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                                 GivenTable.Callback(SelectedValue)
@@ -1409,47 +1406,57 @@ function JustALibrary:CreateWindow(GivenTable)
             end
 
             function ContentBox:AddKeyPicker(GivenTable)
-                local KeybindHolder = {}
+                local KeybindHolder = {Value = "None"}
 
-                local KeybindFakeFrame = Instance.new("Frame",ContentBoxFrame)
-                KeybindFakeFrame.BackgroundTransparency = 1
-                KeybindFakeFrame.Size = UDim2.new(1,0,0,25)
-                KeybindFakeFrame.LayoutOrder = #(ContentBoxFrame:GetChildren())
+                local KeybindFakeFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "KeybindFakeFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,25),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
+                local KeybindName = New({
+                    ClassName = "TextLabel",
+                    Parent = KeybindFakeFrame,
+                    Name = "KeybindName",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.7,0,1,0),
+                    Position = UDim2.new(0.05,0,0,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Text = GivenTable.Text or "Keybind",
+                    Visible = true
+                })
+                local KeybindFrame = New({
+                    ClassName = "Frame",
+                    Parent = KeybindFakeFrame,
+                    Name = "KeybindFrame",
+                    BackgroundTransparency = 0.6,
+                    BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    Size = UDim2.new(0.2,0,1,0),
+                    Position = UDim2.new(0.75,0,0,0),
+                    CornerRadius = 8,
+                    Visible = true
+                })
+                local KeybindButton = New({
+                    ClassName = "TextButton",
+                    Parent = KeybindFrame,
+                    Name = "KeybindButton",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,1,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextScaled = true,
+                    Text = (not GivenTable.Default or table.find(BlacklistedKeys,GivenTable.Default)) and "None" or GivenTable.Default,
+                    Visible = true
+                })
 
-                local KeybindName = Instance.new("TextLabel",KeybindFakeFrame)
-                KeybindName.BackgroundTransparency = 1
-                KeybindName.Size = UDim2.new(0.7,0,1,0)
-                KeybindName.Position = UDim2.new(0.05,0,0,0)
-                KeybindName.TextColor3 = Color3.fromRGB(255,255,255)
-                KeybindName.TextScaled = true
-                KeybindName.TextXAlignment = Enum.TextXAlignment.Left
-                KeybindName.Text = GivenTable.Text or "Keybind"
-
-                local KeybindFrame = Instance.new("Frame",KeybindFakeFrame)
-                KeybindFrame.BackgroundTransparency = 0.6
-                KeybindFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-                KeybindFrame.Size = UDim2.new(0.2,0,1,0)
-                KeybindFrame.Position = UDim2.new(0.75,0,0,0)
-                local KeybindFrameCorner = Instance.new("UICorner",KeybindFrame)
-
-                local KeybindButton = Instance.new("TextButton",KeybindFrame)
-                KeybindButton.BackgroundTransparency = 1
-                KeybindButton.Size = UDim2.new(1,0,1,0)
-                KeybindButton.TextColor3 = Color3.fromRGB(255,255,255)
-                KeybindButton.TextScaled = true
-                if not GivenTable.Default or table.find(BlacklistedKeys,GivenTable.Default) then 
-                    KeybindButton.Text = "None"
-                else
-                    KeybindButton.Text = GivenTable.Default
-                end
-
-                local Trigger = GivenTable.Default or "None"
+                local Trigger,IsDisabled,WaitForKey = GivenTable.Default or "None",false
                 KeybindHolder.Value = Trigger
-                local IsDisabled = false
-                local WaitForKey
-
                 UserInputService.InputBegan:Connect(function(Key,GameProcessed)
-                    if GameProcessed or IsDisabled or Key.KeyCode.Name ~= Trigger or WaitForKey then return end;GivenTable.Callback()
+                    if GameProcessed or IsDisabled or WaitForKey or Key.KeyCode.Name ~= Trigger then return end GivenTable.Callback()
                 end)
 
                 KeybindButton.MouseButton1Click:Connect(function()
@@ -1457,28 +1464,24 @@ function JustALibrary:CreateWindow(GivenTable)
                     WaitForKey = UserInputService.InputBegan:Connect(function(Key,GameProcessed)
                         if not GameProcessed and Key.UserInputType == Enum.UserInputType.Keyboard and not table.find(BlacklistedKeys,Key.KeyCode.Name) then
                             Trigger = Key.KeyCode.Name
-                            KeybindHolder.Value = Trigger
-                            KeybindButton.Text = Trigger
-                            task.wait()
-                            WaitForKey:Disconnect();WaitForKey = nil
+                            if Trigger == "Backspace" or Trigger == "Escape" then Trigger = "None" end
+                            KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
+                            task.wait() WaitForKey:Disconnect() WaitForKey = nil
                         end
                     end)
                 end)
-
-                
 
 				function KeybindHolder:SetText(Text)
                     KeybindName.Text = Text or "Keybind"
                 end
 
                 function KeybindHolder:SetValue(Key)
-                    if WaitForKey then WaitForKey:Disconnect() end
-                    WaitForKey = true
+                    if WaitForKey then WaitForKey:Disconnect() end WaitForKey = true
                     if not table.find(BlacklistedKeys,Key) then
                         Trigger = Key
-                        KeybindButton.Text = Trigger
-                    end
-                    task.wait();WaitForKey = nil
+                        if Trigger == "Backspace" or Trigger == "Escape" then Trigger = "None" end
+                        KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
+                    end task.wait() WaitForKey = nil
                 end
 
                 function KeybindHolder:SetDisabled(Boolean)
@@ -1502,7 +1505,6 @@ function JustALibrary:CreateWindow(GivenTable)
 
                 function KeybindHolder:Destroy()
                     KeybindFakeFrame:Destroy()
-                    
                 end
 
                 JustALibrary.Elements[GivenTable.Index or "Keybind"] = KeybindHolder
@@ -1515,59 +1517,48 @@ function JustALibrary:CreateWindow(GivenTable)
             end
 
             return ContentBox
-
         end
 
         table.insert(JustALibrary.Tabs,Tab)
 
         return Tab
-
     end
 
     return Window
-
 end
 
 function SetupSaveManager(GivenTable)
-
-    local SaveManager = {}
-    local ConfigName = "Config"
-    local ImportMode = false
-    local ImportJSONCode = nil
-    local SelectedConfig = nil
-
-    if not GivenTable.Tab or not table.find(JustALibrary.Tabs,GivenTable.Tab) or not GivenTable.MainFolderName or not GivenTable.SubFolderName then return end
+    if not isfolder or not makefolder or not isfile or not listfiles or not readfile or not writefile or not delfile then return end
+    local SaveManager,ConfigName,ImportMode,ImportJSONCode,SelectedConfig,ConfigsDropdown = {},"Config",false
+    if not GivenTable.Tab or not table.find(JustALibrary.Tabs,GivenTable.Tab) or not GivenTable.MainFolderName then return end
     local MainFolder = isfolder(GivenTable.MainFolderName)
     if not MainFolder then makefolder(GivenTable.MainFolderName) end
-    local SubFolder = isfolder(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName)
-    if not SubFolder then makefolder(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName) end
-    
-    if GivenTable.Autoload and isfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/Autoload.lib") then
-        local AutoloadConfigName = loadfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/Autoload.lib")()
+    if GivenTable.Autoload and isfile(GivenTable.MainFolderName.."/Autoload.lib") then
+        local AutoloadConfigName = loadfile(GivenTable.MainFolderName.."/Autoload.lib")()
         if AutoloadConfigName then
-            local FilesPath = listfiles(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName)
+            local FilesPath = listfiles(GivenTable.MainFolderName)
             for _,Path in FilesPath do
-                if Path and string.match(Path,"([^/]+)$") == AutoloadConfigName then
-                    local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..AutoloadConfigName))
+                if string.match(Path,"([^/\\]+)$") == AutoloadConfigName then
+                    local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..AutoloadConfigName))
                     for Index,Elements in JustALibrary.Elements do
-                        if ConfigData[Index] and ConfigData[Index].Name == Index then
-                            Elements:SetValue(ConfigData[Index].Value)
-                        end
+                        if ConfigData[Index] and ConfigData[Index].Name == Index then Elements:SetValue(ConfigData[Index].Value) end
                     end
                     JustALibrary:Notify({
                         Title = "Save manager",
                         Content = "Loaded config: "..AutoloadConfigName,
-                        Sound = 107396133526484,
-                        Time = 3
-                    })
-                    break
+                        Sound = 107396133526484
+                    }) break
                 end
             end
         end
     end
-
+    local function RefreshList()
+        local FilesPath,FilesList = listfiles(GivenTable.MainFolderName),{}
+        for _,Path in FilesPath do
+            if string.match(Path,"([^/\\]+)$") ~= "Autoload.lib" then print(_,Path,string.match(Path,"([^/\\]+)$")) table.insert(FilesList,string.match(Path,"([^/\\]+)$")) end
+        end ConfigsDropdown:ReplaceValues(FilesList)
+    end
     local SaveManagerContentBox = GivenTable.Tab:AddContentBox({Name = "Save manager",Side = "Right"})
-            
     SaveManagerContentBox:AddInput({
         Text = "Config name",
         Index = "SaveManagerConfigName",
@@ -1575,12 +1566,11 @@ function SetupSaveManager(GivenTable)
         Finished = true,
         Callback = function(Value) ConfigName = Value end
     })
-    
     SaveManagerContentBox:AddButton({
         Text = "Create config",
         Callback = function()
             if ImportMode and ImportJSONCode then
-                writefile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..ConfigName..".lib",ImportJSONCode)
+                writefile(GivenTable.MainFolderName.."/"..ConfigName..".lib",ImportJSONCode)
             else
                 local Config = {}
                 for Index,Elements in JustALibrary.Elements do
@@ -1595,12 +1585,10 @@ function SetupSaveManager(GivenTable)
                             Config[Index] = {Name = Index,Value = Elements.Value}
                         end
                     end
-                end
-                writefile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..ConfigName..".lib",HttpService:JSONEncode(Config))
-            end
+                end writefile(GivenTable.MainFolderName.."/"..ConfigName..".lib",HttpService:JSONEncode(Config))
+            end RefreshList()
         end
     })
-
     SaveManagerContentBox:AddToggle({
         Text = "Import",
         Index = "SaveManagerImportMode",
@@ -1609,7 +1597,6 @@ function SetupSaveManager(GivenTable)
             JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(ImportMode)
         end
     })
-
     SaveManagerContentBox:AddInput({
         Text = "JSON Code",
         Index = "SaveManagerJSONCode",
@@ -1617,39 +1604,24 @@ function SetupSaveManager(GivenTable)
         Finished = true,
         Callback = function(Value) ImportJSONCode = Value end
     })
-
     JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(false)
-    
     SaveManagerContentBox:AddDivider()
-
-    local ConfigsDropdown = SaveManagerContentBox:AddDropdown({
+    ConfigsDropdown = SaveManagerContentBox:AddDropdown({
         Text = "Configs list",
         Index = "SaveManagerConfigsList",
         MaxVisibleValues = "Auto",
         Callback = function(Value) SelectedConfig = tostring(Value) end
     })
-
     SaveManagerContentBox:AddButton({
-        Text = "Refresh list",
-        Callback = function()
-            local FilesPath = listfiles(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName)
-            local FilesList = {}
-            for _,Path in FilesPath do
-                if Path and string.match(Path,"([^/]+)$") ~= "Autoload.lib" then table.insert(FilesList,string.match(Path,"([^/]+)$")) end
-            end
-            ConfigsDropdown:SetDisabled(true)
-            ConfigsDropdown:ReplaceValues(FilesList)
-            ConfigsDropdown:SetDisabled(false)
-        end
+        Text = "Force refresh list",
+        Callback = RefreshList
     })
-
     SaveManagerContentBox:AddDivider()
-
     SaveManagerContentBox:AddButton({
         Text = "Load config",
         Callback = function()
-            if not isfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..SelectedConfig) then return end
-            local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..SelectedConfig))
+            if not isfile(GivenTable.MainFolderName.."/"..SelectedConfig) then return end
+            local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..SelectedConfig))
             for Index,Elements in JustALibrary.Elements do
                 if ConfigData[Index] and ConfigData[Index].Name == Index then
                     Elements:SetValue(ConfigData[Index].Value)
@@ -1658,45 +1630,31 @@ function SetupSaveManager(GivenTable)
             JustALibrary:Notify({
                 Title = "Save manager",
                 Content = "Loaded config: "..SelectedConfig,
-                Sound = 107396133526484,
-                Time = 3
+                Sound = 107396133526484
             })
         end
     })
-
     SaveManagerContentBox:AddButton({
         Text = "Set as autoload",
         Callback = function()
-            if not SelectedConfig then return end
-            writefile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/Autoload.lib","return '"..SelectedConfig.."'")
+            if not SelectedConfig then return end writefile(GivenTable.MainFolderName.."/Autoload.lib","return '"..SelectedConfig.."'")
         end
     })
-
     SaveManagerContentBox:AddButton({
         Text = "Export (Copy JSON)",
         Callback = function()
-            if not SelectedConfig or not setclipboard then return end
-            setclipboard(readfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..SelectedConfig))
+            if not SelectedConfig or not setclipboard then return end setclipboard(readfile(GivenTable.MainFolderName.."/"..SelectedConfig))
         end
     })
-
     SaveManagerContentBox:AddButton({
         Text = "Delete config",
         Callback = function()
-            if not SelectedConfig then return end
-            delfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/"..SelectedConfig)
+            if not SelectedConfig then return end delfile(GivenTable.MainFolderName.."/"..SelectedConfig) RefreshList()
         end
     })
-
     SaveManagerContentBox:AddDivider()
-
     SaveManagerContentBox:AddButton({
         Text = "Reset autoload",
-        Callback = function()
-            if isfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/Autoload.lib") then delfile(GivenTable.MainFolderName.."/"..GivenTable.SubFolderName.."/Autoload.lib") end
-        end
-    })
-
-end
-
-return JustALibrary
+        Callback = function() if isfile(GivenTable.MainFolderName.."/Autoload.lib") then delfile(GivenTable.MainFolderName.."/Autoload.lib") end end
+    }) RefreshList()
+end return JustALibrary
