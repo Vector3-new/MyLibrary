@@ -1534,20 +1534,32 @@ function SetupSaveManager(GivenTable)
     local MainFolder = isfolder(GivenTable.MainFolderName)
     if not MainFolder then makefolder(GivenTable.MainFolderName) end
     if GivenTable.Autoload and isfile(GivenTable.MainFolderName.."/Autoload.lib") then
-        local AutoloadConfigName = loadfile(GivenTable.MainFolderName.."/Autoload.lib")()
-        if AutoloadConfigName then
+        local success, AutoloadConfigName = pcall(function()
+            return loadfile(GivenTable.MainFolderName.."/Autoload.lib")()
+        end)
+        if success and AutoloadConfigName then
             local FilesPath = listfiles(GivenTable.MainFolderName)
-            for _,Path in FilesPath do
-                if string.match(Path,"([^/\\]+)$") == AutoloadConfigName then
-                    local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..AutoloadConfigName))
-                    for Index,Elements in JustALibrary.Elements do
-                        if ConfigData[Index] and ConfigData[Index].Name == Index then Elements:SetValue(ConfigData[Index].Value) end
+            for _, Path in FilesPath do
+                if string.match(Path, "([^/\\]+)$") == AutoloadConfigName then
+                    local fileSuccess, fileContent = pcall(readfile, GivenTable.MainFolderName.."/"..AutoloadConfigName)
+                    if fileSuccess then
+                        local decodeSuccess, ConfigData = pcall(function() return HttpService:JSONDecode(fileContent) end)
+                        if decodeSuccess and ConfigData then
+                            for Index, Elements in JustALibrary.Elements do
+                                if ConfigData[Index] and ConfigData[Index].Name == Index then
+                                    pcall(function() 
+                                        Elements:SetValue(ConfigData[Index].Value) 
+                                    end)
+                                end
+                            end
+                            JustALibrary:Notify({
+                                Title = "Save manager",
+                                Content = "Loaded config: "..AutoloadConfigName,
+                                Sound = 107396133526484
+                            })
+                        end
                     end
-                    JustALibrary:Notify({
-                        Title = "Save manager",
-                        Content = "Loaded config: "..AutoloadConfigName,
-                        Sound = 107396133526484
-                    }) break
+                    break
                 end
             end
         end
