@@ -11,7 +11,8 @@ local LocalPlayer = P.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local JustALibrary = {
     Tabs = {},
-    Elements = {}
+    Elements = {},
+    Connections = {}
 }
 
 local BlacklistedKeys = {
@@ -71,13 +72,14 @@ local function New(GivenTable)
         Object.TextColor3 = GivenTable.TextColor3 or Color3.fromRGB(255,255,255)
         Object.TextSize = GivenTable.TextSize or 8
         Object.TextWrapped = GivenTable.TextWrapped or false
+        Object.TextTruncate = GivenTable.TextTruncate or Enum.TextTruncate.AtEnd
         Object.TextScaled = GivenTable.TextScaled or false
         Object.TextTransparency = GivenTable.TextTransparency or 0
         Object.TextXAlignment = GivenTable.TextXAlignment or Enum.TextXAlignment.Center
         Object.TextYAlignment = GivenTable.TextYAlignment or Enum.TextYAlignment.Center
     end
 
-    if GivenTable.ClassName == "ImageLabel" then
+    if GivenTable.ClassName == "ImageLabel" or GivenTable.ClassName == "ImageButton" then
         Object.Image = GivenTable.Image or ""
         Object.ImageColor3 = GivenTable.ImageColor3 or Color3.fromRGB(255,255,255)
         Object.ImageTransparency = GivenTable.ImageTransparency or 0
@@ -106,24 +108,33 @@ local function New(GivenTable)
 
 end
 
+local function RemoveConnections(Element)
+    if not JustALibrary.Connections[Element] then return end
+    for _,Connection in JustALibrary.Connections[Element] do Connection:Disconnect() end
+    JustALibrary.Connections[Element] = nil
+end
+
 local function MakeDraggable(GivenFrame)
+    RemoveConnections(GivenFrame)
+    local ConnectionsTable = {}
+    JustALibrary.Connections[GivenFrame] = ConnectionsTable
     local IsDragging,CursorPosition,FramePosition,Offset = false
-    GivenFrame.InputBegan:Connect(function(Input,GameProcessed)
+    table.insert(ConnectionsTable,GivenFrame.InputBegan:Connect(function(Input,GameProcessed)
         if not GameProcessed and GivenFrame.Visible and (Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch) then
             CursorPosition = Input.Position
             FramePosition = GivenFrame.AbsolutePosition
             IsDragging = true
         end
-    end)
-    UserInputService.InputChanged:Connect(function(Input)
+    end))
+     table.insert(ConnectionsTable,UserInputService.InputChanged:Connect(function(Input)
         if IsDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
             Offset = Input.Position-CursorPosition
             TweenService:Create(GivenFrame,TweenInfo.new(0.05),{Position = UDim2.fromOffset(FramePosition.X+Offset.X,FramePosition.Y+Offset.Y)}):Play()
         end
-    end)
-    UserInputService.InputEnded:Connect(function(Input)
+    end))
+    table.insert(ConnectionsTable,UserInputService.InputEnded:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then IsDragging = false end
-    end)
+    end))
 end
 
 local ModalElement = New({
@@ -601,14 +612,14 @@ function JustALibrary:CreateWindow(GivenTable)
 
         function Tab:AddContentBox(GivenTable)
 
-            local ContentBox = {}
+            local ContentBox = {HiddenElements = {}}
             local GivenParent = GivenTable.Side == "Right" and SecondTabContentScrollingFrame or TabContentScrollingFrame
 
             local ContentBoxFrame = New({
                 ClassName = "Frame",
                 Parent = GivenParent,
                 Name = GivenTable.Name,
-                Size = UDim2.new(1,0,0,0),
+                Size = UDim2.new(1,0,0,30),
                 AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundColor3 = Color3.fromRGB(0,0,0),
                 BackgroundTransparency = 0.6,
@@ -622,20 +633,87 @@ function JustALibrary:CreateWindow(GivenTable)
                 Visible = true
             })
 
-            local ContentBoxTitle = New({
-                ClassName = "TextLabel",
+            local ContentBoxTitleFrame = New({
+                ClassName = "Frame",
                 Parent = ContentBoxFrame,
-                Name = "ContentBoxTitle",
+                Name = "ContentBoxTitleFrame",
+                Size = UDim2.new(1,0,0,30),
                 BackgroundColor3 = Color3.fromRGB(0,0,0),
                 BackgroundTransparency = 0.6,
-                Size = UDim2.new(1,0,0,25),
-                TextScaled = true,
-                TextColor3 = Color3.fromRGB(255,255,255),
-                Text = GivenTable.Name or "ContentBox",
-                LayoutOrder = -1,
                 CornerRadius = 8,
                 Visible = true
             })
+
+            local ContentBoxTitle = New({
+                ClassName = "TextLabel",
+                Parent = ContentBoxTitleFrame,
+                Name = "ContentBoxTitle",
+                BackgroundTransparency = 1,
+                Size = UDim2.new(0.75,0,0,30),
+                Position = UDim2.fromScale(0.03,0),
+                TextWrapped = true,
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextColor3 = Color3.fromRGB(255,255,255),
+                Text = GivenTable.Name or "ContentBox",
+                Visible = true
+            })
+
+            local ContentBoxPopOut = New({
+                ClassName = "ImageButton",
+                Parent = ContentBoxTitleFrame,
+                Name = "ContentBoxPopOut",
+                BackgroundTransparency = 1,
+                AnchorPoint = Vector2.new(1,0),
+                Size = UDim2.fromOffset(20,20),
+                Position = UDim2.new(0.875,0,0,5),
+                Image = Icons.assets["lucide-external-link"],
+                Visible = true
+            })
+
+            local ContentBoxMinimize = New({
+                ClassName = "ImageButton",
+                Parent = ContentBoxTitleFrame,
+                Name = "ContentBoxMinimize",
+                BackgroundTransparency = 1,
+                AnchorPoint = Vector2.new(1,0),
+                Size = UDim2.fromOffset(20,20),
+                Position = UDim2.new(0.975,0,0,5),
+                Image = Icons.assets["lucide-chevron-down"],
+                Visible = true
+            })
+
+            local IsMinimized = false
+
+            ContentBoxMinimize.MouseButton1Click:Connect(function()
+                IsMinimized = not IsMinimized
+                for _,Element in ContentBoxFrame:GetChildren() do
+                    if Element:IsA("Frame") and Element.Name ~= "ContentBoxTitleFrame" and not ContentBox.HiddenElements[Element] then
+                        Element.Visible = not IsMinimized
+                        if not IsMinimized then
+                            TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.2),{Rotation = 0}):Play()
+                            ContentBoxFrame.UIPadding.PaddingBottom = UDim.new(0,8)
+                        else
+                            TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.2),{Rotation = 180}):Play()
+                            ContentBoxFrame.UIPadding.PaddingBottom = UDim.new(0,0)
+                        end
+                    end
+                end
+            end)
+
+            ContentBoxPopOut.MouseButton1Click:Connect(function()
+                if ContentBoxFrame.Parent ~= GivenParent then
+                    RemoveConnections(ContentBoxFrame)
+                    ContentBoxFrame.Parent = GivenParent
+                    ContentBoxFrame.Size = UDim2.new(1,0,0,30)
+                    ContentBoxPopOut.Rotation = 0
+                else
+                    MakeDraggable(ContentBoxFrame)
+                    ContentBoxFrame.Parent = JustALibraryGUI
+                    ContentBoxFrame.Size = UDim2.fromOffset(275,30)
+                    ContentBoxPopOut.Rotation = 180
+                end
+            end)
 
             function ContentBox:AddLabel(Text)
 
@@ -673,7 +751,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function LabelHolder:SetVisible(Boolean)
-                    LabelFrame.Visible = Boolean
+                    if Boolean then ContentBox.HiddenElements[LabelFrame] = nil else ContentBox.HiddenElements[LabelFrame] = true end
+                    LabelFrame.Visible = Boolean and not IsMinimized
                 end
 
                 function LabelHolder:Destroy()
@@ -711,7 +790,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 })
 
                 function DividerHolder:SetVisible(Boolean)
-                    DividerFrame.Visible = Boolean
+                    if Boolean then ContentBox.HiddenElements[DividerFrame] = nil else ContentBox.HiddenElements[DividerFrame] = true end
+                    DividerFrame.Visible = Boolean and not IsMinimized
                 end
 
                 function DividerHolder:Destroy()
@@ -750,7 +830,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 })
 
                 function ImageHolder:SetVisible(Boolean)
-                    ImageLabel.Visible = Boolean
+                    if Boolean then ContentBox.HiddenElements[ImageFrame] = nil else ContentBox.HiddenElements[ImageFrame] = true end
+                    ImageFrame.Visible = Boolean and not IsMinimized
                 end
 
                 function ImageHolder:Destroy()
@@ -806,7 +887,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function ButtonHolder:SetVisible(Boolean)
-                    ButtonFrame.Visible = Boolean
+                    if Boolean then ContentBox.HiddenElements[ButtonFrame] = nil else ContentBox.HiddenElements[ButtonFrame] = true end
+                    ButtonFrame.Visible = Boolean and not IsMinimized
                 end
 
                 function ButtonHolder:Destroy()
@@ -932,7 +1014,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function ToggleHolder:SetVisible(Boolean)
-                    ToggleFrame.Visible = Boolean
+                    if Boolean then ContentBox.HiddenElements[ToggleFrame] = nil else ContentBox.HiddenElements[ToggleFrame] = true end
+                    ToggleFrame.Visible = Boolean and not IsMinimized
                 end
 
                 function ToggleHolder:Destroy()
@@ -1257,8 +1340,9 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function DropdownHolder:SetVisible(Boolean)
-                    DropdownFrame.Visible = Boolean
                     TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 0}):Play()
+                    if Boolean then ContentBox.HiddenElements[DropdownFrame] = nil else ContentBox.HiddenElements[DropdownFrame] = true end
+                    DropdownFrame.Visible = Boolean and not IsMinimized
                 end
 
                 function DropdownHolder:Destroy()
@@ -1322,8 +1406,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     end
                 end)
 
-                
-
 				function InputHolder:SetText(Text)
                     InputName.Text = Text or "Input"
                 end
@@ -1345,13 +1427,12 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function InputHolder:SetVisible(Boolean)
-                    InputFakeFrame.Visible = Boolean
-                    
+                    if Boolean then ContentBox.HiddenElements[InputFakeFrame] = nil else ContentBox.HiddenElements[InputFakeFrame] = true end
+                    InputFakeFrame.Visible = Boolean and not IsMinimized
                 end
 
                 function InputHolder:Destroy()
                     InputFakeFrame:Destroy()
-                    
                 end
 
                 JustALibrary.Elements[GivenTable.Index or "Input"] = InputHolder
@@ -1448,8 +1529,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function KeybindHolder:SetVisible(Boolean)
-                    KeybindFakeFrame.Visible = Boolean
-                    
+                    if Boolean then ContentBox.HiddenElements[KeybindFakeFrame] = nil else ContentBox.HiddenElements[KeybindFakeFrame] = true end
+                    KeybindFakeFrame.Visible = Boolean and not IsMinimized
                 end
 
                 function KeybindHolder:Destroy()
@@ -1558,11 +1639,7 @@ function SetupSaveManager(GivenTable)
         Index = "SaveManagerImportMode",
         Callback = function(Value)
             ImportMode = Value
-            if ImportMode then
-                JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(true)
-            else
-                JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(false)
-            end
+            JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(ImportMode)
         end
     })
 
