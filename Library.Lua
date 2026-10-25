@@ -425,6 +425,11 @@ function JustALibrary:CreateWindow(GivenTable)
             SortOrder = Enum.SortOrder.LayoutOrder
         }
     })
+    local NotificationsContentPadding = Instance.new("UIPadding",NotificationsContentFrame)
+    NotificationsContentPadding.PaddingTop = UDim.new(0,5)
+    NotificationsContentPadding.PaddingBottom = UDim.new(0,5)
+    NotificationsContentPadding.PaddingLeft = UDim.new(0,5)
+    NotificationsContentPadding.PaddingRight = UDim.new(0,5)
     local NotificationsClearAllButton = New({
         ClassName = "TextButton",
         Parent = WindowFrame,
