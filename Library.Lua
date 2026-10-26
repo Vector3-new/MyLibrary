@@ -72,7 +72,9 @@ local function New(GivenTable)
     end
     if GivenTable.ClassName == "TextBox" then
         Object.PlaceholderText = GivenTable.PlaceholderText or ""
+        Object.PlaceholderColor3 = GivenTable.PlaceholderColor3 or Color3.fromRGB(178,178,178)
         Object.ClearTextOnFocus = GivenTable.ClearTextOnFocus or false
+        Object.MultiLine = GivenTable.MultiLine or false
         Object.TextEditable = GivenTable.TextEditable or true
     end
     if GivenTable.ClassName == "ImageLabel" or GivenTable.ClassName == "ImageButton" then
@@ -87,6 +89,12 @@ local function New(GivenTable)
     if GivenTable.Padding then
         local UIPadding = Instance.new("UIPadding",Object)
         UIPadding.PaddingBottom = UDim.new(0,GivenTable.Padding)
+    end
+    if GivenTable.UIStrokeConfig then
+        local UIStroke = Instance.new("UIStroke",Object)
+        UIStroke.Color = GivenTable.UIStroke.Color or Color3.fromRGB(0,0,0)
+        UIStroke.Thickness = GivenTable.UIStroke.Thickness or 3
+        UIStroke.Transparency = GivenTable.UIStroke.Transparency or 0.6
     end
     if GivenTable.ListLayoutConfig then
         local UIListLayout = Instance.new("UIListLayout",Object)
@@ -320,7 +328,8 @@ function JustALibrary:CreateWindow(GivenTable)
         BackgroundTransparency = 1,
         Size = UDim2.fromScale(0.9,0.9),
         Position = UDim2.fromScale(0.05,0.05),
-        TextScaled = true,
+        TextWrapped = true,
+        TextSize = 14,
         TextColor3 = Color3.fromRGB(255,255,255),
         Text = GivenTable.Title or "Window",
         Visible = true
@@ -393,7 +402,8 @@ function JustALibrary:CreateWindow(GivenTable)
         BackgroundTransparency = 1,
         Size = UDim2.fromScale(0.9,0.9),
         Position = UDim2.fromScale(0.05,0.05),
-        TextScaled = true,
+        TextWrapped = true,
+        TextSize = 12,
         TextColor3 = Color3.fromRGB(255,255,255),
         Text = "Notifications",
         Visible = true
@@ -438,7 +448,7 @@ function JustALibrary:CreateWindow(GivenTable)
         BackgroundColor3 = Color3.fromRGB(0,0,0),
         Size = UDim2.fromOffset(200,40),
         Position = UDim2.fromOffset(WindowFrame.Size.X.Offset+10,WindowFrame.Size.Y.Offset-40),
-        TextScaled = true,
+        TextSize = 14,
         TextColor3 = Color3.fromRGB(255,255,255),
         Text = "Clear All",
         CornerRadius = 8,
@@ -512,7 +522,7 @@ function JustALibrary:CreateWindow(GivenTable)
             Name = "TabLabel",
             BackgroundTransparency = 1,
             TextColor3 = Color3.fromRGB(255,255,255),
-            TextScaled = true,
+            TextSize = 12,
             Text = GivenTable.Name or "Tab",
             Size = GivenTable.Icon and UDim2.fromOffset(90,25) or UDim2.fromOffset(130,25),
             Position = GivenTable.Icon and UDim2.fromOffset(45,12) or UDim2.fromOffset(10,12),
@@ -833,7 +843,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
                     Size = UDim2.new(0.9,0,0,25),
                     Position = UDim2.fromScale(0.05,0),
-                    TextScaled = true,
+                    TextSize = 12,
                     TextColor3 = Color3.fromRGB(255,255,255),
                     Text = GivenTable.Text or "Label",
                     CornerRadius = 8,
@@ -887,7 +897,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Size = UDim2.fromScale(0.7,1),
                     Position = UDim2.fromScale(0.05,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
-                    TextScaled = true,
+                    TextSize = 12,
                     Text = GivenTable.Text or "Toggle",
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Visible = true
@@ -1009,7 +1019,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Size = UDim2.new(0.75,0,0,25),
                     Position = UDim2.fromScale(0.075,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
-                    TextScaled = true,
+                    TextSize = 12,
                     Text = GivenTable.Text or "Dropdown",
                     TextXAlignment = Enum.TextXAlignment.Left,
                     ZIndex = 2,
@@ -1080,7 +1090,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         BackgroundTransparency = 1,
                         Size = UDim2.new(0.85,0,0,25),
                         TextColor3 = Selected and Color3.fromRGB(255,255,255) or Color3.fromRGB(75,75,75),
-                        TextScaled = true,
+                        TextSize = 12,
                         Text = GivenName,
                         TextXAlignment = Enum.TextXAlignment.Left,
                         Visible = true
@@ -1329,7 +1339,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Size = UDim2.new(0.9,0,0,25),
                     Position = UDim2.new(0.05,0,0,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
-                    TextScaled = true,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Text = GivenTable.Text,
                     Visible = true
@@ -1431,7 +1441,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Size = UDim2.new(0.7,0,1,0),
                     Position = UDim2.new(0.05,0,0,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
-                    TextScaled = true,
+                    TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Text = GivenTable.Text or "Keybind",
                     Visible = true
@@ -1442,8 +1452,9 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "KeybindFrame",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    AnchorPoint = Vector2.new(1,0),
                     Size = UDim2.new(0.2,0,1,0),
-                    Position = UDim2.new(0.75,0,0,0),
+                    Position = UDim2.new(0.95,0,0,0),
                     CornerRadius = 8,
                     Visible = true
                 })
@@ -1454,7 +1465,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1,0,1,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
-                    TextScaled = true,
+                    TextSize = 12,
                     Text = (not GivenTable.Default or table.find(BlacklistedKeys,GivenTable.Default)) and "None" or GivenTable.Default,
                     Visible = true
                 })
@@ -1462,7 +1473,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 local Trigger,IsDisabled,WaitForKey = GivenTable.Default or "None",false
                 KeybindHolder.Value = Trigger
                 UserInputService.InputBegan:Connect(function(Key,GameProcessed)
-                    if GameProcessed or IsDisabled or WaitForKey or Key.KeyCode.Name ~= Trigger then return end GivenTable.Callback()
+                    if not GameProcessed and not IsDisabled and not WaitForKey and Key.KeyCode.Name == Trigger and Trigger ~= "None" then GivenTable.Callback() end
                 end)
 
                 KeybindButton.MouseButton1Click:Connect(function()
@@ -1470,7 +1481,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     WaitForKey = UserInputService.InputBegan:Connect(function(Key,GameProcessed)
                         if not GameProcessed and Key.UserInputType == Enum.UserInputType.Keyboard and not table.find(BlacklistedKeys,Key.KeyCode.Name) then
                             Trigger = Key.KeyCode.Name
-                            if Trigger == "Backspace" or Trigger == "Escape" then Trigger = "None" end
+                            if Trigger == "Backspace" then Trigger = "None" end
                             KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
                             task.wait() WaitForKey:Disconnect() WaitForKey = nil
                         end
@@ -1485,7 +1496,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     if WaitForKey then WaitForKey:Disconnect() end WaitForKey = true
                     if not table.find(BlacklistedKeys,Key) then
                         Trigger = Key
-                        if Trigger == "Backspace" or Trigger == "Escape" then Trigger = "None" end
+                        if Trigger == "Backspace" then Trigger = "None" end
                         KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
                     end task.wait() WaitForKey = nil
                 end
@@ -1535,33 +1546,14 @@ end
 
 function SetupSaveManager(GivenTable)
     if not isfolder or not makefolder or not isfile or not listfiles or not readfile or not writefile or not delfile then return end
-    local SaveManager,ConfigName,ImportMode,ImportJSONCode,SelectedConfig,ConfigsDropdown = {},"Config",false
+    local SaveManager,ConfigName,ImportMode,ImportJSONCode,SelectedConfig,ConfigsDropdown,CurrentAutoload = {},"Config",false
     if not GivenTable.Tab or not table.find(JustALibrary.Tabs,GivenTable.Tab) or not GivenTable.MainFolderName then return end
     local MainFolder = isfolder(GivenTable.MainFolderName)
     if not MainFolder then makefolder(GivenTable.MainFolderName) end
-    if GivenTable.Autoload and isfile(GivenTable.MainFolderName.."/Autoload.lib") then
-        local AutoloadConfigName = loadfile(GivenTable.MainFolderName.."/Autoload.lib")()
-        if AutoloadConfigName then
-            local FilesPath = listfiles(GivenTable.MainFolderName)
-            for _,Path in FilesPath do
-                if string.match(Path,"([^/\\]+)$") == AutoloadConfigName then
-                    local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..AutoloadConfigName))
-                    for Index,Elements in JustALibrary.Elements do
-                        if ConfigData[Index] and ConfigData[Index].Name == Index then task.spawn(function() Elements:SetValue(ConfigData[Index].Value) end) end
-                    end
-                    JustALibrary:Notify({
-                        Title = "Save manager",
-                        Content = "Loaded config: "..AutoloadConfigName,
-                        Sound = 107396133526484
-                    }) break
-                end
-            end
-        end
-    end
     local function RefreshList()
         local FilesPath,FilesList = listfiles(GivenTable.MainFolderName),{}
         for _,Path in FilesPath do
-            if string.match(Path,"([^/\\]+)$") ~= "Autoload.lib" then print(_,Path,string.match(Path,"([^/\\]+)$")) table.insert(FilesList,string.match(Path,"([^/\\]+)$")) end
+            if string.match(Path,"([^/\\]+)$") ~= "Autoload.lib" then table.insert(FilesList,string.match(Path,"([^/\\]+)$")) end
         end ConfigsDropdown:ReplaceValues(FilesList)
     end
     local SaveManagerContentBox = GivenTable.Tab:AddContentBox({Name = "Save manager",Side = "Right"})
@@ -1641,7 +1633,7 @@ function SetupSaveManager(GivenTable)
     SaveManagerContentBox:AddButton({
         Text = "Set as autoload",
         Callback = function()
-            if not SelectedConfig then return end writefile(GivenTable.MainFolderName.."/Autoload.lib","return '"..SelectedConfig.."'")
+            if not SelectedConfig then return end writefile(GivenTable.MainFolderName.."/Autoload.lib","return '"..SelectedConfig.."'") CurrentAutoload:SetText("Current Autoload: "..SelectedConfig)
         end
     })
     SaveManagerContentBox:AddButton({
@@ -1657,8 +1649,29 @@ function SetupSaveManager(GivenTable)
         end
     })
     SaveManagerContentBox:AddDivider()
+    CurrentAutoload = SaveManagerContentBox:AddLabel("Current Autoload: None")
     SaveManagerContentBox:AddButton({
         Text = "Reset autoload",
-        Callback = function() if isfile(GivenTable.MainFolderName.."/Autoload.lib") then delfile(GivenTable.MainFolderName.."/Autoload.lib") end end
+        Callback = function() if isfile(GivenTable.MainFolderName.."/Autoload.lib") then delfile(GivenTable.MainFolderName.."/Autoload.lib") CurrentAutoload:SetText("Current Autoload: None") end end
     }) RefreshList()
+    if GivenTable.Autoload and isfile(GivenTable.MainFolderName.."/Autoload.lib") then
+        local AutoloadConfigName = loadfile(GivenTable.MainFolderName.."/Autoload.lib")()
+        if AutoloadConfigName then
+            CurrentAutoload:SetText("Current Autoload: "..AutoloadConfigName)
+            local FilesPath = listfiles(GivenTable.MainFolderName)
+            for _,Path in FilesPath do
+                if string.match(Path,"([^/\\]+)$") == AutoloadConfigName then
+                    local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..AutoloadConfigName))
+                    for Index,Elements in JustALibrary.Elements do
+                        if ConfigData[Index] and ConfigData[Index].Name == Index then task.spawn(function() Elements:SetValue(ConfigData[Index].Value) end) end
+                    end
+                    JustALibrary:Notify({
+                        Title = "Save manager",
+                        Content = "Loaded config: "..AutoloadConfigName,
+                        Sound = 107396133526484
+                    }) break
+                end
+            end
+        end
+    end
 end return JustALibrary
