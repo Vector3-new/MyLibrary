@@ -12,7 +12,8 @@ local Mouse = LocalPlayer:GetMouse()
 local JustALibrary = {
     Tabs = {},
     Elements = {},
-    Connections = {}
+    Connections = {},
+    IsMobile = UserInputService.TouchEnabled and not UserInputService.MouseEnabled
 }
 local BlacklistedKeys = {
 	"Unknown",
@@ -82,6 +83,7 @@ local function New(GivenTable)
         Object.ImageColor3 = GivenTable.ImageColor3 or Color3.fromRGB(255,255,255)
         Object.ImageTransparency = GivenTable.ImageTransparency or 0
     end
+    if GivenTable.ClassName == "TextButton" or GivenTable.ClassName == "ImageButton" then Object.AutoButtonColor = false end
     if GivenTable.CornerRadius then
         local UICorner = Instance.new("UICorner",Object)
         UICorner.CornerRadius = UDim.new(0,GivenTable.CornerRadius)
@@ -259,22 +261,23 @@ function JustALibrary:Notify(GivenTable)
     end)
 end
 
-function JustALibrary:CreateDraggableLabel(GivenText)
-    local DraggableLabelHolder = {}
-    local DraggableLabelFrame = New({
+function JustALibrary:CreateDraggableLabel(GivenText,Position)
+    local DraggableElementHolder = {}
+    local DraggableFrame = New({
         ClassName = "Frame",
-        Name = "DraggableLabel",
+        Name = "Draggable",
         Parent = JustALibraryGUI,
         BackgroundColor3 = Color3.fromRGB(0,0,0),
         BackgroundTransparency = 0.4,
         Size = UDim2.fromOffset(30,30),
+        Position = Position or UDim2.new(0,0,0,0),
         AutomaticSize = Enum.AutomaticSize.X,
         CornerRadius = 8,
         Visible = true
     })
-    local DraggableLabelText = New({
+    local DraggableText = New({
         ClassName = "TextLabel",
-        Parent = DraggableLabelFrame,
+        Parent = DraggableFrame,
         Name = "DraggableLabelText",
         BackgroundTransparency = 1,
         Size = UDim2.new(1,0,0,30),
@@ -282,16 +285,70 @@ function JustALibrary:CreateDraggableLabel(GivenText)
         TextColor3 = Color3.fromRGB(255,255,255),
         TextScaled = true,
         TextXAlignment = Enum.TextXAlignment.Left,
-        Text = GivenText or "Hello World!",
+        Text = GivenText or "",
         Visible = true
     })
-    local TextPadding = Instance.new("UIPadding",DraggableLabelText)
+    local TextPadding = Instance.new("UIPadding",DraggableText)
     TextPadding.PaddingTop = UDim.new(0,5)
     TextPadding.PaddingBottom = UDim.new(0,5)
     TextPadding.PaddingLeft = UDim.new(0,5)
     TextPadding.PaddingRight = UDim.new(0,5)
-    MakeDraggable(DraggableLabelFrame)
-    return DraggableLabelHolder
+    MakeDraggable(DraggableFrame)
+
+    function DraggableElementHolder:SetText(Text)
+        DraggableText.Text = Text or ""
+    end
+
+    function DraggableElementHolder:SetVisible(Boolean)
+        DraggableFrame.Visible = Boolean
+    end
+
+    function DraggableElementHolder:Destroy()
+        DraggableFrame:Destroy()
+    end
+
+    return DraggableElementHolder
+end
+
+function JustALibrary:CreateDraggableButton(GivenText,GivenFunction,Position)
+    local DraggableElementHolder = {}
+    local DraggableButton = New({
+        ClassName = "TextButton",
+        Name = "DraggableButton",
+        Parent = JustALibraryGUI,
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        BackgroundTransparency = 0.4,
+        Size = UDim2.fromOffset(30,30),
+        Position = Position or UDim2.new(0,0,0,0),
+        AutomaticSize = Enum.AutomaticSize.X,
+        TextColor3 = Color3.fromRGB(255,255,255),
+        TextScaled = true,
+        TextXAlignment = Enum.TextXAlignment.Center,
+        Text = GivenText or "",
+        CornerRadius = 8,
+        Visible = true
+    })
+    DraggableButton.MouseButton1Click:Connect(GivenFunction or function() end)
+    local ButtonPadding = Instance.new("UIPadding",DraggableButton)
+    ButtonPadding.PaddingTop = UDim.new(0,5)
+    ButtonPadding.PaddingBottom = UDim.new(0,5)
+    ButtonPadding.PaddingLeft = UDim.new(0,5)
+    ButtonPadding.PaddingRight = UDim.new(0,5)
+    MakeDraggable(DraggableButton)
+    
+    function DraggableElementHolder:SetText(Text)
+        DraggableText.Text = Text or ""
+    end
+
+    function DraggableElementHolder:SetVisible(Boolean)
+        DraggableButton.Visible = Boolean
+    end
+
+    function DraggableElementHolder:Destroy()
+        DraggableButton:Destroy()
+    end
+
+    return DraggableElementHolder
 end
 
 function JustALibrary:CreateWindow(GivenTable)
@@ -307,8 +364,7 @@ function JustALibrary:CreateWindow(GivenTable)
         BackgroundTransparency = 1,
         Active = true,
         Visible = true
-    })
-    MakeDraggable(WindowFrame)
+    }) MakeDraggable(WindowFrame)
 
     local WindowTitle = New({
         ClassName = "Frame",
@@ -455,19 +511,20 @@ function JustALibrary:CreateWindow(GivenTable)
         Visible = false
     })
 
+    local ShowWindowButton 
     function Window:ToggleVisible()
         WindowFrame.Visible = not WindowFrame.Visible
         ModalElement.Visible = WindowFrame.Visible
         Cursor.Visible = WindowFrame.Visible
+        if JustALibrary.IsMobile then ShowWindowButton:SetVisible(not WindowFrame.Visible) end
         if WindowFrame.Visible then
             TweenService:Create(LibraryBlur,TweenInfo.new(0.1,Enum.EasingStyle.Linear),{Size = 12}):Play()
         else
             TweenService:Create(LibraryBlur,TweenInfo.new(0.25,Enum.EasingStyle.Linear),{Size = 0}):Play()
         end
     end
-    WindowTitleButton.MouseButton1Click:Connect(function()
-        Window:ToggleVisible()
-    end)
+    ShowWindowButton = JustALibrary:CreateDraggableButton("Show Window",function() Window:ToggleVisible() end,UDim2.fromOffset(25,25)) ShowWindowButton:SetVisible(false)
+    WindowTitleButton.MouseButton1Click:Connect(function() Window:ToggleVisible() end)
 
     NotificationsFrameButton.MouseButton1Click:Connect(function()
         if NotificationsContentFrame.Visible then
