@@ -477,8 +477,7 @@ function JustALibrary:CreateWindow(GivenTable)
         ClassName = "Frame",
         Parent = WindowFrame,
         Name = "NotificationsContentFrame",
-        Size = UDim2.fromOffset(200,WindowFrame.Size.Y.Offset-50),
-        Position = UDim2.fromOffset(WindowFrame.Size.X.Offset+10,0),
+        Size = UDim2.fromScale(1,0.9),
         BackgroundColor3 = Color3.fromRGB(0,0,0),
         BackgroundTransparency = 0.6,
         CornerRadius = 8,
@@ -496,14 +495,32 @@ function JustALibrary:CreateWindow(GivenTable)
     NotificationsContentPadding.PaddingBottom = UDim.new(0,5)
     NotificationsContentPadding.PaddingLeft = UDim.new(0,5)
     NotificationsContentPadding.PaddingRight = UDim.new(0,5)
+    local SearchNotificationsInput = New({
+        ClassName = "TextBox",
+        Parent = WindowFrame,
+        Name = "Input",
+        BackgroundTransparency = 0.6,
+        Size = UDim2.fromScale(0.74,0.09),
+        Position = UDim2.fromScale(0,0.91),
+        TextColor3 = Color3.fromRGB(255,255,255),
+        TextWrapped = true,
+        TextTruncate = Enum.TextTruncate.AtEnd,
+        TextSize = 12,
+        PlaceholderText = "Search...",
+        ClearTextOnFocus = true,
+        TextXAlignment = Enum.TextXAlignment.Center,
+        Text = "",
+        CornerRadius = 8,
+        Visible = false
+    })
     local NotificationsClearAllButton = New({
         ClassName = "TextButton",
         Parent = WindowFrame,
         Name = "NotificationsClearAllButton",
         BackgroundTransparency = 0.6,
         BackgroundColor3 = Color3.fromRGB(0,0,0),
-        Size = UDim2.fromOffset(200,40),
-        Position = UDim2.fromOffset(WindowFrame.Size.X.Offset+10,WindowFrame.Size.Y.Offset-40),
+        Size = UDim2.fromScale(0.25,0.09),
+        Position = UDim2.fromScale(0.75,0.91),
         TextSize = 14,
         TextColor3 = Color3.fromRGB(255,255,255),
         Text = "Clear All",
@@ -528,18 +545,48 @@ function JustALibrary:CreateWindow(GivenTable)
 
     NotificationsFrameButton.MouseButton1Click:Connect(function()
         if NotificationsContentFrame.Visible then
-            NotificationsContentFrame.Visible = false NotificationsClearAllButton.Visible = false
+            NotificationsContentFrame.Visible = false SearchNotificationsInput.Visible = false NotificationsClearAllButton.Visible = false
             TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
         else
-            NotificationsContentFrame.Visible = true NotificationsClearAllButton.Visible = true
+            for _,TabFrames in TabsFrame:GetChildren() do
+                if TabFrames:IsA("Frame") then
+                    WindowFrame[TabFrames.Name].Visible = false
+                    TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                end
+            end
+            NotificationsContentFrame.Visible = true SearchNotificationsInput.Visible = true NotificationsClearAllButton.Visible = true
             TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
         end
     end)
 
+    local function NormalizeText(Search)
+        return (string.lower(Search):gsub("%s+",""))
+    end
+    local function Search(GivenText)
+        local CleanText = NormalizeText(GivenText)
+        if CleanText == "" then
+            for _,Notify in NotificationsContentFrame:GetChildren() do
+                if Notify:IsA("Frame") then Notify.Visible = true end
+            end return
+        end
+        for _,Notify in NotificationsContentFrame:GetChildren() do
+            if Notify:IsA("Frame") then
+                local IsMatchFound = false
+                for _,TextLabel in Notify.NotificationFrame:GetChildren() do
+                    if TextLabel:IsA("TextLabel") then
+                        local CleanLabelText = NormalizeText(TextLabel.Text)
+                        if string.find(CleanLabelText,CleanText,1,true) then IsMatchFound = true break end
+                    end
+                end Notify.Visible = IsMatchFound
+            end
+        end
+    end
+    SearchNotificationsInput:GetPropertyChangedSignal("Text"):Connect(function() Search(SearchNotificationsInput.Text) end)
+
     NotificationsClearAllButton.MouseButton1Click:Connect(function()
         for _,Notifications in NotificationsContentFrame:GetChildren() do
             if Notifications:IsA("Frame") then
-                TweenService:Create(Notifications.NotificationFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position = UDim2.fromScale(1.5,0)}):Play()
+                TweenService:Create(Notifications.NotificationFrame,TweenInfo.new(0.3,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position = UDim2.fromScale(1.1,0)}):Play()
                 task.spawn(function() task.wait(0.6) Notifications:Destroy() end) task.wait(0.05)
             end
         end
@@ -553,7 +600,7 @@ function JustALibrary:CreateWindow(GivenTable)
         NewNotification.Parent = NotificationsContentFrame
         NewNotification.LayoutOrder = #(NotificationsContentFrame:GetChildren())
         NewNotification.NotificationFrame.Position = UDim2.fromScale(-1.1,0)
-        for _,Labels in NewNotification.NotificationFrame:GetChildren() do if Labels:IsA("TextLabel") then Labels.Size = UDim2.fromOffset(180,25) end end
+        for _,Labels in NewNotification.NotificationFrame:GetChildren() do if Labels:IsA("TextLabel") then Labels.Size = UDim2.new(0.975,0,0,25) end end
         NewNotification.NotificationFrame.Size = UDim2.fromScale(1,1)
         NewNotification.Size = UDim2.new(1,0,0,NewNotification.NotificationFrame.AbsoluteSize.Y)
         TweenService:Create(NewNotification.NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
@@ -650,6 +697,8 @@ function JustALibrary:CreateWindow(GivenTable)
             Visible = true
         })
         TabButton.MouseButton1Click:Connect(function()
+            NotificationsContentFrame.Visible = false SearchNotificationsInput.Visible = false NotificationsClearAllButton.Visible = false
+            TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
             for _,TabFrames in TabsFrame:GetChildren() do
                 if TabFrames:IsA("Frame") then
                     if TabFrames == TabFrame then
