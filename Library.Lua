@@ -1793,13 +1793,14 @@ function SetupSaveManager(GivenTable)
         Text = "Config name",
         Index = "SaveManagerConfigName",
         Placeholder = "Config name here...",
-        Finished = true,
         Callback = function(Value) ConfigName = Value end
     })
     SaveManagerContentBox:AddButton({
         Text = "Create config",
-        Callback = function()
+        Callback = function() if ConfigName == "" then return end
             if ImportMode and ImportJSONCode then
+                local Success = pcall(function() HttpService:JSONDecode(ImportJSONCode) end)
+                if not Success then JustALibrary:Notify({Title="Save manager",Content="Invalid JSON"}) return end
                 writefile(GivenTable.MainFolderName.."/"..ConfigName..".lib",ImportJSONCode)
             else
                 local Config = {}
@@ -1859,7 +1860,7 @@ function SetupSaveManager(GivenTable)
                 Title = "Save manager",
                 Content = "Loaded config: "..SelectedConfig,
                 Sound = 107396133526484
-            })
+            }) JustALibrary.Elements["SaveManagerConfigName"]:SetValue("")
         end
     })
     SaveManagerContentBox:AddButton({
