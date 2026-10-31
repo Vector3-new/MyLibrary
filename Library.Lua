@@ -1658,6 +1658,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Position = UDim2.new(0.05,0,0,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
+                    TextTruncate = Enum.TextTruncate.None,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Text = GivenTable.Text,
                     Visible = true
