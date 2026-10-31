@@ -144,6 +144,7 @@ local ModalElement = New({
     Parent = JustALibraryGUI,
     Name = "ModalElement",
     BackgroundTransparency = 1,
+    Size = UDim2.fromScale(1,1),
     ZIndex = -999,
     Text = "",
     Visible = true
