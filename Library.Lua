@@ -1696,7 +1696,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "SecondSliderFrame",
                     BackgroundTransparency = 0,
                     BackgroundColor3 = Color3.fromRGB(255,255,255),
-                    Size = UDim2.fromScale(0.5,1),
+                    Size = UDim2.fromScale(math.clamp(((GivenTable.Default or GivenTable.Min)-GivenTable.Min)/(GivenTable.Max-GivenTable.Min),0,1) or 0,1),
                     CornerRadius = 4,
                     Visible = true
                 })
@@ -1711,7 +1711,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     SliderValue.Text = tostring(NewValue)
                     TweenService:Create(SecondSliderFrame,TweenInfo.new(0.1),{Size = UDim2.fromScale((GivenTable.Max>GivenTable.Min) and math.clamp((NewValue-GivenTable.Min)/(GivenTable.Max-GivenTable.Min),0,1) or 0,1)}):Play()
                     GivenTable.Callback(NewValue)
-                end Calculate(GivenTable.Default)
+                end
                 local function TrackMove(CursorX)
                     local FrameSize,FramePosition = SliderFrame.AbsoluteSize.X,SliderFrame.AbsolutePosition.X if FrameSize<=0 then return end
                     Calculate(GivenTable.Min+math.clamp((CursorX-FramePosition)/FrameSize,0,1)*(GivenTable.Max-GivenTable.Min))
