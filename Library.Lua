@@ -420,12 +420,12 @@ function JustALibrary:CreateWindow(GivenTable)
         Name = "TabsFrame",
         BackgroundTransparency = 1,
         Position = UDim2.new(0.23,0,0,-60),
-        Size = UDim2.new(0.54,0,0,50),
+        Size = UDim2.new(0.65,0,0,50),
         ScrollingConfig = {
             ScrollingDirection = "X"
         },
         ListLayoutConfig = {
-            Padding = UDim.new(0,10),
+            Padding = UDim.new(0,5),
             FillDirection = Enum.FillDirection.Horizontal,
             SortOrder = Enum.SortOrder.LayoutOrder
         },
@@ -447,9 +447,8 @@ function JustALibrary:CreateWindow(GivenTable)
         ClassName = "Frame",
         Parent = WindowFrame,
         Name = "NotificationsFrame",
-        AnchorPoint = Vector2.new(1,0),
         Size = UDim2.fromOffset(50,50),
-        Position = UDim2.new(1,0,0,-60),
+        Position = UDim2.new(0.91,0,0,-60),
         BackgroundColor3 = Color3.fromRGB(0,0,0),
         BackgroundTransparency = 0.6,
         CornerRadius = 8,
