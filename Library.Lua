@@ -1638,7 +1638,7 @@ function JustALibrary:CreateWindow(GivenTable)
             end
 
            function ContentBox:AddSlider(GivenTable)
-                local SliderHolder = {}
+                local SliderHolder = {Value = GivenTable.Default or GivenTable.Min}
 
                 local SliderFakeFrame = New({
                     ClassName = "Frame",
@@ -1674,7 +1674,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     TextSize = 12,
                     TextTruncate = Enum.TextTruncate.None,
                     TextXAlignment = Enum.TextXAlignment.Right,
-                    Text = GivenTable.Default.."/"..GivenTable.Max,
+                    Text = GivenTable.Default or GivenTable.Min,
                     Visible = true
                 })
                 local SliderFrame = New({
@@ -1706,7 +1706,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 local function Calculate(GivenValue)
                     local NewValue = Round(math.clamp(GivenValue,GivenTable.Min,GivenTable.Max),GivenTable.RoundTo)
                     SliderHolder.Value = NewValue
-                    SliderValue.Text = tostring(NewValue).."/"..GivenTable.Max
+                    SliderValue.Text = tostring(NewValue)
                     TweenService:Create(SecondSliderFrame,TweenInfo.new(0.1),{Size = UDim2.fromScale((GivenTable.Max>GivenTable.Min) and math.clamp((NewValue-GivenTable.Min)/(GivenTable.Max-GivenTable.Min),0,1) or 0,1)}):Play()
                     GivenTable.Callback(NewValue)
                 end Calculate(GivenTable.Default)
