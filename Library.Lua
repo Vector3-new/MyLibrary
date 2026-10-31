@@ -435,7 +435,7 @@ function JustALibrary:CreateWindow(GivenTable)
         ClassName = "Frame",
         Parent = WindowFrame,
         Name = "SecondTabsDivider",
-        Position = UDim2.new(0.78,0,0,-60),
+        Position = UDim2.new(0.89,0,0,-60),
         Size = UDim2.new(0.01,0,0,50),
         BackgroundColor3 = Color3.fromRGB(0,0,0),
         BackgroundTransparency = 0.6,
@@ -447,24 +447,21 @@ function JustALibrary:CreateWindow(GivenTable)
         ClassName = "Frame",
         Parent = WindowFrame,
         Name = "NotificationsFrame",
-        Size = UDim2.new(0.2,0,0,50),
-        Position = UDim2.new(0.8,0,0,-60),
+        AnchorPoint = Vector2.new(1,0),
+        Size = UDim2.fromOffset(50,50),
+        Position = UDim2.new(1,0,0,-60),
         BackgroundColor3 = Color3.fromRGB(0,0,0),
         BackgroundTransparency = 0.6,
         CornerRadius = 8,
         Visible = true
     })
-    local NotificationsFrameText = New({
-        ClassName = "TextLabel",
+    local NotificationsIcon = New({
+        ClassName = "ImageLabel",
         Parent = NotificationsFrame,
-        Name = "NotificationsFrameText",
         BackgroundTransparency = 1,
-        Size = UDim2.fromScale(0.9,0.9),
-        Position = UDim2.fromScale(0.05,0.05),
-        TextWrapped = true,
-        TextSize = 12,
-        TextColor3 = Color3.fromRGB(255,255,255),
-        Text = "Notifications",
+        Position = UDim2.fromOffset(10,11),
+        Size = UDim2.fromOffset(30,30),
+        Image = Icons.assets["lucide-bell-ring"],
         Visible = true
     })
     local NotificationsFrameButton = New({
@@ -558,7 +555,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
             end
             NotificationsContentFrame.Visible = true SearchNotificationsInput.Visible = true NotificationsClearAllButton.Visible = true
-            TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
+            TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(100,100,100)}):Play()
         end
     end)
 
@@ -609,48 +606,33 @@ function JustALibrary:CreateWindow(GivenTable)
         TweenService:Create(NewNotification.NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
     end)
 
-    function Window:AddTab(GivenTable)
+    function Window:AddTab(TabName,TabIcon)
         local Tab = {}
 
         local TabFrame = New({
             ClassName = "Frame",
             Parent = TabsFrame,
-            Name = GivenTable.Name or "Tab",
+            Name = TabName or "Tab",
             BackgroundColor3 = Color3.fromRGB(0,0,0),
             BackgroundTransparency = 0.6,
-            Size = UDim2.fromOffset(150,50),
+            Size = UDim2.fromOffset(50,50),
             LayoutOrder = #(TabsFrame:GetChildren()),
             CornerRadius = 8,
             Visible = true
         })
-        local TabLabel = New({
-            ClassName = "TextLabel",
+        local TabIcon = New({
+            ClassName = "ImageLabel",
             Parent = TabFrame,
-            Name = "TabLabel",
             BackgroundTransparency = 1,
-            TextColor3 = Color3.fromRGB(255,255,255),
-            TextSize = 12,
-            Text = GivenTable.Name or "Tab",
-            Size = GivenTable.Icon and UDim2.fromOffset(90,25) or UDim2.fromOffset(130,25),
-            Position = GivenTable.Icon and UDim2.fromOffset(45,12) or UDim2.fromOffset(10,12),
+            Position = UDim2.fromOffset(10,10),
+            Size = UDim2.fromOffset(30,30),
+            Image = TabIcon and Icons.assets[TabIcon] or "",
             Visible = true
         })
-        if GivenTable.Icon then
-            local TabIcon = New({
-                ClassName = "ImageLabel",
-                Parent = TabFrame,
-                BackgroundTransparency = 1,
-                Position = UDim2.fromOffset(10,10),
-                Size = UDim2.fromOffset(30,30),
-                Image = Icons.assets[GivenTable.Icon],
-                Visible = true
-            })
-        end
-
         local TabContentFrame = New({
             ClassName = "Frame",
             Parent = WindowFrame,
-            Name = GivenTable.Name or "Tab",
+            Name = TabName or "Tab",
             BackgroundTransparency = 0.6,
             BackgroundColor3 = Color3.fromRGB(0,0,0),
             Size = UDim2.fromScale(1,1),
@@ -706,7 +688,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 if TabFrames:IsA("Frame") then
                     if TabFrames == TabFrame then
                         WindowFrame[TabFrames.Name].Visible = true
-                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(100,100,100)}):Play()
                     else
                         WindowFrame[TabFrames.Name].Visible = false
                         TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
@@ -1677,7 +1659,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     TextSize = 12,
                     TextTruncate = Enum.TextTruncate.None,
                     TextXAlignment = Enum.TextXAlignment.Right,
-                    Text = GivenTable.Default or GivenTable.Min,
+                    Text = (GivenTable.Default or GivenTable.Min)..(GivenTable.Suffix and " "..GivenTable.Suffix or ""),
                     Visible = true
                 })
                 local SliderFrame = New({
@@ -1709,7 +1691,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 local function Calculate(GivenValue)
                     local NewValue = Round(math.clamp(GivenValue,GivenTable.Min,GivenTable.Max),GivenTable.RoundTo)
                     SliderHolder.Value = NewValue
-                    SliderValue.Text = tostring(NewValue)
+                    SliderValue.Text = tostring(NewValue)..(GivenTable.Suffix and " "..GivenTable.Suffix or "")
                     TweenService:Create(SecondSliderFrame,TweenInfo.new(0.1),{Size = UDim2.fromScale((GivenTable.Max>GivenTable.Min) and math.clamp((NewValue-GivenTable.Min)/(GivenTable.Max-GivenTable.Min),0,1) or 0,1)}):Play()
                     GivenTable.Callback(NewValue)
                 end
