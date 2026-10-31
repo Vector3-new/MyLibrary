@@ -60,6 +60,7 @@ local function New(GivenTable)
     Object.Position = GivenTable.Position or UDim2.new(0,0,0,0)
     Object.LayoutOrder = GivenTable.LayoutOrder or 0
     Object.ZIndex = GivenTable.ZIndex or 0
+    Object.BorderSizePixel = 0
     if GivenTable.ClassName == "TextLabel" or GivenTable.ClassName == "TextButton" or GivenTable.ClassName == "TextBox" then
         Object.Text = GivenTable.Text or (GivenTable.ClassName == "TextLabel" and "Text" or GivenTable.ClassName == "TextBox" and "" or "Button")
         Object.TextColor3 = GivenTable.TextColor3 or Color3.fromRGB(255,255,255)
@@ -114,7 +115,7 @@ local function RemoveConnections(Element)
     for _,Connection in JustALibrary.Connections[Element] do Connection:Disconnect() end
     JustALibrary.Connections[Element] = nil
 end
-
+IsElementDragging = false
 local function MakeDraggable(GivenFrame)
     RemoveConnections(GivenFrame)
     local ConnectionsTable = {}
@@ -128,7 +129,7 @@ local function MakeDraggable(GivenFrame)
         end
     end))
      table.insert(ConnectionsTable,UserInputService.InputChanged:Connect(function(Input)
-        if IsDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+        if not IsElementDragging and IsDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
             Offset = Input.Position-CursorPosition
             TweenService:Create(GivenFrame,TweenInfo.new(0.05),{Position = UDim2.fromOffset(FramePosition.X+Offset.X,FramePosition.Y+Offset.Y)}):Play()
         end
@@ -201,16 +202,19 @@ function JustALibrary:Notify(GivenTable)
         Size = UDim2.new(1,0,0,0),
         AutomaticSize = Enum.AutomaticSize.Y,
         CornerRadius = 8,
-        Padding = 5,
         ListLayoutConfig = {SortOrder = Enum.SortOrder.LayoutOrder,HorizontalAlignment = Enum.HorizontalAlignment.Center},
         Visible = true
     })
+    local NotificationPadding = Instance.new("UIPadding",NotificationFrame)
+    NotificationPadding.PaddingBottom = UDim.new(0,5)
+    NotificationPadding.PaddingLeft = UDim.new(0,5)
+    NotificationPadding.PaddingRight = UDim.new(0,5)
     local NotificationTitle = New({
         ClassName = "TextLabel",
         Parent = NotificationFrame,
         Name = "NotificationTitle",
         BackgroundTransparency = 1,
-        Size = UDim2.fromOffset(280,25),
+        Size = UDim2.new(1,0,0,25),
         LayoutOrder = #(NotificationFrame:GetChildren()),
         TextColor3 = Color3.fromRGB(255,255,255),
         TextSize = 12,
@@ -224,7 +228,7 @@ function JustALibrary:Notify(GivenTable)
         Name = "NotificationContent",
         BackgroundTransparency = 1,
         LayoutOrder = #(NotificationFrame:GetChildren()),
-        Size = UDim2.fromOffset(280,0),
+        Size = UDim2.fromScale(1,0),
         AutomaticSize = Enum.AutomaticSize.Y,
         TextColor3 = Color3.fromRGB(200,200,200),
         TextWrapped = true,
@@ -241,7 +245,6 @@ function JustALibrary:Notify(GivenTable)
         BackgroundTransparency = 0,
         LayoutOrder = #(NotificationFrame:GetChildren()),
         Size = UDim2.new(0,0,0,3),
-        CornerRadius = 8,
         Visible = true
     })
     if GivenTable.Sound then
@@ -253,7 +256,7 @@ function JustALibrary:Notify(GivenTable)
     NotificationFakeFrame.Parent = NotificationsHolder
     task.spawn(function()
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
-        TweenService:Create(NotificationTimeFrame,TweenInfo.new(GivenTable.Time or 3,Enum.EasingStyle.Linear),{Size = UDim2.new(0,280,0,3)}):Play()
+        TweenService:Create(NotificationTimeFrame,TweenInfo.new(GivenTable.Time or 3),{Size = UDim2.new(0.975,0,0,3)}):Play()
         task.wait(GivenTable.Time or 3)
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position = UDim2.fromScale(1.1,0)}):Play()
         task.wait(0.75)
@@ -382,10 +385,9 @@ function JustALibrary:CreateWindow(GivenTable)
         Parent = WindowTitle,
         Name = "WindowTitleText",
         BackgroundTransparency = 1,
-        Size = UDim2.fromScale(0.9,0.9),
-        Position = UDim2.fromScale(0.05,0.05),
-        TextWrapped = true,
-        TextSize = 14,
+        Size = UDim2.fromScale(0.8,0.8),
+        Position = UDim2.fromScale(0.1,0.1),
+        TextScaled = true,
         TextColor3 = Color3.fromRGB(255,255,255),
         Text = GivenTable.Title or "Window",
         Visible = true
@@ -1635,8 +1637,129 @@ function JustALibrary:CreateWindow(GivenTable)
                 return KeybindHolder
             end
 
-            function ContentBox:AddSlider(GivenTable)
+           function ContentBox:AddSlider(GivenTable)
+                local SliderHolder = {}
 
+                local SliderFakeFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "SliderFakeFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,40),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
+                local SliderName = New({
+                    ClassName = "TextLabel",
+                    Parent = SliderFakeFrame,
+                    Name = "SliderName",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.45,0,0,25),
+                    Position = UDim2.new(0.05,0,0,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextSize = 12,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    Text = GivenTable.Text,
+                    Visible = true
+                })
+                local SliderValue = New({
+                    ClassName = "TextLabel",
+                    Parent = SliderFakeFrame,
+                    Name = "SliderValue",
+                    BackgroundTransparency = 1,
+                    AnchorPoint = Vector2.new(1,0),
+                    Size = UDim2.new(0.45,0,0,25),
+                    Position = UDim2.fromScale(0.95,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextSize = 12,
+                    TextTruncate = Enum.TextTruncate.None,
+                    TextXAlignment = Enum.TextXAlignment.Right,
+                    Text = GivenTable.Default.."/"..GivenTable.Max,
+                    Visible = true
+                })
+                local SliderFrame = New({
+                    ClassName = "Frame",
+                    Parent = SliderFakeFrame,
+                    Name = "SliderFrame",
+                    BackgroundTransparency = 0.6,
+                    BackgroundColor3 = Color3.fromRGB(0,0,0),
+                    Size = UDim2.new(0.9,0,0,15),
+                    Position = UDim2.new(0.05,0,0,25),
+                    CornerRadius = 4,
+                    Visible = true
+                })
+                local SecondSliderFrame = New({
+                    ClassName = "Frame",
+                    Parent = SliderFrame,
+                    Name = "SecondSliderFrame",
+                    BackgroundTransparency = 0,
+                    BackgroundColor3 = Color3.fromRGB(255,255,255),
+                    Size = UDim2.fromScale(0.5,1),
+                    CornerRadius = 4,
+                    Visible = true
+                })
+
+                local function Round(GivenValue,RoundTo)
+                    if not RoundTo or RoundTo<=0 then return math.floor(GivenValue+0.5) end
+                    return math.floor(GivenValue*10^RoundTo+0.5)/10^RoundTo
+                end
+                local function Calculate(GivenValue)
+                    local NewValue = Round(math.clamp(GivenValue,GivenTable.Min,GivenTable.Max),GivenTable.RoundTo)
+                    SliderHolder.Value = NewValue
+                    SliderValue.Text = tostring(NewValue).."/"..GivenTable.Max
+                    TweenService:Create(SecondSliderFrame,TweenInfo.new(0.1),{Size = UDim2.fromScale((GivenTable.Max>GivenTable.Min) and math.clamp((NewValue-GivenTable.Min)/(GivenTable.Max-GivenTable.Min),0,1) or 0,1)}):Play()
+                    GivenTable.Callback(NewValue)
+                end Calculate(GivenTable.Default)
+                local function TrackMove(CursorX)
+                    local FrameSize,FramePosition = SliderFrame.AbsoluteSize.X,SliderFrame.AbsolutePosition.X if FrameSize<=0 then return end
+                    Calculate(GivenTable.Min+math.clamp((CursorX-FramePosition)/FrameSize,0,1)*(GivenTable.Max-GivenTable.Min))
+                end
+
+                SliderFrame.InputBegan:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                        IsElementDragging = true TrackMove(Input.Position.X)
+                    end
+                end)
+                UserInputService.InputChanged:Connect(function(Input)
+                    if IsElementDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+                        TrackMove(Input.Position.X)
+                    end
+                end)
+                UserInputService.InputEnded:Connect(function(Input)
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then IsElementDragging = false end
+                end)
+
+                function SliderHolder:SetText(Text)
+                    SliderName.Text = Text or "Slider"
+                end
+
+                function SliderHolder:SetValue(Num)
+                    if not Num or typeof(Num) ~= "number" then return end Calculate(Num)
+                end
+
+                function SliderHolder:SetDisabled(Boolean)
+                    SliderFrame.Interactable = not Boolean
+                    if SliderFrame.Interactable then
+                        TweenService:Create(SliderName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(225,225,225)}):Play()
+                        TweenService:Create(SliderValue,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(225,225,225)}):Play()
+                        TweenService:Create(SliderFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(225,225,225)}):Play()
+                    else
+                        TweenService:Create(SliderName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        TweenService:Create(SliderValue,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        TweenService:Create(SliderFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
+                    end
+                end
+
+                function SliderHolder:SetVisible(Boolean)
+                    if Boolean then ContentBox.HiddenElements[SliderFakeFrame] = nil else ContentBox.HiddenElements[SliderFakeFrame] = true end
+                    SliderFakeFrame.Visible = Boolean and not IsMinimized
+                end
+
+                function SliderHolder:Destroy() SliderFakeFrame:Destroy() end
+
+                JustALibrary.Elements[GivenTable.Index or "Slider"] = SliderHolder
+
+                return SliderHolder
             end
 
             return ContentBox
