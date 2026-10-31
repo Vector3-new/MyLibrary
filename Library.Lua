@@ -115,7 +115,7 @@ local function RemoveConnections(Element)
     for _,Connection in JustALibrary.Connections[Element] do Connection:Disconnect() end
     JustALibrary.Connections[Element] = nil
 end
-IsElementDragging = false
+local IsElementDragging = false
 local function MakeDraggable(GivenFrame)
     RemoveConnections(GivenFrame)
     local ConnectionsTable = {}
@@ -1715,18 +1715,19 @@ function JustALibrary:CreateWindow(GivenTable)
                     Calculate(GivenTable.Min+math.clamp((CursorX-FramePosition)/FrameSize,0,1)*(GivenTable.Max-GivenTable.Min))
                 end
 
+                local IsSliderDragging = false
                 SliderFrame.InputBegan:Connect(function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                        IsElementDragging = true TrackMove(Input.Position.X)
+                        IsSliderDragging = true IsElementDragging = true TrackMove(Input.Position.X)
                     end
                 end)
                 UserInputService.InputChanged:Connect(function(Input)
-                    if IsElementDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+                    if IsSliderDragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
                         TrackMove(Input.Position.X)
                     end
                 end)
                 UserInputService.InputEnded:Connect(function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then IsElementDragging = false end
+                    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then IsSliderDragging = false IsElementDragging = false end
                 end)
 
                 function SliderHolder:SetText(Text)
