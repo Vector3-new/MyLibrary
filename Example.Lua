@@ -1,14 +1,15 @@
-local JustALibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vector3-new/MyLibrary/refs/heads/main/Library.Lua"))()
+local JustALibrary = loadfile("JustALibrary.Lua")()
 
 local MainWindow = JustALibrary:CreateWindow({
     Title = "Example",
     Size = UDim2.fromOffset(550,450) -- or UDim2.fromOffset(650,550)
 })
 
-local Watermark = JustALibrary:CreateDraggableLabel()
+local Watermark = JustALibrary:CreateDraggableLabel("helo world",UDim2.fromScale(0.48,0.1))
 
-local Main = MainWindow:AddTab({Name = "Home"})
-local Settings = MainWindow:AddTab({Name = "Settings",Icon = "lucide-cog"})
+local Main = MainWindow:AddTab("Home","lucide-home")
+local Settings = MainWindow:AddTab("Settings","lucide-cog")
+for i=1,10 do MainWindow:AddTab("Tab"..i,"lucide-layout") end
 
 --[[
     :AddContentBox({
@@ -194,6 +195,26 @@ Contentbox2:AddKeyPicker({
     end
 })
 
+Contentbox2:AddSlider({
+	Text = "Slider 1",
+	Index = "MySlider",
+	Min = 0,
+	Max = 100,
+	Default = 3,
+	Suffix = "Coconuts",
+	Callback = function(Value) print(Value) end
+})
+
+Contentbox2:AddSlider({
+	Text = "Slider 2",
+	Index = "MySlider2",
+	Min = 0,
+	Max = 100,
+	Default = 3,
+	RoundTo = 2,
+	Callback = function(Value) print(Value) end
+})
+
 --[[
     :SetupSaveManager({
         Tab = nil,
@@ -210,6 +231,6 @@ SetupSaveManager({
     MainFolderName = "TestFolder",
     SubFolderName = "Configs",
     Autoload = true,
-    FilterIndexMode = "Exclude",
-    FilterIndex = {"Togl"}
+    --FilterIndexMode = "Exclude",
+    --FilterIndex = {"Togl"}
 })
