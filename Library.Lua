@@ -1143,7 +1143,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     TextSize = 10,
                     Text = DropdownValueText,
                     TextXAlignment = Enum.TextXAlignment.Left,
-                    TextYAlignment = Enum.TextYAlignment.Top,
                     ZIndex = 2,
                     Visible = true
                 })
