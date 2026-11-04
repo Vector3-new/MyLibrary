@@ -1143,6 +1143,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     TextSize = 10,
                     Text = DropdownValueText,
                     TextXAlignment = Enum.TextXAlignment.Left,
+                    TextYAlignment = Enum.TextYAlignment.Top,
                     ZIndex = 2,
                     Visible = true
                 })
@@ -1310,6 +1311,7 @@ function JustALibrary:CreateWindow(GivenTable)
                                 if Button:IsA("Frame") then
                                     if Button.Name == ValueName then
                                         table.insert(SelectedValue,Button.Name)
+                                        DropdownValue.Text = table.concat(SelectedValue,", ")
                                         TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                         TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                     elseif not table.find(SelectedValue,Button.Name) then
@@ -1326,6 +1328,7 @@ function JustALibrary:CreateWindow(GivenTable)
                             if Button:IsA("Frame") then
                                 if Button.Name == ValueName then
                                     SelectedValue = Button.Name
+                                    DropdownValue.Text = Button.Name
                                     DropdownHolder.Value = SelectedValue
                                     TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                     TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
