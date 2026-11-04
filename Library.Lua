@@ -1172,6 +1172,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         Parent = DropdownValuesFrame,
                         Name = GivenName,
                         BackgroundTransparency = 1,
+                        AutomaticSize = Enum.AutomaticSize.Y,
                         Size = UDim2.new(1,0,0,25),
                         LayoutOrder = #(DropdownValuesFrame:GetChildren()),
                         Visible = true
@@ -1181,10 +1182,13 @@ function JustALibrary:CreateWindow(GivenTable)
                         Parent = ValueFrame,
                         Name = "ValueText",
                         BackgroundTransparency = 1,
+                        AutomaticSize = Enum.AutomaticSize.Y,
                         Size = UDim2.new(0.85,0,0,25),
                         TextColor3 = Selected and Color3.fromRGB(255,255,255) or Color3.fromRGB(75,75,75),
                         TextSize = 12,
                         Text = GivenName,
+                        TextTruncate = Enum.TextTruncate.SplitWord,
+                        TextWrapped = true,
                         TextXAlignment = Enum.TextXAlignment.Left,
                         Visible = true
                     })
@@ -1194,11 +1198,11 @@ function JustALibrary:CreateWindow(GivenTable)
                         Name = "ValueButton",
                         BackgroundTransparency = 0.6,
                         BackgroundColor3 = Color3.fromRGB(100,100,100),
-                        AnchorPoint = Vector2.new(1,0),
+                        AnchorPoint = Vector2.new(1,0.5),
                         Size = UDim2.fromOffset(25,25),
-                        Position = UDim2.fromScale(0.99,0),
+                        Position = UDim2.fromScale(0.99,0.5),
                         Text = "",
-                        CornerRadius = 20,
+                        CornerRadius = 8,
                         Visible = true
                     })
                     local ValueIcon = New({
