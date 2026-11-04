@@ -1100,17 +1100,17 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "DropdownFrame",
                     BackgroundTransparency = 1,
                     AutomaticSize = Enum.AutomaticSize.Y,
-                    Size = UDim2.new(1,0,0,25),
+                    Size = UDim2.new(1,0,0,50),
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
-                local DropdownText = New({
+                local DropdownName = New({
                     ClassName = "TextLabel",
                     Parent = DropdownFrame,
-                    Name = "DropdownText",
+                    Name = "DropdownName",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.75,0,0,25),
-                    Position = UDim2.fromScale(0.075,0),
+                    Size = UDim2.new(0.9,0,0,25),
+                    Position = UDim2.new(0.05,0,0,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     Text = GivenTable.Text or "Dropdown",
@@ -1125,10 +1125,25 @@ function JustALibrary:CreateWindow(GivenTable)
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
                     Size = UDim2.new(0.9,0,0,25),
-                    Position = UDim2.fromScale(0.05,0),
+                    Position = UDim2.new(0.05,0,0,25),
                     Text = "",
                     TextTransparency = 1,
                     CornerRadius = 8,
+                    Visible = true
+                })
+                local DropdownValueText = GivenTable.Default and (typeof(GivenTable.Default) == "table" and GivenTable.MultiSelection and table.concat(GivenTable.Default,", ") or typeof(GivenTable.Default) == "string" and GivenTable.Default) or "---"
+                local DropdownValue = New({
+                    ClassName = "TextLabel",
+                    Parent = DropdownButton,
+                    Name = "DropdownValue",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(0.8,0,0,25),
+                    Position = UDim2.new(0.05,0,0,0),
+                    TextColor3 = Color3.fromRGB(255,255,255),
+                    TextSize = 10,
+                    Text = DropdownValueText,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    ZIndex = 2,
                     Visible = true
                 })
                 local DropdownIcon = New({
@@ -1149,7 +1164,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     BackgroundTransparency = 0.6,
                     AutomaticSize = Enum.AutomaticSize.Y,
                     Size = UDim2.new(0.9,0,0,0),
-                    Position = UDim2.new(0.05,0,0,30),
+                    Position = UDim2.new(0.05,0,0,55),
                     CornerRadius = 8,
                     ListLayoutConfig = {
                         Padding = UDim.new(0,5),
@@ -1231,12 +1246,14 @@ function JustALibrary:CreateWindow(GivenTable)
                                     if Button.Name == ValueName then
                                         if SelectedValue ~= Button.Name then
                                             SelectedValue = Button.Name
+                                            DropdownValue.Text = Button.Name
                                             DropdownHolder.Value = SelectedValue
                                             TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                             TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                             GivenTable.Callback(SelectedValue)
                                         elseif SelectedValue == Button.Name and GivenTable.CanDeselect then
                                             SelectedValue = nil
+                                            DropdownValue.Text = "---"
                                             DropdownHolder.Value = SelectedValue
                                             TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
                                             TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
@@ -1250,12 +1267,13 @@ function JustALibrary:CreateWindow(GivenTable)
                                     if Button.Name == ValueName then
                                         if not table.find(SelectedValue,Button.Name) then
                                             table.insert(SelectedValue,Button.Name)
+                                            DropdownValue.Text = table.concat(SelectedValue,", ")
                                             TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                             TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                             GivenTable.Callback(SelectedValue)
                                         elseif (table.find(SelectedValue,Button.Name) and #SelectedValue>1) or (table.find(SelectedValue,Button.Name) and GivenTable.CanDeselect) then
-                                            local Index = table.find(SelectedValue,Button.Name)
-                                            if Index then table.remove(SelectedValue,Index) end
+                                            table.remove(SelectedValue,table.find(SelectedValue,Button.Name))
+                                            DropdownValue.Text = #SelectedValue>0 and table.concat(SelectedValue,", ") or "---"
                                             TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
                                             TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                             GivenTable.Callback(SelectedValue)
@@ -1281,7 +1299,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 end)
 
                 function DropdownHolder:SetText(Text)
-                    DropdownText.Text = Text or "Dropdown"
+                    DropdownName.Text = Text or "Dropdown"
                 end
 
                 function DropdownHolder:SetValue(Value)
@@ -1329,12 +1347,13 @@ function JustALibrary:CreateWindow(GivenTable)
                         SelectedValue = nil
                         GivenTable.Callback(SelectedValue)
                     end
+                    DropdownValue.Text = "---"
                     for _,Button in DropdownValuesFrame:GetChildren() do
                         if Button:IsA("Frame") then Button:Destroy() end
                     end
                     for _,Value in NewValues do
                         local ValueName if typeof(Value) == "string" then ValueName = Value elseif typeof(Value) == "Instance" then ValueName = Value.Name end
-                        local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value)
+                        local ValueFrame = CreateValue(ValueName)
                         ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                             for _,Button in DropdownValuesFrame:GetChildren() do
                                 if Button:IsA("Frame") then 
@@ -1342,12 +1361,14 @@ function JustALibrary:CreateWindow(GivenTable)
                                         if Button.Name == ValueName then
                                             if SelectedValue ~= Button.Name then
                                                 SelectedValue = Button.Name
+                                                DropdownValue.Text = Button.Name
                                                 DropdownHolder.Value = SelectedValue
                                                 TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                                 TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                                 GivenTable.Callback(SelectedValue)
                                             elseif SelectedValue == Button.Name and GivenTable.CanDeselect then
                                                 SelectedValue = nil
+                                                DropdownValue.Text = "---"
                                                 DropdownHolder.Value = SelectedValue
                                                 TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
                                                 TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
@@ -1361,12 +1382,13 @@ function JustALibrary:CreateWindow(GivenTable)
                                         if Button.Name == ValueName then
                                             if not table.find(SelectedValue,Button.Name) then
                                                 table.insert(SelectedValue,Button.Name)
+                                                DropdownValue.Text = table.concat(SelectedValue,", ")
                                                 TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                                 TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                                 GivenTable.Callback(SelectedValue)
-                                            elseif (table.find(SelectedValue,Button.Name) and #SelectedValue > 1) or (table.find(SelectedValue,Button.Name) and GivenTable.CanDeselect) then
-                                                local Index = table.find(SelectedValue,Button.Name)
-                                                if Index then table.remove(SelectedValue,Index) end
+                                            elseif (table.find(SelectedValue,Button.Name) and #SelectedValue>1) or (table.find(SelectedValue,Button.Name) and GivenTable.CanDeselect) then
+                                                table.remove(SelectedValue,table.find(SelectedValue,Button.Name))
+                                                DropdownValue.Text = #SelectedValue>0 and table.concat(SelectedValue,", ") or "---"
                                                 TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
                                                 TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                                 GivenTable.Callback(SelectedValue)
@@ -1392,11 +1414,13 @@ function JustALibrary:CreateWindow(GivenTable)
                         DropdownButton.Interactable = false
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 0}):Play()
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{ImageColor3 = Color3.fromRGB(125,125,125)}):Play()
-                        TweenService:Create(DropdownText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        TweenService:Create(DropdownName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        TweenService:Create(DropdownValue,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
                     else
                         DropdownButton.Interactable = true
                         TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{ImageColor3 = Color3.fromRGB(255,255,255)}):Play()
-                        TweenService:Create(DropdownText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(225,225,225)}):Play()
+                        TweenService:Create(DropdownName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(225,225,225)}):Play()
+                        TweenService:Create(DropdownValue,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                     end
                     
                 end
@@ -1634,7 +1658,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = ContentBoxFrame,
                     Name = "SliderFakeFrame",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(1,0,0,40),
+                    Size = UDim2.new(1,0,0,35),
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Visible = true
                 })
@@ -1673,7 +1697,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "SliderFrame",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.new(0.9,0,0,15),
+                    Size = UDim2.new(0.9,0,0,10),
                     Position = UDim2.new(0.05,0,0,25),
                     CornerRadius = 4,
                     Visible = true
