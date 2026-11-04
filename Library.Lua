@@ -1137,8 +1137,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = DropdownButton,
                     Name = "DropdownValue",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.8,0,0,25),
-                    Position = UDim2.new(0.05,0,0,0),
+                    Size = UDim2.new(0.85,0,0,25),
+                    Position = UDim2.new(0.03,0,0,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 10,
                     Text = DropdownValueText,
@@ -1176,7 +1176,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 local DropdownValuesPadding = Instance.new("UIPadding",DropdownValuesFrame)
                 DropdownValuesPadding.PaddingTop = UDim.new(0,5)
                 DropdownValuesPadding.PaddingBottom = UDim.new(0,5)
-                DropdownValuesPadding.PaddingLeft = UDim.new(0,8)
+                DropdownValuesPadding.PaddingLeft = UDim.new(0,6)
                 DropdownValuesPadding.PaddingRight = UDim.new(0,5)
 
                 local SelectedValue = "" if GivenTable.MultiSelection then SelectedValue = {} end
