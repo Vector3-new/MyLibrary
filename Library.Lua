@@ -1869,7 +1869,7 @@ function SetupSaveManager(GivenTable)
             if not isfile(GivenTable.MainFolderName.."/"..SelectedConfig) then return end
             local ConfigData = HttpService:JSONDecode(readfile(GivenTable.MainFolderName.."/"..SelectedConfig))
             for Index,Elements in JustALibrary.Elements do
-                if ConfigData[Index] and ConfigData[Index].Name == Index then task.spawn(function() Elements:SetValue() Elements:SetValue(ConfigData[Index].Value) end) end
+                if ConfigData[Index] and ConfigData[Index].Name == Index then task.spawn(function() Elements:SetValue(ConfigData[Index].Value) end) end
             end
             JustALibrary:Notify({
                 Title = "Save manager",
