@@ -1802,7 +1802,7 @@ function SetupSaveManager(GivenTable)
             if string.match(Path,"([^/\\]+)$") ~= "Autoload.lib" then table.insert(FilesList,string.match(Path,"([^/\\]+)$")) end
         end ConfigsDropdown:ReplaceValues(FilesList)
     end
-    local SaveManagerContentBox = GivenTable.Tab:AddContentBox({Name = "Save manager",Side = "Right"})
+    local SaveManagerContentBox = GivenTable.Tab:AddContentBox({Name = GivenTable.Name or "Save manager",Side = "Right"})
     SaveManagerContentBox:AddInput({
         Text = "Config name",
         Index = "SaveManagerConfigName",
