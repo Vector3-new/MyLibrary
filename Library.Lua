@@ -1806,7 +1806,7 @@ function SetupSaveManager(GivenTable)
     local SaveManagerContentBox = GivenTable.Tab:AddContentBox({Name = GivenTable.Name or "Save manager",Side = "Right"})
     SaveManagerContentBox:AddInput({
         Text = "Config name",
-        Index = "SaveManagerConfigName",
+        Index = GivenTable.MainFolderName.."SaveManagerConfigName",
         Placeholder = "Config name here...",
         Callback = function(Value) ConfigName = Value end
     })
@@ -1820,7 +1820,7 @@ function SetupSaveManager(GivenTable)
             else
                 local Config = {}
                 for Index,Elements in JustALibrary.Elements do
-                    if Index ~= "SaveManagerConfigName" and Index ~= "SaveManagerConfigsList" and Index ~= "SaveManagerImportMode" and Index ~= "SaveManagerJSONCode" then
+                    if not string.find(Index,"SaveManager") then
                         if GivenTable.FilterIndexMode and GivenTable.FilterIndex then
                             if GivenTable.FilterIndexMode == "Exclude" and not table.find(GivenTable.FilterIndex,Index) then
                                 Config[Index] = {Name = Index,Value = Elements.Value}
@@ -1832,29 +1832,29 @@ function SetupSaveManager(GivenTable)
                         end
                     end
                 end writefile(GivenTable.MainFolderName.."/"..ConfigName..".lib",HttpService:JSONEncode(Config))
-            end RefreshList()
+            end RefreshList() JustALibrary.Elements[GivenTable.MainFolderName.."SaveManagerConfigName"]:SetValue("")
         end
     })
     SaveManagerContentBox:AddToggle({
         Text = "Import",
-        Index = "SaveManagerImportMode",
+        Index = GivenTable.MainFolderName.."SaveManagerImportMode",
         Callback = function(Value)
             ImportMode = Value
-            JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(ImportMode)
+            JustALibrary.Elements[GivenTable.MainFolderName.."SaveManagerJSONCode"]:SetVisible(ImportMode)
         end
     })
     SaveManagerContentBox:AddInput({
         Text = "JSON Code",
-        Index = "SaveManagerJSONCode",
+        Index = GivenTable.MainFolderName.."SaveManagerJSONCode",
         Placeholder = "JSON here...",
         Finished = true,
         Callback = function(Value) ImportJSONCode = Value end
     })
-    JustALibrary.Elements["SaveManagerJSONCode"]:SetVisible(false)
+    JustALibrary.Elements[GivenTable.MainFolderName.."SaveManagerJSONCode"]:SetVisible(false)
     SaveManagerContentBox:AddDivider()
     ConfigsDropdown = SaveManagerContentBox:AddDropdown({
         Text = "Configs list",
-        Index = "SaveManagerConfigsList",
+        Index = GivenTable.MainFolderName.."SaveManagerConfigsList",
         MaxVisibleValues = "Auto",
         Callback = function(Value) SelectedConfig = tostring(Value) end
     })
@@ -1875,7 +1875,7 @@ function SetupSaveManager(GivenTable)
                 Title = "Save manager",
                 Content = "Loaded config: "..SelectedConfig,
                 Sound = 107396133526484
-            }) JustALibrary.Elements["SaveManagerConfigName"]:SetValue("")
+            }) JustALibrary.Elements[GivenTable.MainFolderName.."SaveManagerConfigName"]:SetValue("")
         end
     })
     SaveManagerContentBox:AddButton({
