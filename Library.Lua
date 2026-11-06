@@ -1338,7 +1338,7 @@ function JustALibrary:CreateWindow(GivenTable)
                                 end
                             end
                         end
-                        GivenTable.Callback(Value)
+                        GivenTable.Callback(SelectedValue)
                     end
                 end
 
