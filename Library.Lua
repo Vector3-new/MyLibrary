@@ -95,9 +95,9 @@ local function New(GivenTable)
     end
     if GivenTable.UIStrokeConfig then
         local UIStroke = Instance.new("UIStroke",Object)
-        UIStroke.Color = GivenTable.UIStroke.Color or Color3.fromRGB(0,0,0)
-        UIStroke.Thickness = GivenTable.UIStroke.Thickness or 3
-        UIStroke.Transparency = GivenTable.UIStroke.Transparency or 0.6
+        UIStroke.Color = GivenTable.UIStrokeConfig.Color or Color3.fromRGB(0,0,0)
+        UIStroke.Thickness = GivenTable.UIStrokeConfig.Thickness or 3
+        UIStroke.Transparency = GivenTable.UIStrokeConfig.Transparency or 0.6
     end
     if GivenTable.ListLayoutConfig then
         local UIListLayout = Instance.new("UIListLayout",Object)
@@ -207,16 +207,42 @@ function JustALibrary:Notify(GivenTable)
         Visible = true
     })
     local NotificationPadding = Instance.new("UIPadding",NotificationFrame)
-    NotificationPadding.PaddingBottom = UDim.new(0,5)
-    NotificationPadding.PaddingLeft = UDim.new(0,5)
-    NotificationPadding.PaddingRight = UDim.new(0,5)
+    NotificationPadding.PaddingTop = UDim.new(0,8)
+    NotificationPadding.PaddingBottom = UDim.new(0,8)
+    NotificationPadding.PaddingLeft = UDim.new(0,10)
+    NotificationPadding.PaddingRight = UDim.new(0,10)
+    local NotificationTopFrame = New({
+        ClassName = "Frame",
+        Parent = NotificationFrame,
+        Name = "NotificationTopFrame",
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1,0,0,20),
+        LayoutOrder = #(NotificationFrame:GetChildren()),
+        ListLayoutConfig = {
+            Padding = UDim.new(0,8),
+            FillDirection = Enum.FillDirection.Horizontal,
+            VerticalAlignment = Enum.VerticalAlignment.Center
+        },
+        Visible = true
+    })
+    local NotificationIcon = New({
+        ClassName = "ImageLabel",
+        Parent = NotificationTopFrame,
+        Name = "NotificationIcon",
+        BackgroundTransparency = 1,
+        Size = UDim2.new(0,20,0,20),
+        LayoutOrder = #(NotificationTopFrame:GetChildren()),
+        Image = GivenTable.Icon and Icons.assets[GivenTable.Icon] or Icons.assets["lucide-bell-ring"],
+        ImageColor3 = GivenTable.IconColor3 or Color3.fromRGB(255,255,255),
+        Visible = true
+    })
     local NotificationTitle = New({
         ClassName = "TextLabel",
-        Parent = NotificationFrame,
+        Parent = NotificationTopFrame,
         Name = "NotificationTitle",
         BackgroundTransparency = 1,
-        Size = UDim2.new(1,0,0,25),
-        LayoutOrder = #(NotificationFrame:GetChildren()),
+        Size = UDim2.new(1,-28,1,0),
+        LayoutOrder = #(NotificationTopFrame:GetChildren()),
         TextColor3 = Color3.fromRGB(255,255,255),
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
@@ -232,20 +258,22 @@ function JustALibrary:Notify(GivenTable)
         Size = UDim2.fromScale(1,0),
         AutomaticSize = Enum.AutomaticSize.Y,
         TextColor3 = Color3.fromRGB(200,200,200),
+        TextSize = 11,
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
         Text = GivenTable.Content or "Hello World!",
-        Padding = 3,
+        Padding = 5,
         Visible = true
     })
     local NotificationTimeFrame = New({
         ClassName = "Frame",
         Parent = NotificationFrame,
         Name = "NotificationTime",
-        BackgroundColor3 = Color3.fromRGB(255,255,255),
+        BackgroundColor3 = GivenTable.IconColor3 or Color3.fromRGB(255,255,255),
         BackgroundTransparency = 0,
         LayoutOrder = #(NotificationFrame:GetChildren()),
         Size = UDim2.new(0,0,0,3),
+        CornerRadius = 8,
         Visible = true
     })
     if GivenTable.Sound then
@@ -257,11 +285,9 @@ function JustALibrary:Notify(GivenTable)
     NotificationFakeFrame.Parent = NotificationsHolder
     task.spawn(function()
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
-        TweenService:Create(NotificationTimeFrame,TweenInfo.new(GivenTable.Time or 3),{Size = UDim2.new(0.975,0,0,3)}):Play()
-        task.wait(GivenTable.Time or 3)
+        TweenService:Create(NotificationTimeFrame,TweenInfo.new(GivenTable.Time or 3),{Size = UDim2.new(1,0,0,3)}):Play() task.wait(GivenTable.Time or 3)
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position = UDim2.fromScale(1.1,0)}):Play()
-        task.wait(0.75)
-        NotificationFakeFrame:Destroy()
+        task.wait(0.75) NotificationFakeFrame:Destroy()
     end)
 end
 
@@ -597,13 +623,11 @@ function JustALibrary:CreateWindow(GivenTable)
         local NewNotification = Notification:Clone()
         if NewNotification.NotificationFrame:FindFirstChild("Sound") then NewNotification.NotificationFrame.Sound:Destroy() end
         if NewNotification.NotificationFrame:FindFirstChild("NotificationTime") then NewNotification.NotificationFrame.NotificationTime:Destroy() end
-        if NewNotification.NotificationFrame:FindFirstChild("UIPadding") then NewNotification.NotificationFrame.UIPadding:Destroy() end
-        NewNotification.Parent = NotificationsContentFrame
+        if NewNotification.NotificationFrame.NotificationContent:FindFirstChild("UIPadding") then NewNotification.NotificationFrame.NotificationContent.UIPadding:Destroy() end
         NewNotification.LayoutOrder = #(NotificationsContentFrame:GetChildren())
         NewNotification.NotificationFrame.Position = UDim2.fromScale(-1.1,0)
-        for _,Labels in NewNotification.NotificationFrame:GetChildren() do if Labels:IsA("TextLabel") then Labels.Size = UDim2.new(0.975,0,0,25) end end
         NewNotification.NotificationFrame.Size = UDim2.fromScale(1,1)
-        NewNotification.Size = UDim2.new(1,0,0,NewNotification.NotificationFrame.AbsoluteSize.Y)
+        NewNotification.Parent = NotificationsContentFrame
         TweenService:Create(NewNotification.NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
     end)
 
