@@ -722,14 +722,14 @@ function JustALibrary:CreateWindow(GivenTable)
             end
         end)
 
-        function Tab:AddContentBox(GivenTable)
+        function Tab:AddContentBox(GivenName,GivenSide,GivenIcon)
             local ContentBox = {HiddenElements = {}}
-            local GivenParent = GivenTable.Side == "Right" and SecondTabContentScrollingFrame or TabContentScrollingFrame
+            local GivenParent = GivenSide == "Right" and SecondTabContentScrollingFrame or TabContentScrollingFrame
 
             local ContentBoxFrame = New({
                 ClassName = "Frame",
                 Parent = GivenParent,
-                Name = GivenTable.Name,
+                Name = GivenName,
                 Size = UDim2.new(1,0,0,30),
                 AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundColor3 = Color3.fromRGB(0,0,0),
@@ -758,15 +758,27 @@ function JustALibrary:CreateWindow(GivenTable)
                 Parent = ContentBoxTitleFrame,
                 Name = "ContentBoxTitle",
                 BackgroundTransparency = 1,
-                Size = UDim2.new(0.75,0,0,30),
-                Position = UDim2.fromScale(0.03,0),
+                Size = GivenIcon and UDim2.new(0.65,0,0,30) or UDim2.new(0.75,0,0,30),
+                Position = GivenIcon and UDim2.fromScale(0.125,0) or UDim2.fromScale(0.03,0),
                 TextWrapped = true,
                 TextSize = 12,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextColor3 = Color3.fromRGB(255,255,255),
-                Text = GivenTable.Name or "ContentBox",
+                Text = GivenName or "ContentBox",
                 Visible = true
             })
+            if GivenIcon then
+                New({
+                    ClassName = "ImageLabel",
+                    Parent = ContentBoxTitleFrame,
+                    Name = "ContentBoxIcon",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.fromOffset(20,20),
+                    Position = UDim2.new(0.025,0,0,5),
+                    Image = Icons.assets[GivenIcon],
+                    Visible = true
+                })
+            end
             local ContentBoxPopOut = New({
                 ClassName = "ImageButton",
                 Parent = ContentBoxTitleFrame,
@@ -1757,7 +1769,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 local IsSliderDragging = false
-                SliderFrame.InputBegan:Connect(function(Input)
+                SliderFakeFrame.InputBegan:Connect(function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         IsSliderDragging = true IsElementDragging = true TrackMove(Input.Position.X)
                     end
@@ -1780,15 +1792,15 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function SliderHolder:SetDisabled(Boolean)
-                    SliderFrame.Interactable = not Boolean
-                    if SliderFrame.Interactable then
+                    SliderFakeFrame.Interactable = not Boolean
+                    if SliderFakeFrame.Interactable then
                         TweenService:Create(SliderName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(225,225,225)}):Play()
                         TweenService:Create(SliderValue,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(225,225,225)}):Play()
-                        TweenService:Create(SliderFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(225,225,225)}):Play()
+                        TweenService:Create(SliderFakeFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(225,225,225)}):Play()
                     else
                         TweenService:Create(SliderName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
                         TweenService:Create(SliderValue,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
-                        TweenService:Create(SliderFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        TweenService:Create(SliderFakeFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
                     end
                 end
 
@@ -1827,7 +1839,7 @@ function SetupSaveManager(GivenTable)
             if string.match(Path,"([^/\\]+)$") ~= "Autoload.lib" then table.insert(FilesList,string.match(Path,"([^/\\]+)$")) end
         end ConfigsDropdown:ReplaceValues(FilesList)
     end
-    local SaveManagerContentBox = GivenTable.Tab:AddContentBox({Name = GivenTable.Name or "Save manager",Side = "Right"})
+    local SaveManagerContentBox = GivenTable.Tab:AddContentBox(GivenTable.Name or "Save manager","Right","lucide-folder-open")
     SaveManagerContentBox:AddInput({
         Text = "Config name",
         Index = GivenTable.MainFolderName.."SaveManagerConfigName",
