@@ -1910,7 +1910,7 @@ function SetupSaveManager(GivenTable)
             JustALibrary:Notify({
                 Title = "Save manager",
                 Content = "Loaded config: "..SelectedConfig,
-                Sound = 107396133526484
+                Icon = "lucide-file-check"
             }) JustALibrary.Elements[GivenTable.MainFolderName.."SaveManagerConfigName"]:SetValue("")
         end
     })
@@ -1952,7 +1952,7 @@ function SetupSaveManager(GivenTable)
                     JustALibrary:Notify({
                         Title = "Save manager",
                         Content = "Loaded config: "..AutoloadConfigName,
-                        Sound = 107396133526484
+                        Icon = "lucide-file-check"
                     }) break
                 end
             end
