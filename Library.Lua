@@ -1379,12 +1379,12 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function DropdownHolder:ReplaceValues(NewValues)
-                    local OldSelected = {}
                     if GivenTable.MultiSelection then
-                        for _,Value in SelectedValue do table.insert(OldSelected,Value) end
                         table.clear(SelectedValue)
+                        GivenTable.Callback(SelectedValue)
                     else
-                        OldSelected = SelectedValue
+                        SelectedValue = nil
+                        GivenTable.Callback(SelectedValue)
                     end
                     DropdownValue.Text = "---"
                     for _,Button in DropdownValuesFrame:GetChildren() do
@@ -1392,7 +1392,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     end
                     for _,Value in NewValues do
                         local ValueName if typeof(Value) == "string" then ValueName = Value elseif typeof(Value) == "Instance" then ValueName = Value.Name end
-                        local ValueFrame = CreateValue(ValueName,(GivenTable.MultiSelection and table.find(OldSelected,ValueName)) or OldSelected == ValueName)
+                        local ValueFrame = CreateValue(ValueName)
                         ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                             for _,Button in DropdownValuesFrame:GetChildren() do
                                 if Button:IsA("Frame") then 
