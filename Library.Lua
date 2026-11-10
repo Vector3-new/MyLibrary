@@ -1274,7 +1274,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 for _,Value in GivenTable.Values or {} do
-                    local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or nil
+                    local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or "Value"
                     local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value or typeof(GivenTable.Default) == "table" and GivenTable.MultiSelection and table.find(GivenTable.Default,Value))
                     ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                         for _,Button in DropdownValuesFrame:GetChildren() do
@@ -1399,7 +1399,7 @@ function JustALibrary:CreateWindow(GivenTable)
                             for _,Button in DropdownValuesFrame:GetChildren() do
                                 if Button:IsA("Frame") then 
                                     if not GivenTable.MultiSelection then
-                                        if Button.Name == ValueName then
+                                        if ValueName and Button.Name == ValueName then
                                             if SelectedValue ~= Button.Name then
                                                 SelectedValue = Button.Name
                                                 DropdownValue.Text = Button.Name
@@ -1420,7 +1420,7 @@ function JustALibrary:CreateWindow(GivenTable)
                                             TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
                                         end
                                     elseif GivenTable.MultiSelection then
-                                        if Button.Name == ValueName then
+                                        if ValueName and Button.Name == ValueName then
                                             if not table.find(SelectedValue,Button.Name) then
                                                 table.insert(SelectedValue,Button.Name)
                                                 DropdownValue.Text = table.concat(SelectedValue,", ")
