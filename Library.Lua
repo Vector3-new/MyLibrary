@@ -1274,7 +1274,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 for _,Value in GivenTable.Values or {} do
-                    local ValueName if typeof(Value) == "string" then ValueName = Value elseif typeof(Value) == "Instance" then ValueName = Value.Name end
+                    local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or nil
                     local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value or typeof(GivenTable.Default) == "table" and GivenTable.MultiSelection and table.find(GivenTable.Default,Value))
                     ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                         for _,Button in DropdownValuesFrame:GetChildren() do
@@ -1340,32 +1340,32 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function DropdownHolder:SetValue(Value)
-                    if Value and typeof(Value) == "table" and GivenTable.MultiSelection then table.clear(SelectedValue)
+                    if GivenTable.MultiSelection then if typeof(Value) ~= "table" then return end
+                        Value = table.clone(Value)
+                        table.clear(SelectedValue)
                         for _,Values in Value do
-                            local ValueName if typeof(Values) == "string" then ValueName = Values elseif typeof(Values) == "Instance" then ValueName = Values.Name end
-                            for _,Button in DropdownValuesFrame:GetChildren() do
-                                if Button:IsA("Frame") then
-                                    if Button.Name == ValueName then
-                                        table.insert(SelectedValue,Button.Name)
-                                        DropdownValue.Text = table.concat(SelectedValue,", ")
-                                        TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
-                                        TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
-                                    elseif not table.find(SelectedValue,Button.Name) then
-                                        TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(75,75,75)}):Play()
-                                        TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 1}):Play()
-                                    end
-                                end
+                            local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or nil
+                            local IsAllowed = ValueName and not table.find(SelectedValue,ValueName) and DropdownValuesFrame:FindFirstChild(ValueName)
+                            if IsAllowed and IsAllowed:IsA("Frame") then table.insert(SelectedValue,ValueName) end
+                        end
+                        for _, Button in DropdownValuesFrame:GetChildren() do
+                            if Button:IsA("Frame") then local IsSelected = table.find(SelectedValue,Button.Name)
+                                TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = IsSelected and Color3.fromRGB(255,255,255) or Color3.fromRGB(75,75,75)}):Play()
+                                TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = IsSelected and 0 or 1}):Play()
                             end
                         end
+                        DropdownValue.Text = #SelectedValue>0 and table.concat(SelectedValue, ", ") or "---"
+                        DropdownHolder.Value = SelectedValue
                         GivenTable.Callback(SelectedValue)
-                    elseif not GivenTable.MultiSelection then
-                        local ValueName if typeof(Value) == "string" then ValueName = Value elseif typeof(Value) == "Instance" then ValueName = Value.Name end
-                        for _,Button in DropdownValuesFrame:GetChildren() do
+                    else
+                        local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or nil
+                        SelectedValue = nil
+                        DropdownValue.Text = "---"
+                        for _, Button in DropdownValuesFrame:GetChildren() do
                             if Button:IsA("Frame") then
-                                if Button.Name == ValueName then
+                                if ValueName and Button.Name == ValueName then
                                     SelectedValue = Button.Name
                                     DropdownValue.Text = Button.Name
-                                    DropdownHolder.Value = SelectedValue
                                     TweenService:Create(Button.ValueText,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                                     TweenService:Create(Button.ValueButton.ValueIcon,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
                                 else
@@ -1374,6 +1374,7 @@ function JustALibrary:CreateWindow(GivenTable)
                                 end
                             end
                         end
+                        DropdownHolder.Value = SelectedValue
                         GivenTable.Callback(SelectedValue)
                     end
                 end
@@ -1384,6 +1385,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         GivenTable.Callback(SelectedValue)
                     else
                         SelectedValue = nil
+                        DropdownHolder.Value = SelectedValue
                         GivenTable.Callback(SelectedValue)
                     end
                     DropdownValue.Text = "---"
@@ -1391,7 +1393,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         if Button:IsA("Frame") then Button:Destroy() end
                     end
                     for _,Value in NewValues do
-                        local ValueName if typeof(Value) == "string" then ValueName = Value elseif typeof(Value) == "Instance" then ValueName = Value.Name end
+                        local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or nil
                         local ValueFrame = CreateValue(ValueName)
                         ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                             for _,Button in DropdownValuesFrame:GetChildren() do
@@ -1444,7 +1446,9 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 function DropdownHolder:GetActiveValues()
-                    return SelectedValue
+                    if  GivenTable.MultiSelection and typeof(SelectedValue) == "table" then
+                        return table.clone(SelectedValue)
+                    end return SelectedValue
                 end
 
                 function DropdownHolder:SetDisabled(Boolean)
