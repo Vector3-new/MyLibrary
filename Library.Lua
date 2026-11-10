@@ -1358,7 +1358,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         DropdownHolder.Value = SelectedValue
                         GivenTable.Callback(SelectedValue)
                     else
-                        local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or nil
+                        local ValueName = (typeof(Value) == "string" and Value) or (typeof(Value) == "Instance" and Value.Name) or nil
                         SelectedValue = nil
                         DropdownValue.Text = "---"
                         for _, Button in DropdownValuesFrame:GetChildren() do
