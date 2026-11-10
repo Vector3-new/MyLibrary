@@ -1274,7 +1274,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
 
                 for _,Value in GivenTable.Values or {} do
-                    local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or "Value"
+                    local ValueName = (typeof(Value) == "string" and Value) or (typeof(Value) == "Instance" and Value.Name) or "Value"
                     local ValueFrame = CreateValue(ValueName,GivenTable.Default == Value or typeof(GivenTable.Default) == "table" and GivenTable.MultiSelection and table.find(GivenTable.Default,Value))
                     ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                         for _,Button in DropdownValuesFrame:GetChildren() do
@@ -1393,7 +1393,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         if Button:IsA("Frame") then Button:Destroy() end
                     end
                     for _,Value in NewValues do
-                        local ValueName = (typeof(Values) == "string" and Values) or (typeof(Values) == "Instance" and Values.Name) or nil
+                        local ValueName = (typeof(Value) == "string" and Value) or (typeof(Value) == "Instance" and Value.Name) or nil
                         local ValueFrame = CreateValue(ValueName)
                         ValueFrame.ValueButton.MouseButton1Click:Connect(function()
                             for _,Button in DropdownValuesFrame:GetChildren() do
