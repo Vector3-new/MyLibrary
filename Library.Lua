@@ -939,6 +939,10 @@ function JustALibrary:CreateWindow(GivenTable)
                     Visible = true
                 })
 
+                function ImageHolder:SetImage(Image)
+                    ImageLabel.Image = Image
+                end
+
                 function ImageHolder:SetVisible(Boolean)
                     if Boolean then ContentBox.HiddenElements[ImageFrame] = nil else ContentBox.HiddenElements[ImageFrame] = true end
                     ImageFrame.Visible = Boolean and not IsMinimized
