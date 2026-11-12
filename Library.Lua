@@ -383,14 +383,13 @@ end
 
 function JustALibrary:CreateWindow(GivenTable)
     local Window = {}
-    local WindowSize = GivenTable.Size or UDim2.fromOffset(650,550)
 
     local WindowFrame = New({
         ClassName = "Frame",
         Parent = JustALibraryGUI,
         Name = "WindowFrame",
-        Size = WindowSize,
-        Position = UDim2.new(0.5,-WindowSize.X.Offset/2,0.5,-WindowSize.Y.Offset/2),
+        Size = UDim2.fromOffset(550,450),
+        Position = UDim2.new(0.5,-550/2,0.5,-450/2),
         BackgroundTransparency = 1,
         Active = true,
         Visible = true
@@ -486,7 +485,8 @@ function JustALibrary:CreateWindow(GivenTable)
         ClassName = "ImageLabel",
         Parent = NotificationsFrame,
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(10,11),
+        AnchorPoint = Vector2.new(0.5,0.5),
+        Position = UDim2.new(0.5,0,0.5,1),
         Size = UDim2.fromOffset(30,30),
         Image = Icons.assets["lucide-bell-ring"],
         Visible = true
@@ -555,6 +555,37 @@ function JustALibrary:CreateWindow(GivenTable)
         Visible = false
     })
 
+    local WindowResizeFrame = New({
+        ClassName = "Frame",
+        Parent = WindowFrame,
+        Name = "WindowResizeFrame",
+        BackgroundTransparency = 0.6,
+        AnchorPoint = Vector2.new(1,1),
+        BackgroundColor3 = Color3.fromRGB(0,0,0),
+        Size = UDim2.fromOffset(15,15),
+        Position = UDim2.new(1,15,1,15),
+        CornerRadius = 8,
+        Visible = true
+    })
+
+    local IsResizing,ResizeStartCursorPos,WindowSize = false
+    WindowResizeFrame.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+            IsResizing = true IsElementDragging = true ResizeStartCursorPos = Input.Position WindowSize = WindowFrame.AbsoluteSize
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(Input)
+        if IsResizing and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+            WindowFrame.Size = UDim2.fromOffset(math.clamp(WindowSize.X+Input.Position.X-ResizeStartCursorPos.X,400,1000),math.clamp(WindowSize.Y+Input.Position.Y-ResizeStartCursorPos.Y,300,900))
+            TabsFrame.Size = UDim2.new(0,math.max(0,math.clamp(WindowSize.X+Input.Position.X-ResizeStartCursorPos.X,400,1000)*0.8-94),0,50)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+            if IsResizing then IsResizing = false IsElementDragging = false end
+        end
+    end)
+
     local ShowWindowButton 
     function Window:ToggleVisible()
         WindowFrame.Visible = not WindowFrame.Visible
@@ -571,19 +602,20 @@ function JustALibrary:CreateWindow(GivenTable)
     WindowTitleButton.MouseButton1Click:Connect(function() Window:ToggleVisible() end)
 
     NotificationsFrameButton.MouseButton1Click:Connect(function()
-        if NotificationsContentFrame.Visible then
-            NotificationsContentFrame.Visible = false SearchNotificationsInput.Visible = false NotificationsClearAllButton.Visible = false
-            TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
-        else
+        if not NotificationsContentFrame.Visible then
             for _,TabFrames in TabsFrame:GetChildren() do
-                if TabFrames:IsA("Frame") then
-                    WindowFrame[TabFrames.Name].Visible = false
-                    TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                if TabFrames:IsA("Frame") then WindowFrame[TabFrames.Name].Visible = false TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                    for _,Frame in WindowFrame[TabFrames.Name]:GetChildren() do if Frame:IsA("ScrollingFrame") then Frame.Position = UDim2.new(Frame.Position.X.Scale,Frame.Position.X.Offset,Frame.Position.Y.Scale,0) end end
                 end
             end
             NotificationsContentFrame.Visible = true SearchNotificationsInput.Visible = true NotificationsClearAllButton.Visible = true
             TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(100,100,100)}):Play()
         end
+    end)
+
+    NotificationsFrameButton:GetPropertyChangedSignal("GuiState"):Connect(function()
+        if NotificationsFrameButton.GuiState == Enum.GuiState.Hover then TweenService:Create(NotificationsIcon,TweenInfo.new(0.1),{Size = UDim2.fromOffset(35,35)}):Play()
+        else TweenService:Create(NotificationsIcon,TweenInfo.new(0.1),{Size = UDim2.fromOffset(30,30)}):Play() end
     end)
 
     local function NormalizeText(Search)
@@ -649,7 +681,8 @@ function JustALibrary:CreateWindow(GivenTable)
             ClassName = "ImageLabel",
             Parent = TabFrame,
             BackgroundTransparency = 1,
-            Position = UDim2.fromOffset(10,10),
+            AnchorPoint = Vector2.new(0.5,0.5),
+            Position = UDim2.fromScale(0.5,0.5),
             Size = UDim2.fromOffset(30,30),
             Image = TabIcon and Icons.assets[TabIcon] or "",
             Visible = true
@@ -668,14 +701,12 @@ function JustALibrary:CreateWindow(GivenTable)
             ClassName = "Frame",
             Parent = TabContentFrame,
             Name = "TabContentScrollingFrame",
-            Size = UDim2.fromScale(0.47,0.95),
-            Position = UDim2.fromScale(0.025,0.025),
+            Size = UDim2.new(0.5,-7,1,-20),
+            Position = UDim2.fromOffset(5,0),
             BackgroundTransparency = 1,
-            ScrollingConfig = {
-                ScrollingDirection = "Y"
-            },
+            ScrollingConfig = {ScrollingDirection = "Y"},
             ListLayoutConfig = {
-                Padding = UDim.new(0,8),
+                Padding = UDim.new(0,4),
                 SortOrder = Enum.SortOrder.LayoutOrder
             },
             Visible = true
@@ -684,19 +715,17 @@ function JustALibrary:CreateWindow(GivenTable)
             ClassName = "Frame",
             Parent = TabContentFrame,
             Name = "SecondTabContentScrollingFrame",
-            Size = UDim2.fromScale(0.47,0.95),
-            Position = UDim2.fromScale(0.505,0.025),
+            AnchorPoint = Vector2.new(1,0),
+            Size = UDim2.new(0.5,-7,1,-20),
+            Position = UDim2.new(1,-5,0,0),
             BackgroundTransparency = 1,
-            ScrollingConfig = {
-                ScrollingDirection = "Y"
-            },
+            ScrollingConfig = {ScrollingDirection = "Y"},
             ListLayoutConfig = {
-                Padding = UDim.new(0,8),
+                Padding = UDim.new(0,4),
                 SortOrder = Enum.SortOrder.LayoutOrder
             },
             Visible = true
         })
-
         local TabButton = New({
             ClassName = "TextButton",
             Parent = TabFrame,
@@ -713,13 +742,21 @@ function JustALibrary:CreateWindow(GivenTable)
                 if TabFrames:IsA("Frame") then
                     if TabFrames == TabFrame then
                         WindowFrame[TabFrames.Name].Visible = true
-                        TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(100,100,100)}):Play()
+                        for _,Frame in WindowFrame[TabFrames.Name]:GetChildren() do if Frame:IsA("ScrollingFrame") then
+                            TweenService:Create(Frame,TweenInfo.new(0.2),{Position = UDim2.new(Frame.Position.X.Scale,Frame.Position.X.Offset,Frame.Position.Y.Scale,5)}):Play()
+                        end end TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(100,100,100)}):Play()
                     else
                         WindowFrame[TabFrames.Name].Visible = false
+                        for _,Frame in WindowFrame[TabFrames.Name]:GetChildren() do if Frame:IsA("ScrollingFrame") then Frame.Position = UDim2.new(Frame.Position.X.Scale,Frame.Position.X.Offset,Frame.Position.Y.Scale,0) end end
                         TweenService:Create(TabFrames,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
                     end
                 end
             end
+        end)
+
+        TabButton:GetPropertyChangedSignal("GuiState"):Connect(function()
+            if TabButton.GuiState == Enum.GuiState.Hover then TweenService:Create(TabIcon,TweenInfo.new(0.1),{Size = UDim2.fromOffset(35,35)}):Play()
+            else TweenService:Create(TabIcon,TweenInfo.new(0.1),{Size = UDim2.fromOffset(30,30)}):Play() end
         end)
 
         function Tab:AddContentBox(GivenName,GivenSide,GivenIcon)
@@ -738,11 +775,15 @@ function JustALibrary:CreateWindow(GivenTable)
                 Padding = 8,
                 LayoutOrder = #(GivenParent:GetChildren()),
                 ListLayoutConfig = {
-                    Padding = UDim.new(0,8),
+                    Padding = UDim.new(0,5),
                     SortOrder = Enum.SortOrder.LayoutOrder
                 },
                 Visible = true
             })
+            ContentBoxFrame.UIPadding.PaddingTop = UDim.new(0,5)
+            ContentBoxFrame.UIPadding.PaddingLeft = UDim.new(0,5)
+            ContentBoxFrame.UIPadding.PaddingRight = UDim.new(0,5)
+            ContentBoxFrame.UIPadding.PaddingBottom = UDim.new(0,5)
             local ContentBoxTitleFrame = New({
                 ClassName = "Frame",
                 Parent = ContentBoxFrame,
@@ -790,6 +831,10 @@ function JustALibrary:CreateWindow(GivenTable)
                 Image = Icons.assets["lucide-external-link"],
                 Visible = true
             })
+            ContentBoxPopOut:GetPropertyChangedSignal("GuiState"):Connect(function()
+                if ContentBoxPopOut.GuiState == Enum.GuiState.Hover then TweenService:Create(ContentBoxPopOut,TweenInfo.new(0.1),{Size = UDim2.fromOffset(25,25)}):Play()
+                else TweenService:Create(ContentBoxPopOut,TweenInfo.new(0.1),{Size = UDim2.fromOffset(20,20)}):Play() end
+            end)
             local ContentBoxMinimize = New({
                 ClassName = "ImageButton",
                 Parent = ContentBoxTitleFrame,
@@ -801,6 +846,10 @@ function JustALibrary:CreateWindow(GivenTable)
                 Image = Icons.assets["lucide-chevron-down"],
                 Visible = true
             })
+            ContentBoxMinimize:GetPropertyChangedSignal("GuiState"):Connect(function()
+                if ContentBoxMinimize.GuiState == Enum.GuiState.Hover then TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.1),{Size = UDim2.fromOffset(25,25)}):Play()
+                else TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.1),{Size = UDim2.fromOffset(20,20)}):Play() end
+            end)
 
             local IsMinimized = false
             ContentBoxMinimize.MouseButton1Click:Connect(function()
@@ -808,13 +857,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 for _,Element in ContentBoxFrame:GetChildren() do
                     if Element:IsA("Frame") and Element.Name ~= "ContentBoxTitleFrame" and not ContentBox.HiddenElements[Element] then
                         Element.Visible = not IsMinimized
-                        if not IsMinimized then
-                            TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.2),{Rotation = 0}):Play()
-                            ContentBoxFrame.UIPadding.PaddingBottom = UDim.new(0,8)
-                        else
-                            TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.2),{Rotation = 180}):Play()
-                            ContentBoxFrame.UIPadding.PaddingBottom = UDim.new(0,0)
-                        end
+                        if not IsMinimized then TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.2),{Rotation = 0}):Play()
+                        else TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.2),{Rotation = 180}):Play() end
                     end
                 end
             end)
@@ -840,10 +884,11 @@ function JustALibrary:CreateWindow(GivenTable)
                     ClassName = "Frame",
                     Parent = ContentBoxFrame,
                     Name = "LabelFrame",
-                    BackgroundTransparency = 1,
+                    BackgroundTransparency = 0.6,
                     Size = UDim2.new(1,0,0,0),
                     AutomaticSize = Enum.AutomaticSize.Y,
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    CornerRadius = 8,
                     Visible = true
                 })
                 local LabelText = New({
@@ -851,16 +896,20 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = LabelFrame,
                     Name = "LabelText",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.9,0,0,0),
                     AutomaticSize = Enum.AutomaticSize.Y,
-                    Position = UDim2.fromScale(0.05,0),
+                    Size = UDim2.new(1,0,0,25),
                     TextWrapped = true,
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Text = Text or "Label",
+                    Padding = 5,
                     Visible = true
                 })
+                LabelText.UIPadding.PaddingTop = UDim.new(0,5)
+                LabelText.UIPadding.PaddingLeft = UDim.new(0,5)
+                LabelText.UIPadding.PaddingRight = UDim.new(0,5)
+                LabelText.UIPadding.PaddingBottom = UDim.new(0,5)
 
                 function LabelHolder:SetText(Text)
                     LabelText.Text = Text or "Label"
@@ -896,8 +945,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "Divider",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.new(0.9,0,0,5),
-                    Position = UDim2.fromScale(0.05,0),
+                    Size = UDim2.new(1,0,0,5),
                     CornerRadius = 8,
                     Visible = true
                 })
@@ -932,8 +980,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "ImageLabel",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.fromScale(0.9,1),
-                    Position = UDim2.fromScale(0.05,0),
+                    Size = UDim2.fromScale(1,1),
                     Image = GivenTable.Image,
                     CornerRadius = 8,
                     Visible = true
@@ -973,8 +1020,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "Button",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.new(0.9,0,0,25),
-                    Position = UDim2.fromScale(0.05,0),
+                    Size = UDim2.new(1,0,0,25),
                     TextSize = 12,
                     TextColor3 = Color3.fromRGB(255,255,255),
                     Text = GivenTable.Text or "Label",
@@ -1026,8 +1072,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = ToggleFrame,
                     Name = "ToggleText",
                     BackgroundTransparency = 1,
-                    Size = UDim2.fromScale(0.7,1),
-                    Position = UDim2.fromScale(0.05,0),
+                    Size = UDim2.new(1,-45,0,22),
+                    Position = UDim2.fromOffset(3,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     Text = GivenTable.Text or "Toggle",
@@ -1041,8 +1087,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
                     AnchorPoint = Vector2.new(1,0),
-                    Size = UDim2.new(0,50,0,25),
-                    Position = UDim2.fromScale(0.95,0),
+                    Size = UDim2.fromOffset(50,25),
+                    Position = UDim2.new(1,-5,0,0),
                     CornerRadius = 20,
                     Visible = true
                 })
@@ -1150,8 +1196,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = DropdownFrame,
                     Name = "DropdownName",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.9,0,0,25),
-                    Position = UDim2.new(0.05,0,0,0),
+                    Size = UDim2.new(1,0,0,25),
+                    Position = UDim2.fromOffset(3,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     Text = GivenTable.Text or "Dropdown",
@@ -1165,8 +1211,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "DropdownButton",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.new(0.9,0,0,25),
-                    Position = UDim2.new(0.05,0,0,25),
+                    Size = UDim2.new(1,0,0,25),
+                    Position = UDim2.fromOffset(0,25),
                     Text = "",
                     TextTransparency = 1,
                     CornerRadius = 8,
@@ -1178,8 +1224,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = DropdownButton,
                     Name = "DropdownValue",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.85,0,0,25),
-                    Position = UDim2.new(0.03,0,0,0),
+                    Size = UDim2.new(1,-30,0,25),
+                    Position = UDim2.fromOffset(5,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 10,
                     Text = DropdownValueText,
@@ -1194,7 +1240,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     BackgroundTransparency = 1,
                     AnchorPoint = Vector2.new(1,0),
                     Size = UDim2.new(0,25,0,25),
-                    Position = UDim2.fromScale(0.99,0),
+                    Position = UDim2.new(1,-3,0,0),
                     Image = Icons.assets["lucide-chevron-down"],
                     Visible = true
                 })
@@ -1204,8 +1250,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "DropdownValuesFrame",
                     BackgroundTransparency = 0.6,
                     AutomaticSize = Enum.AutomaticSize.Y,
-                    Size = UDim2.new(0.9,0,0,0),
-                    Position = UDim2.new(0.05,0,0,55),
+                    Size = UDim2.fromScale(1,0),
+                    Position = UDim2.fromOffset(0,55),
                     CornerRadius = 8,
                     ListLayoutConfig = {
                         Padding = UDim.new(0,5),
@@ -1253,7 +1299,7 @@ function JustALibrary:CreateWindow(GivenTable)
                         Parent = ValueFrame,
                         Name = "ValueButton",
                         BackgroundTransparency = 0.6,
-                        BackgroundColor3 = Color3.fromRGB(100,100,100),
+                        BackgroundColor3 = Color3.fromRGB(75,75,75),
                         AnchorPoint = Vector2.new(1,0.5),
                         Size = UDim2.fromOffset(25,25),
                         Position = UDim2.fromScale(0.99,0.5),
@@ -1503,8 +1549,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = InputFakeFrame,
                     Name = "InputName",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.9,0,0,25),
-                    Position = UDim2.new(0.05,0,0,0),
+                    Size = UDim2.new(1,0,0,25),
+                    Position = UDim2.fromOffset(3,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -1517,8 +1563,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "InputFrame",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.new(0.9,0,0,25),
-                    Position = UDim2.new(0.05,0,0,25),
+                    Size = UDim2.new(1,0,0,25),
+                    Position = UDim2.fromOffset(0,25),
                     CornerRadius = 8,
                     Visible = true
                 })
@@ -1527,8 +1573,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = InputFrame,
                     Name = "Input",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.9,0,0,25),
-                    Position = UDim2.new(0.05,0,0,0),
+                    Size = UDim2.new(1,0,0,25),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextWrapped = true,
                     TextTruncate = Enum.TextTruncate.AtEnd,
@@ -1536,8 +1581,12 @@ function JustALibrary:CreateWindow(GivenTable)
                     ClearTextOnFocus = GivenTable.ClearTextOnFocus or false,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Text = GivenTable.Default or "",
+                    Padding = 5,
                     Visible = true
                 })
+                Input.UIPadding.PaddingTop = UDim.new(0,5)
+                Input.UIPadding.PaddingLeft = UDim.new(0,5)
+                Input.UIPadding.PaddingRight = UDim.new(0,5)
 
                 local WaitingForFinish = false
                 Input:GetPropertyChangedSignal("Text"):Connect(function()
@@ -1605,8 +1654,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = KeybindFakeFrame,
                     Name = "KeybindName",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.7,0,1,0),
-                    Position = UDim2.new(0.05,0,0,0),
+                    Size = UDim2.fromScale(1,1),
+                    Position = UDim2.fromOffset(3,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -1620,8 +1669,9 @@ function JustALibrary:CreateWindow(GivenTable)
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
                     AnchorPoint = Vector2.new(1,0),
-                    Size = UDim2.new(0.2,0,1,0),
-                    Position = UDim2.new(0.95,0,0,0),
+                    AutomaticSize = Enum.AutomaticSize.X,
+                    Size = UDim2.fromOffset(25,25),
+                    Position = UDim2.fromScale(1,0),
                     CornerRadius = 8,
                     Visible = true
                 })
@@ -1630,12 +1680,17 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = KeybindFrame,
                     Name = "KeybindButton",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(1,0,1,0),
+                    AutomaticSize = Enum.AutomaticSize.X,
+                    Size = UDim2.fromScale(1,1),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     Text = (not GivenTable.Default or table.find(BlacklistedKeys,GivenTable.Default)) and "None" or GivenTable.Default,
+                    Padding = 5,
                     Visible = true
                 })
+                KeybindButton.UIPadding.PaddingLeft = UDim.new(0,5)
+                KeybindButton.UIPadding.PaddingRight = UDim.new(0,5)
+                KeybindButton.UIPadding.PaddingBottom = UDim.new(0,0)
 
                 local Trigger,IsDisabled,WaitForKey = GivenTable.Default or "None",false
                 KeybindHolder.Value = Trigger
@@ -1713,8 +1768,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = SliderFakeFrame,
                     Name = "SliderName",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0.45,0,0,25),
-                    Position = UDim2.new(0.05,0,0,0),
+                    Size = UDim2.new(1,0,0,25),
+                    Position = UDim2.fromOffset(3,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     TextTruncate = Enum.TextTruncate.None,
@@ -1728,8 +1783,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "SliderValue",
                     BackgroundTransparency = 1,
                     AnchorPoint = Vector2.new(1,0),
-                    Size = UDim2.new(0.45,0,0,25),
-                    Position = UDim2.fromScale(0.95,0),
+                    Size = UDim2.new(1,0,0,25),
+                    Position = UDim2.new(1,-3,0,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
                     TextTruncate = Enum.TextTruncate.None,
@@ -1743,8 +1798,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "SliderFrame",
                     BackgroundTransparency = 0.6,
                     BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.new(0.9,0,0,10),
-                    Position = UDim2.new(0.05,0,0,25),
+                    Size = UDim2.new(1,0,0,10),
+                    Position = UDim2.fromOffset(0,25),
                     CornerRadius = 4,
                     Visible = true
                 })
