@@ -701,7 +701,7 @@ function JustALibrary:CreateWindow(GivenTable)
             ClassName = "Frame",
             Parent = TabContentFrame,
             Name = "TabContentScrollingFrame",
-            Size = UDim2.new(0.5,-7,1,-20),
+            Size = UDim2.new(0.5,-7,1,-10),
             Position = UDim2.fromOffset(5,0),
             BackgroundTransparency = 1,
             ScrollingConfig = {ScrollingDirection = "Y"},
@@ -716,7 +716,7 @@ function JustALibrary:CreateWindow(GivenTable)
             Parent = TabContentFrame,
             Name = "SecondTabContentScrollingFrame",
             AnchorPoint = Vector2.new(1,0),
-            Size = UDim2.new(0.5,-7,1,-20),
+            Size = UDim2.new(0.5,-7,1,-10),
             Position = UDim2.new(1,-5,0,0),
             BackgroundTransparency = 1,
             ScrollingConfig = {ScrollingDirection = "Y"},
@@ -879,30 +879,20 @@ function JustALibrary:CreateWindow(GivenTable)
 
             function ContentBox:AddLabel(Text)
                 local LabelHolder = {}
-
-                local LabelFrame = New({
-                    ClassName = "Frame",
-                    Parent = ContentBoxFrame,
-                    Name = "LabelFrame",
-                    BackgroundTransparency = 0.6,
-                    Size = UDim2.new(1,0,0,0),
-                    AutomaticSize = Enum.AutomaticSize.Y,
-                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
-                    CornerRadius = 8,
-                    Visible = true
-                })
                 local LabelText = New({
                     ClassName = "TextLabel",
-                    Parent = LabelFrame,
+                    Parent = ContentBoxFrame,
                     Name = "LabelText",
-                    BackgroundTransparency = 1,
+                    BackgroundTransparency = 0.6,
                     AutomaticSize = Enum.AutomaticSize.Y,
                     Size = UDim2.new(1,0,0,25),
-                    TextWrapped = true,
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     TextColor3 = Color3.fromRGB(255,255,255),
+                    TextWrapped = true,
                     TextSize = 12,
                     TextXAlignment = Enum.TextXAlignment.Left,
                     Text = Text or "Label",
+                    CornerRadius = 8,
                     Padding = 5,
                     Visible = true
                 })
@@ -914,73 +904,48 @@ function JustALibrary:CreateWindow(GivenTable)
                 function LabelHolder:SetText(Text)
                     LabelText.Text = Text or "Label"
                 end
-
                 function LabelHolder:SetVisible(Boolean)
-                    if Boolean then ContentBox.HiddenElements[LabelFrame] = nil else ContentBox.HiddenElements[LabelFrame] = true end
-                    LabelFrame.Visible = Boolean and not IsMinimized
+                    if Boolean then ContentBox.HiddenElements[LabelText] = nil else ContentBox.HiddenElements[LabelText] = true end
+                    LabelText.Visible = Boolean and not IsMinimized
                 end
-
                 function LabelHolder:Destroy()
-                    LabelFrame:Destroy()
+                    LabelText:Destroy()
                 end
-
                 return LabelHolder
             end
 
             function ContentBox:AddDivider()
                 local DividerHolder = {}
-
-                local DividerFrame = New({
-                    ClassName = "Frame",
-                    Parent = ContentBoxFrame,
-                    Name = "DividerFrame",
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1,0,0,5),
-                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
-                    Visible = true
-                })
                 local Divider = New({
                     ClassName = "Frame",
-                    Parent = DividerFrame,
+                    Parent = ContentBoxFrame,
                     Name = "Divider",
                     BackgroundTransparency = 0.6,
-                    BackgroundColor3 = Color3.fromRGB(0,0,0),
                     Size = UDim2.new(1,0,0,5),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     CornerRadius = 8,
                     Visible = true
                 })
 
                 function DividerHolder:SetVisible(Boolean)
-                    if Boolean then ContentBox.HiddenElements[DividerFrame] = nil else ContentBox.HiddenElements[DividerFrame] = true end
-                    DividerFrame.Visible = Boolean and not IsMinimized
+                    if Boolean then ContentBox.HiddenElements[Divider] = nil else ContentBox.HiddenElements[Divider] = true end
+                    Divider.Visible = Boolean and not IsMinimized
                 end
-
                 function DividerHolder:Destroy()
-                    DividerFrame:Destroy()
+                    Divider:Destroy()
                 end
-
                 return DividerHolder
             end
 
             function ContentBox:AddImage(GivenTable)
                 local ImageHolder = {}
-
-                local ImageFrame = New({
-                    ClassName = "Frame",
-                    Parent = ContentBoxFrame,
-                    Name = "ImageFrame",
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1,0,0,GivenTable.ImageHeight or 230),
-                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
-                    Visible = true
-                })
                 local ImageLabel = New({
                     ClassName = "ImageLabel",
-                    Parent = ImageFrame,
+                    Parent = ContentBoxFrame,
                     Name = "ImageLabel",
                     BackgroundTransparency = 0.6,
-                    BackgroundColor3 = Color3.fromRGB(0,0,0),
-                    Size = UDim2.fromScale(1,1),
+                    Size = UDim2.new(1,0,0,GivenTable.ImageHeight or 230),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     Image = GivenTable.Image,
                     CornerRadius = 8,
                     Visible = true
@@ -989,50 +954,35 @@ function JustALibrary:CreateWindow(GivenTable)
                 function ImageHolder:SetImage(Image)
                     ImageLabel.Image = Image
                 end
-
                 function ImageHolder:SetVisible(Boolean)
-                    if Boolean then ContentBox.HiddenElements[ImageFrame] = nil else ContentBox.HiddenElements[ImageFrame] = true end
-                    ImageFrame.Visible = Boolean and not IsMinimized
+                    if Boolean then ContentBox.HiddenElements[ImageLabel] = nil else ContentBox.HiddenElements[ImageLabel] = true end
+                    ImageLabel.Visible = Boolean and not IsMinimized
                 end
-
                 function ImageHolder:Destroy()
                     ImageLabel:Destroy()
                 end
-
                 return ImageHolder
             end
 
             function ContentBox:AddButton(GivenTable)
                 local ButtonHolder = {}
-
-                local ButtonFrame = New({
-                    ClassName = "Frame",
-                    Parent = ContentBoxFrame,
-                    Name = "ButtonFrame",
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1,0,0,25),
-                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
-                    Visible = true
-                })
                 local Button = New({
                     ClassName = "TextButton",
-                    Parent = ButtonFrame,
+                    Parent = ContentBoxFrame,
                     Name = "Button",
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     BackgroundTransparency = 0.6,
-                    BackgroundColor3 = Color3.fromRGB(0,0,0),
                     Size = UDim2.new(1,0,0,25),
                     TextSize = 12,
                     TextColor3 = Color3.fromRGB(255,255,255),
                     Text = GivenTable.Text or "Label",
                     CornerRadius = 8,
                     Visible = true
-                })
-                Button.MouseButton1Click:Connect(GivenTable.Callback)
+                }) Button.MouseButton1Click:Connect(GivenTable.Callback)
 
                 function ButtonHolder:SetText(Text)
                     Button.Text = Text or "Button"
                 end
-
                 function ButtonHolder:SetDisabled(Boolean)
                     if Boolean then
                         Button.Interactable = false
@@ -1042,22 +992,18 @@ function JustALibrary:CreateWindow(GivenTable)
                         TweenService:Create(Button,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                     end
                 end
-
                 function ButtonHolder:SetVisible(Boolean)
-                    if Boolean then ContentBox.HiddenElements[ButtonFrame] = nil else ContentBox.HiddenElements[ButtonFrame] = true end
-                    ButtonFrame.Visible = Boolean and not IsMinimized
+                    if Boolean then ContentBox.HiddenElements[Button] = nil else ContentBox.HiddenElements[Button] = true end
+                    Button.Visible = Boolean and not IsMinimized
                 end
-
                 function ButtonHolder:Destroy()
-                    ButtonFrame:Destroy()
+                    Button:Destroy()
                 end
-
                 return ButtonHolder
             end
 
             function ContentBox:AddToggle(GivenTable)
                 local ToggleHolder = {Value = false}
-
                 local ToggleFrame = New({
                     ClassName = "Frame",
                     Parent = ContentBoxFrame,
@@ -1072,7 +1018,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = ToggleFrame,
                     Name = "ToggleText",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(1,-45,0,22),
+                    Size = UDim2.new(1,0,0,22),
                     Position = UDim2.fromOffset(3,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 12,
@@ -1109,8 +1055,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     IsToggled = true
                     ToggleButtonFrame.BackgroundColor3 = Color3.fromRGB(125,125,125)
                     SecondToggleButtonFrame.Position = UDim2.fromScale(0.5,0)
-                end
-                ToggleHolder.Value = IsToggled
+                end ToggleHolder.Value = IsToggled
 
                 local ToggleButton = New({
                     ClassName = "TextButton",
@@ -1137,7 +1082,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 function ToggleHolder:SetText(Text)
                     ToggleText.Text = Text or "Toggle"
                 end
-
                 function ToggleHolder:SetValue(Boolean)
                      if IsToggled == Boolean then return end 
                     IsToggled = Boolean
@@ -1151,7 +1095,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     end
                     GivenTable.Callback(IsToggled)
                 end
-
                 function ToggleHolder:SetDisabled(Boolean)
                     if Boolean then
                         ToggleButton.Interactable = false
@@ -1163,24 +1106,19 @@ function JustALibrary:CreateWindow(GivenTable)
                         TweenService:Create(SecondToggleButtonFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(255,255,255)}):Play()
                     end
                 end
-
                 function ToggleHolder:SetVisible(Boolean)
                     if Boolean then ContentBox.HiddenElements[ToggleFrame] = nil else ContentBox.HiddenElements[ToggleFrame] = true end
                     ToggleFrame.Visible = Boolean and not IsMinimized
                 end
-
                 function ToggleHolder:Destroy()
                     ToggleFrame:Destroy()
                 end
-
                 JustALibrary.Elements[GivenTable.Index or "Toggle"] = ToggleHolder
-
                 return ToggleHolder
             end
 
             function ContentBox:AddDropdown(GivenTable)
                 local DropdownHolder = {}
-
                 local DropdownFrame = New({
                     ClassName = "Frame",
                     Parent = ContentBoxFrame,
@@ -1224,8 +1162,8 @@ function JustALibrary:CreateWindow(GivenTable)
                     Parent = DropdownButton,
                     Name = "DropdownValue",
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(1,-30,0,25),
-                    Position = UDim2.fromOffset(5,0),
+                    Size = UDim2.new(1,-33,0,25),
+                    Position = UDim2.fromOffset(8,0),
                     TextColor3 = Color3.fromRGB(255,255,255),
                     TextSize = 10,
                     Text = DropdownValueText,
@@ -1387,7 +1325,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 function DropdownHolder:SetText(Text)
                     DropdownName.Text = Text or "Dropdown"
                 end
-
                 function DropdownHolder:SetValue(Value)
                     if GivenTable.MultiSelection then if typeof(Value) ~= "table" then return end
                         Value = table.clone(Value)
@@ -1427,7 +1364,6 @@ function JustALibrary:CreateWindow(GivenTable)
                         GivenTable.Callback(SelectedValue)
                     end
                 end
-
                 function DropdownHolder:ReplaceValues(NewValues)
                     if GivenTable.MultiSelection then
                         table.clear(SelectedValue)
@@ -1493,13 +1429,11 @@ function JustALibrary:CreateWindow(GivenTable)
                         end)
                     end
                 end
-
                 function DropdownHolder:GetActiveValues()
                     if  GivenTable.MultiSelection and typeof(SelectedValue) == "table" then
                         return table.clone(SelectedValue)
                     end return SelectedValue
                 end
-
                 function DropdownHolder:SetDisabled(Boolean)
                     DropdownValuesFrame.Visible = false
                     if Boolean then
@@ -1516,25 +1450,20 @@ function JustALibrary:CreateWindow(GivenTable)
                     end
                     
                 end
-
                 function DropdownHolder:SetVisible(Boolean)
                     TweenService:Create(DropdownIcon,TweenInfo.new(0.25),{Rotation = 0}):Play()
                     if Boolean then ContentBox.HiddenElements[DropdownFrame] = nil else ContentBox.HiddenElements[DropdownFrame] = true end
                     DropdownFrame.Visible = Boolean and not IsMinimized
                 end
-
                 function DropdownHolder:Destroy()
                     DropdownFrame:Destroy()
                 end
-
                 JustALibrary.Elements[GivenTable.Index or "Dropdown"] = DropdownHolder
-
                 return DropdownHolder
             end
 
             function ContentBox:AddInput(GivenTable)
                 local InputHolder = {Value = GivenTable.Default or ""}
-
                 local InputFakeFrame = New({
                     ClassName = "Frame",
                     Parent = ContentBoxFrame,
@@ -1605,12 +1534,10 @@ function JustALibrary:CreateWindow(GivenTable)
 				function InputHolder:SetText(Text)
                     InputName.Text = Text or "Input"
                 end
-
                 function InputHolder:SetValue(NewValue)
                     Input.Text = NewValue
                     GivenTable.Callback(Input.Text)
                 end
-
                 function InputHolder:SetDisabled(Boolean)
                     if Boolean then
                         Input.Interactable = false
@@ -1622,24 +1549,19 @@ function JustALibrary:CreateWindow(GivenTable)
                         TweenService:Create(Input,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                     end
                 end
-
                 function InputHolder:SetVisible(Boolean)
                     if Boolean then ContentBox.HiddenElements[InputFakeFrame] = nil else ContentBox.HiddenElements[InputFakeFrame] = true end
                     InputFakeFrame.Visible = Boolean and not IsMinimized
                 end
-
                 function InputHolder:Destroy()
                     InputFakeFrame:Destroy()
                 end
-
                 JustALibrary.Elements[GivenTable.Index or "Input"] = InputHolder
-
                 return InputHolder
             end
 
             function ContentBox:AddKeyPicker(GivenTable)
                 local KeybindHolder = {Value = "None"}
-
                 local KeybindFakeFrame = New({
                     ClassName = "Frame",
                     Parent = ContentBoxFrame,
@@ -1713,7 +1635,6 @@ function JustALibrary:CreateWindow(GivenTable)
 				function KeybindHolder:SetText(Text)
                     KeybindName.Text = Text or "Keybind"
                 end
-
                 function KeybindHolder:SetValue(Key)
                     if WaitForKey then WaitForKey:Disconnect() end WaitForKey = true
                     if not table.find(BlacklistedKeys,Key) then
@@ -1722,7 +1643,6 @@ function JustALibrary:CreateWindow(GivenTable)
                         KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
                     end task.wait() WaitForKey = nil
                 end
-
                 function KeybindHolder:SetDisabled(Boolean)
                     if Boolean then
                         KeybindButton.Interactable = false
@@ -1736,24 +1656,19 @@ function JustALibrary:CreateWindow(GivenTable)
                         TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                     end
                 end
-
                 function KeybindHolder:SetVisible(Boolean)
                     if Boolean then ContentBox.HiddenElements[KeybindFakeFrame] = nil else ContentBox.HiddenElements[KeybindFakeFrame] = true end
                     KeybindFakeFrame.Visible = Boolean and not IsMinimized
                 end
-
                 function KeybindHolder:Destroy()
                     KeybindFakeFrame:Destroy()
                 end
-
                 JustALibrary.Elements[GivenTable.Index or "Keybind"] = KeybindHolder
-
                 return KeybindHolder
             end
 
            function ContentBox:AddSlider(GivenTable)
                 local SliderHolder = {Value = GivenTable.Default or GivenTable.Min}
-
                 local SliderFakeFrame = New({
                     ClassName = "Frame",
                     Parent = ContentBoxFrame,
@@ -1848,11 +1763,9 @@ function JustALibrary:CreateWindow(GivenTable)
                 function SliderHolder:SetText(Text)
                     SliderName.Text = Text or "Slider"
                 end
-
                 function SliderHolder:SetValue(Num)
                     if not Num or typeof(Num) ~= "number" then return end Calculate(Num)
                 end
-
                 function SliderHolder:SetDisabled(Boolean)
                     SliderFakeFrame.Interactable = not Boolean
                     if SliderFakeFrame.Interactable then
@@ -1865,27 +1778,21 @@ function JustALibrary:CreateWindow(GivenTable)
                         TweenService:Create(SliderFakeFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(125,125,125)}):Play()
                     end
                 end
-
                 function SliderHolder:SetVisible(Boolean)
                     if Boolean then ContentBox.HiddenElements[SliderFakeFrame] = nil else ContentBox.HiddenElements[SliderFakeFrame] = true end
                     SliderFakeFrame.Visible = Boolean and not IsMinimized
                 end
-
-                function SliderHolder:Destroy() SliderFakeFrame:Destroy() end
-
+                function SliderHolder:Destroy()
+                    SliderFakeFrame:Destroy()
+                end
                 JustALibrary.Elements[GivenTable.Index or "Slider"] = SliderHolder
-
                 return SliderHolder
             end
-
             return ContentBox
         end
-
         table.insert(JustALibrary.Tabs,Tab)
-
         return Tab
     end
-
     return Window
 end
 
