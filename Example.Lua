@@ -1,236 +1,198 @@
-local JustALibrary = loadfile("JustALibrary.Lua")()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vector3-new/MyLibrary/refs/heads/main/Library.Lua"))()
 
-local MainWindow = JustALibrary:CreateWindow({
-    Title = "Example",
-    Size = UDim2.fromOffset(550,450) -- or UDim2.fromOffset(650,550)
+-- 1. Create Main Window (accepts a string)
+local MainWindow = Library:CreateWindow("Example")
+
+-- 2. Notifications
+Library:Notify({
+    Title = "Welcome",
+    Content = "Library has been successfully loaded!",
+    Icon = "lucide-bell-ring", -- Uses Lucide icons from your Icons.Lua
+    Time = 5,
+    -- Sound = "1234567890", -- Optional Roblox Sound ID
+    -- SoundVolume = 1
 })
 
-local Watermark = JustALibrary:CreateDraggableLabel("helo world",UDim2.fromScale(0.48,0.1))
+-- 3. Standalone Draggable Elements (HUD)
+local DraggableLabel = Library:CreateDraggableLabel("Status: Active",UDim2.fromOffset(20, 100))
+-- DraggableLabel:SetText("Status: Idle")
+-- DraggableLabel:SetVisible(true)
+-- DraggableLabel:Destroy()
 
-local Main = MainWindow:AddTab("Home","lucide-home")
-local Settings = MainWindow:AddTab("Settings","lucide-cog")
-for i=1,10 do MainWindow:AddTab("Tab"..i,"lucide-layout") end
+local DraggableButton = Library:CreateDraggableButton("Toggle UI",function() MainWindow:ToggleVisible() end,UDim2.fromOffset(20,140))
+-- DraggableButton:SetVisible(true)
+-- DraggableButton:Destroy()
 
---[[
-    :AddContentBox({
-        Name = "LocalPlayer",
-        Side = "Left"
-    })
-]]
+-- 4. Tabs
+local MainTab = MainWindow:AddTab("Main","lucide-home")
+local VisualsTab = MainWindow:AddTab("Visuals","lucide-eye")
+local SettingsTab = MainWindow:AddTab("Settings","lucide-settings")
 
-local LocalPlayerBox = Main:AddContentBox({Name = "LocalPlayer",Side = "Left"})
-local Contentbox1 = Main:AddContentBox({Name = "Contentbox 1",Side = "Right"})
-local Contentbox2 = Main:AddContentBox({Name = "Contentbox 2",Side = "Right"})
+-- 5. Content Boxes (Sides: "Left" or "Right")
+local LeftBox = MainTab:AddContentBox("General Controls","Left","lucide-sliders")
+local RightBox = MainTab:AddContentBox("Interactive Elements","Right","lucide-box")
 
---[[
-    :AddImage({
-        Image = nil,
-        ImageHeight = 230
-    })
+-- 6. Elements inside Left ContentBox
 
-    :SetVisible(Boolean)
-    :Destroy()
-]]
+-- Label
+local MyLabel = LeftBox:AddLabel("This is a standard text label. It wraps automatically.")
+-- MyLabel:SetText("Updated label text!")
+-- MyLabel:SetVisible(true)
+-- MyLabel:Destroy()
 
-local Iamge = LocalPlayerBox:AddImage({Image = game.Players:GetUserThumbnailAsync(game.Players.LocalPlayer.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)})
+-- Divider
+local MyDivider = LeftBox:AddDivider()
+-- MyDivider:SetVisible(true)
+-- MyDivider:Destroy()
 
---[[
-    :SetText(Text)
-    :SetVisible(Boolean)
-    :Destroy()
-]]
+-- Image (accepts 1st argument: Image ID, 2nd argument: Height)
+local MyImage = LeftBox:AddImage("rbxassetid://10822217003",120)
+-- MyImage:SetImage("rbxassetid://1234567890")
+-- MyImage:SetVisible(true)
+-- MyImage:Destroy()
 
-local Label = LocalPlayerBox:AddLabel(game.Players.LocalPlayer.DisplayName.." ["..game.Players.LocalPlayer.Name.."]")
-
---[[
-    :SetVisible(Boolean)
-    :Destroy()
-]]
-
-local Divider = LocalPlayerBox:AddDivider()
-
---[[
-    :AddButton({
-        Text = "Button",
-        Callback = function() end
-    })
-
-    :SetText(Text)
-    :SetDisabled(Boolean)
-    :SetVisible(Boolean)
-    :Destroy()
-]]
-
-local Button = LocalPlayerBox:AddButton({
-    Text = "Print",
+-- Button
+local MyButton = LeftBox:AddButton({
+    Text = "Trigger Notification",
     Callback = function()
-
-        --[[
-            :Notify({
-                Title = "Notification",
-                Content = "Hello World!",
-                Sound = nil,
-                SoundVolume = 0.5,
-                Time = 3
-            })
-        ]]
-
-        JustALibrary:Notify({
-            Content = game.Players.LocalPlayer.DisplayName.." ["..game.Players.LocalPlayer.Name.."]".."\nHello World!",
-            Sound = 107396133526484,
+        Library:Notify({
+            Title = "Button Clicked",
+            Content = "You pressed the example button!",
+            Icon = "lucide-check",
             Time = 3
         })
     end
 })
+-- MyButton:SetText("New Button Text")
+-- MyButton:SetDisabled(false)
+-- MyButton:SetVisible(true)
+-- MyButton:Destroy()
 
---[[
-    :AddToggle({
-        Text = "Toggle",
-        Index = "Toggle",
-        Default = false,
-        Callback = function() end
-    })
-
-    :SetText(Text)
-    :SetValue(Boolean)
-    :SetDisabled(Boolean)
-    :SetVisible(Boolean)
-    :Destroy()
-]]
-
-Contentbox1:AddToggle({
-    Text = "Toggle",
-    Index = "Togl",
-    Callback = function(Value) print(Value) end
+-- Toggle
+local MyToggle = LeftBox:AddToggle({
+    Text = "Enable Feature",
+    Index = "ExampleToggle", -- Required if you want SaveManager to save this element
+    Default = false,
+    Callback = function(Value)
+        print("Toggle state changed to:",Value)
+    end
 })
+-- MyToggle:SetText("Updated Toggle")
+-- MyToggle:SetValue(true)
+-- MyToggle:SetDisabled(false)
+-- MyToggle:SetVisible(true)
+-- MyToggle:Destroy()
 
---[[
-    :AddDropdown({
-        Text = "Dropdown",
-        Index = "Dropdown",
-        Values = {},
-        Default = nil,
-        MaxVisibleValues = "Auto", or number > 0
-        MultiSelection = true, returns table
-        Callback = function() end
-    })
+-- 7. Elements inside Right ContentBox
 
-    :SetText(Text)
-    :SetValue(string or table)
-    :ReplaceValues(Table)
-    :GetActiveValues()
-    :SetDisabled(Boolean)
-    :SetVisible(Boolean)
-    :Destroy()
-]]
-
-Contentbox1:AddDropdown({
-    Text = "Single Dropdown",
-    Index = "Drop1",
-    Values = {"I","II","III"},
-    Default = "I",
-    MultiSelection = false,
-		CanDeselect = true,
-    Callback = function(Value) print(Value) end
+-- Slider
+local MySlider = RightBox:AddSlider({
+    Text = "WalkSpeed",
+    Index = "WalkSpeedSlider",
+    Min = 16,
+    Max = 250,
+    Default = 16,
+    RoundTo = 0, -- Number of decimal places (0 for integers, 1 for 0.1, etc.)
+    Suffix = "studs/s",
+    Callback = function(Value)
+        print("Slider value:",Value)
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+        end
+    end
 })
+-- MySlider:SetText("Speed")
+-- MySlider:SetValue(50)
+-- MySlider:SetDisabled(false)
+-- MySlider:SetVisible(true)
+-- MySlider:Destroy()
 
-Contentbox1:AddDropdown({
-    Text = "Multi Dropdown",
-    Index = "Drop2",
-    Values = {"IV","V","VI"},
-    Default = {"IV","V"},
-    MultiSelection = true,
-		CanDeselect = true,
-    Callback = function(Value) for Index,Item in Value do print(Index,Item) end end
+-- Text Input
+local MyInput = RightBox:AddInput({
+    Text = "Custom Message",
+    Index = "CustomMessageInput",
+    Default = "",
+    Placeholder = "Type something here...",
+    ClearTextOnFocus = false,
+    Finished = true, -- true = triggers callback only when Enter/unfocused; false = triggers on every keystroke
+    Callback = function(Value)
+        print("Input text:",Value)
+    end
 })
+-- MyInput:SetText("New Input Title")
+-- MyInput:SetValue("Hello!")
+-- MyInput:SetDisabled(false)
+-- MyInput:SetVisible(true)
+-- MyInput:Destroy()
 
---[[
-    :AddInput({
-        Text = "Input",
-        Index = "Input",
-        Default = nil,
-        Placeholder = nil,
-        ClearTextOnFocus = false,
-        Finished = false,
-        Callback = function() end
-    })
-
-    :SetText(Text)
-    :SetValue(Text)
-    :SetDisabled(Boolean)
-    :SetVisible(Boolean)
-    :Destroy()
-]]
-
-Contentbox1:AddInput({
-    Text = "Input",
-    Index = "MyInput",
-    Default = "Nothing",
-    Placeholder = "Type something",
-    Finished = true,
-    Callback = function(Value) print(Value) end
-})
-
---[[
-    :AddKeyPicker({
-        Text = "Keybind",
-        Index = "Keybind",
-        Default = "None",
-        Callback = function() end
-    })
-
-    :SetText(Text)
-    :SetValue(Key(string))
-    :SetDisabled(Boolean)
-    :SetVisible(Boolean)
-    :Destroy()
-]]
-
-Contentbox2:AddKeyPicker({
-    Text = "Toggle Window",
-    Index = "ToggleWindowKeybind",
-    Default = "T",
+-- KeyPicker (Keybind)
+local MyKeybind = RightBox:AddKeyPicker({
+    Text = "Toggle UI Keybind",
+    Index = "ToggleUIKeybind",
+    Default = "RightShift", -- Backspace clears the bind to "None"
     Callback = function()
         MainWindow:ToggleVisible()
     end
 })
+-- MyKeybind:SetText("Menu Key")
+-- MyKeybind:SetValue("Insert")
+-- MyKeybind:SetDisabled(false)
+-- MyKeybind:SetVisible(true)
+-- MyKeybind:Destroy()
 
-Contentbox2:AddSlider({
-	Text = "Slider 1",
-	Index = "MySlider",
-	Min = 0,
-	Max = 100,
-	Default = 3,
-	Suffix = "Coconuts",
-	Callback = function(Value) print(Value) end
+-- Single-Selection Dropdown
+local SingleDropdown = RightBox:AddDropdown({
+    Text = "Select Mode",
+    Index = "ModeDropdown",
+    Values = {"Legit","Rage","Semi-Rage","Visuals Only"},
+    Default = "Legit",
+    MultiSelection = false,
+    CanDeselect = true,
+    Callback = function(Value)
+        print("Selected mode:",Value)
+    end
+})
+-- SingleDropdown:SetText("New Dropdown Title")
+-- SingleDropdown:SetValue("Rage")
+-- SingleDropdown:ReplaceValues({"Option 1", "Option 2"})
+-- print(SingleDropdown:GetActiveValues())
+-- SingleDropdown:SetDisabled(false)
+-- SingleDropdown:SetVisible(true)
+-- SingleDropdown:Destroy()
+
+-- Multi-Selection Dropdown
+local MultiDropdown = RightBox:AddDropdown({
+    Text = "Target Parts",
+    Index = "TargetPartsDropdown",
+    Values = {"Head","Torso","Left Arm","Right Arm","Legs"},
+    Default = {"Head", "Torso"},
+    MultiSelection = true,
+    CanDeselect = false, -- Prevents deselecting the last remaining item
+    Callback = function(SelectedTable)
+        print("Active targets:",table.concat(SelectedTable, ", "))
+    end
 })
 
-Contentbox2:AddSlider({
-	Text = "Slider 2",
-	Index = "MySlider2",
-	Min = 0,
-	Max = 100,
-	Default = 3,
-	RoundTo = 2,
-	Callback = function(Value) print(Value) end
+-- 8. Element Visibility & State Control Example (Visuals Tab)
+local ControlBox = VisualsTab:AddContentBox("Dynamic Controls","Left","lucide-wrench")
+local SecretLabel = ControlBox:AddLabel("Secret Feature Unlocked!")
+SecretLabel:SetVisible(false)
+
+ControlBox:AddToggle({
+    Text = "Show Secret Label",
+    Default = false,
+    Callback = function(State)
+        SecretLabel:SetVisible(State)
+    end
 })
 
---[[
-    :SetupSaveManager({
-        Tab = nil,
-        MainFolderName = nil,
-        SubFolderName = nil,
-        Autoload = false,
-        FilterIndexMode = "Exclude", or "Selected"
-        FilterIndex = {}
-    })
-]]
-
+-- 9. Save Manager Setup (Settings Tab)
 SetupSaveManager({
-    Tab = Settings,
-    MainFolderName = "TestFolder",
-    SubFolderName = "Configs",
+    Tab = SettingsTab,
+    Name = "Config Manager",
+    MainFolderName = "MyScriptConfigs",
     Autoload = true,
-    --FilterIndexMode = "Exclude",
-    --FilterIndex = {"Togl"}
+    -- Optional filtering:
+    -- FilterIndexMode = "Exclude", -- "Exclude" or "Selected"
+    -- FilterIndex = {"ToggleUIKeybind"}
 })
