@@ -799,8 +799,8 @@ function JustALibrary:CreateWindow(GivenTable)
                 Parent = ContentBoxTitleFrame,
                 Name = "ContentBoxTitle",
                 BackgroundTransparency = 1,
-                Size = GivenIcon and UDim2.new(0.65,0,0,30) or UDim2.new(0.75,0,0,30),
-                Position = GivenIcon and UDim2.fromScale(0.125,0) or UDim2.fromScale(0.03,0),
+                Size = UDim2.new(1,0,0,30),
+                Position = GivenIcon and UDim2.fromOffset(28,0) or UDim2.fromOffset(3,0),
                 TextWrapped = true,
                 TextSize = 12,
                 TextXAlignment = Enum.TextXAlignment.Left,
@@ -815,7 +815,7 @@ function JustALibrary:CreateWindow(GivenTable)
                     Name = "ContentBoxIcon",
                     BackgroundTransparency = 1,
                     Size = UDim2.fromOffset(20,20),
-                    Position = UDim2.new(0.025,0,0,5),
+                    Position = UDim2.fromOffset(5,5),
                     Image = Icons.assets[GivenIcon],
                     Visible = true
                 })
@@ -827,14 +827,10 @@ function JustALibrary:CreateWindow(GivenTable)
                 BackgroundTransparency = 1,
                 AnchorPoint = Vector2.new(1,0),
                 Size = UDim2.fromOffset(20,20),
-                Position = UDim2.new(0.875,0,0,5),
+                Position = UDim2.new(1,-28,0,5),
                 Image = Icons.assets["lucide-external-link"],
                 Visible = true
             })
-            ContentBoxPopOut:GetPropertyChangedSignal("GuiState"):Connect(function()
-                if ContentBoxPopOut.GuiState == Enum.GuiState.Hover then TweenService:Create(ContentBoxPopOut,TweenInfo.new(0.1),{Size = UDim2.fromOffset(25,25)}):Play()
-                else TweenService:Create(ContentBoxPopOut,TweenInfo.new(0.1),{Size = UDim2.fromOffset(20,20)}):Play() end
-            end)
             local ContentBoxMinimize = New({
                 ClassName = "ImageButton",
                 Parent = ContentBoxTitleFrame,
@@ -842,20 +838,16 @@ function JustALibrary:CreateWindow(GivenTable)
                 BackgroundTransparency = 1,
                 AnchorPoint = Vector2.new(1,0),
                 Size = UDim2.fromOffset(20,20),
-                Position = UDim2.new(0.975,0,0,5),
+                Position = UDim2.new(1,-5,0,5),
                 Image = Icons.assets["lucide-chevron-down"],
                 Visible = true
             })
-            ContentBoxMinimize:GetPropertyChangedSignal("GuiState"):Connect(function()
-                if ContentBoxMinimize.GuiState == Enum.GuiState.Hover then TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.1),{Size = UDim2.fromOffset(25,25)}):Play()
-                else TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.1),{Size = UDim2.fromOffset(20,20)}):Play() end
-            end)
 
             local IsMinimized = false
             ContentBoxMinimize.MouseButton1Click:Connect(function()
                 IsMinimized = not IsMinimized
                 for _,Element in ContentBoxFrame:GetChildren() do
-                    if Element:IsA("Frame") and Element.Name ~= "ContentBoxTitleFrame" and not ContentBox.HiddenElements[Element] then
+                    if (Element:IsA("Frame") or Element:IsA("ImageLabel") or Element:IsA("TextButton") or Element:IsA("TextLabel") ) and Element.Name ~= "ContentBoxTitleFrame" and not ContentBox.HiddenElements[Element] then
                         Element.Visible = not IsMinimized
                         if not IsMinimized then TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.2),{Rotation = 0}):Play()
                         else TweenService:Create(ContentBoxMinimize,TweenInfo.new(0.2),{Rotation = 180}):Play() end
