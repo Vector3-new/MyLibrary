@@ -148,8 +148,7 @@ local ModalElement = New({
     ZIndex = -999,
     Text = "",
     Visible = true
-})
-ModalElement.Modal = true
+}) ModalElement.Modal = true
 
 local Cursor = New({
     ClassName = "Frame",
@@ -162,8 +161,7 @@ local Cursor = New({
     ZIndex = 999,
     CornerRadius = 8,
     Visible = true
-})
-local CursorStroke = Instance.new("UIStroke",Cursor)
+}) local CursorStroke = Instance.new("UIStroke",Cursor)
 CursorStroke.Color = Color3.fromRGB(0,0,0)
 CursorStroke.Thickness = 1
 Mouse.Move:Connect(function() Cursor.Position = UDim2.fromOffset(Mouse.X,Mouse.Y) end)
@@ -233,7 +231,7 @@ function JustALibrary:Notify(GivenTable)
         Size = UDim2.new(0,20,0,20),
         LayoutOrder = #(NotificationTopFrame:GetChildren()),
         Image = GivenTable.Icon and Icons.assets[GivenTable.Icon] or Icons.assets["lucide-bell-ring"],
-        ImageColor3 = GivenTable.IconColor3 or Color3.fromRGB(255,255,255),
+        ImageColor3 = Color3.fromRGB(255,255,255),
         Visible = true
     })
     local NotificationTitle = New({
@@ -241,12 +239,25 @@ function JustALibrary:Notify(GivenTable)
         Parent = NotificationTopFrame,
         Name = "NotificationTitle",
         BackgroundTransparency = 1,
-        Size = UDim2.new(1,-28,1,0),
+        Size = UDim2.new(1,-101,1,0),
         LayoutOrder = #(NotificationTopFrame:GetChildren()),
         TextColor3 = Color3.fromRGB(255,255,255),
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
         Text = GivenTable.Title or "Notification",
+        Visible = true
+    })
+    local NotificationTimeLabel = New({
+        ClassName = "TextLabel",
+        Parent = NotificationTopFrame,
+        Name = "NotificationTimeLabel",
+        LayoutOrder = #(NotificationTopFrame:GetChildren()),
+        BackgroundTransparency = 1,
+        Size = UDim2.new(0,75,0,20),
+        TextColor3 = Color3.fromRGB(200,200,200),
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Text = os.date("%H:%M:%S"),
         Visible = true
     })
     local NotificationContent = New({
@@ -281,8 +292,7 @@ function JustALibrary:Notify(GivenTable)
         NotificationSound.SoundId = "rbxassetid://"..GivenTable.Sound
         NotificationSound.Volume = GivenTable.SoundVolume or 1
         NotificationSound:Play()
-    end
-    NotificationFakeFrame.Parent = NotificationsHolder
+    end NotificationFakeFrame.Parent = NotificationsHolder
     task.spawn(function()
         TweenService:Create(NotificationFrame,TweenInfo.new(0.75,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position = UDim2.fromScale(0,0)}):Play()
         TweenService:Create(NotificationTimeFrame,TweenInfo.new(GivenTable.Time or 3),{Size = UDim2.new(1,0,0,3)}):Play() task.wait(GivenTable.Time or 3)
@@ -317,8 +327,7 @@ function JustALibrary:CreateDraggableLabel(GivenText,Position)
         TextXAlignment = Enum.TextXAlignment.Left,
         Text = GivenText or "",
         Visible = true
-    })
-    local TextPadding = Instance.new("UIPadding",DraggableText)
+    }) local TextPadding = Instance.new("UIPadding",DraggableText)
     TextPadding.PaddingTop = UDim.new(0,5)
     TextPadding.PaddingBottom = UDim.new(0,5)
     TextPadding.PaddingLeft = UDim.new(0,5)
@@ -328,15 +337,12 @@ function JustALibrary:CreateDraggableLabel(GivenText,Position)
     function DraggableElementHolder:SetText(Text)
         DraggableText.Text = Text or ""
     end
-
     function DraggableElementHolder:SetVisible(Boolean)
         DraggableFrame.Visible = Boolean
     end
-
     function DraggableElementHolder:Destroy()
         DraggableFrame:Destroy()
     end
-
     return DraggableElementHolder
 end
 
@@ -357,33 +363,28 @@ function JustALibrary:CreateDraggableButton(GivenText,GivenFunction,Position)
         Text = GivenText or "",
         CornerRadius = 8,
         Visible = true
-    })
-    DraggableButton.MouseButton1Click:Connect(GivenFunction or function() end)
+    }) DraggableButton.MouseButton1Click:Connect(GivenFunction or function() end)
     local ButtonPadding = Instance.new("UIPadding",DraggableButton)
     ButtonPadding.PaddingTop = UDim.new(0,5)
     ButtonPadding.PaddingBottom = UDim.new(0,5)
     ButtonPadding.PaddingLeft = UDim.new(0,5)
     ButtonPadding.PaddingRight = UDim.new(0,5)
     MakeDraggable(DraggableButton)
-    
-    function DraggableElementHolder:SetText(Text)
-        DraggableText.Text = Text or ""
-    end
 
+    function DraggableElementHolder:SetText(Text)
+        DraggableButton.Text = Text or ""
+    end
     function DraggableElementHolder:SetVisible(Boolean)
         DraggableButton.Visible = Boolean
     end
-
     function DraggableElementHolder:Destroy()
         DraggableButton:Destroy()
     end
-
     return DraggableElementHolder
 end
 
-function JustALibrary:CreateWindow(GivenTable)
+function JustALibrary:CreateWindow(GivenName)
     local Window = {}
-
     local WindowFrame = New({
         ClassName = "Frame",
         Parent = JustALibraryGUI,
@@ -394,7 +395,6 @@ function JustALibrary:CreateWindow(GivenTable)
         Active = true,
         Visible = true
     }) MakeDraggable(WindowFrame)
-
     local WindowTitle = New({
         ClassName = "Frame",
         Parent = WindowFrame,
@@ -415,7 +415,7 @@ function JustALibrary:CreateWindow(GivenTable)
         Position = UDim2.fromScale(0.1,0.1),
         TextScaled = true,
         TextColor3 = Color3.fromRGB(255,255,255),
-        Text = GivenTable.Title or "Window",
+        Text = GivenName or "Window",
         Visible = true
     })
     local WindowTitleButton = New({
@@ -427,7 +427,6 @@ function JustALibrary:CreateWindow(GivenTable)
         Text = "",
         Visible = true
     })
-
     local TabsDivider = New({
         ClassName = "Frame",
         Parent = WindowFrame,
@@ -468,7 +467,6 @@ function JustALibrary:CreateWindow(GivenTable)
         CornerRadius = 8,
         Visible = true
     })
-
     local NotificationsFrame = New({
         ClassName = "Frame",
         Parent = WindowFrame,
@@ -554,7 +552,6 @@ function JustALibrary:CreateWindow(GivenTable)
         CornerRadius = 8,
         Visible = false
     })
-
     local WindowResizeFrame = New({
         ClassName = "Frame",
         Parent = WindowFrame,
@@ -566,9 +563,7 @@ function JustALibrary:CreateWindow(GivenTable)
         Position = UDim2.new(1,15,1,15),
         CornerRadius = 8,
         Visible = true
-    })
-
-    local IsResizing,ResizeStartCursorPos,WindowSize = false
+    }) local IsResizing,ResizeStartCursorPos,WindowSize = false
     WindowResizeFrame.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
             IsResizing = true IsElementDragging = true ResizeStartCursorPos = Input.Position WindowSize = WindowFrame.AbsoluteSize
@@ -584,9 +579,7 @@ function JustALibrary:CreateWindow(GivenTable)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
             if IsResizing then IsResizing = false IsElementDragging = false end
         end
-    end)
-
-    local ShowWindowButton 
+    end) local ShowWindowButton 
     function Window:ToggleVisible()
         WindowFrame.Visible = not WindowFrame.Visible
         ModalElement.Visible = WindowFrame.Visible
@@ -612,12 +605,10 @@ function JustALibrary:CreateWindow(GivenTable)
             TweenService:Create(NotificationsFrame,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(100,100,100)}):Play()
         end
     end)
-
     NotificationsFrameButton:GetPropertyChangedSignal("GuiState"):Connect(function()
         if NotificationsFrameButton.GuiState == Enum.GuiState.Hover then TweenService:Create(NotificationsIcon,TweenInfo.new(0.1),{Size = UDim2.fromOffset(35,35)}):Play()
         else TweenService:Create(NotificationsIcon,TweenInfo.new(0.1),{Size = UDim2.fromOffset(30,30)}):Play() end
     end)
-
     local function NormalizeText(Search)
         return (string.lower(Search):gsub("%s+",""))
     end
@@ -639,8 +630,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 end Notify.Visible = IsMatchFound
             end
         end
-    end
-    SearchNotificationsInput:GetPropertyChangedSignal("Text"):Connect(function() Search(SearchNotificationsInput.Text) end)
+    end SearchNotificationsInput:GetPropertyChangedSignal("Text"):Connect(function() Search(SearchNotificationsInput.Text) end)
 
     NotificationsClearAllButton.MouseButton1Click:Connect(function()
         for _,Notifications in NotificationsContentFrame:GetChildren() do
@@ -650,7 +640,6 @@ function JustALibrary:CreateWindow(GivenTable)
             end
         end
     end)
-
     NotificationsHolder.ChildAdded:Connect(function(Notification)
         local NewNotification = Notification:Clone()
         if NewNotification.NotificationFrame:FindFirstChild("Sound") then NewNotification.NotificationFrame.Sound:Destroy() end
@@ -665,7 +654,6 @@ function JustALibrary:CreateWindow(GivenTable)
 
     function Window:AddTab(TabName,TabIcon)
         local Tab = {}
-
         local TabFrame = New({
             ClassName = "Frame",
             Parent = TabsFrame,
@@ -753,7 +741,6 @@ function JustALibrary:CreateWindow(GivenTable)
                 end
             end
         end)
-
         TabButton:GetPropertyChangedSignal("GuiState"):Connect(function()
             if TabButton.GuiState == Enum.GuiState.Hover then TweenService:Create(TabIcon,TweenInfo.new(0.1),{Size = UDim2.fromOffset(35,35)}):Play()
             else TweenService:Create(TabIcon,TweenInfo.new(0.1),{Size = UDim2.fromOffset(30,30)}):Play() end
@@ -762,7 +749,6 @@ function JustALibrary:CreateWindow(GivenTable)
         function Tab:AddContentBox(GivenName,GivenSide,GivenIcon)
             local ContentBox = {HiddenElements = {}}
             local GivenParent = GivenSide == "Right" and SecondTabContentScrollingFrame or TabContentScrollingFrame
-
             local ContentBoxFrame = New({
                 ClassName = "Frame",
                 Parent = GivenParent,
@@ -841,9 +827,7 @@ function JustALibrary:CreateWindow(GivenTable)
                 Position = UDim2.new(1,-5,0,5),
                 Image = Icons.assets["lucide-chevron-down"],
                 Visible = true
-            })
-
-            local IsMinimized = false
+            }) local IsMinimized = false
             ContentBoxMinimize.MouseButton1Click:Connect(function()
                 IsMinimized = not IsMinimized
                 for _,Element in ContentBoxFrame:GetChildren() do
@@ -854,7 +838,6 @@ function JustALibrary:CreateWindow(GivenTable)
                     end
                 end
             end)
-
             ContentBoxPopOut.MouseButton1Click:Connect(function()
                 if ContentBoxFrame.Parent ~= GivenParent then
                     RemoveConnections(ContentBoxFrame)
@@ -929,16 +912,16 @@ function JustALibrary:CreateWindow(GivenTable)
                 return DividerHolder
             end
 
-            function ContentBox:AddImage(GivenTable)
+            function ContentBox:AddImage(GivenImage,ImageHeight)
                 local ImageHolder = {}
                 local ImageLabel = New({
                     ClassName = "ImageLabel",
                     Parent = ContentBoxFrame,
                     Name = "ImageLabel",
                     BackgroundTransparency = 0.6,
-                    Size = UDim2.new(1,0,0,GivenTable.ImageHeight or 230),
+                    Size = UDim2.new(1,0,0,ImageHeight or 230),
                     LayoutOrder = #(ContentBoxFrame:GetChildren()),
-                    Image = GivenTable.Image,
+                    Image = GivenImage,
                     CornerRadius = 8,
                     Visible = true
                 })
