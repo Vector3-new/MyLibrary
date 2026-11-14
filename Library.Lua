@@ -1857,13 +1857,13 @@ function SetupSaveManager(GivenTable)
                 Icon = "lucide-file-check"
             }) JustALibrary.Elements[GivenTable.MainFolderName.."SaveManagerConfigName"]:SetValue("")
         end
-    })
+    }) if GivenTable.Autoload then
     SaveManagerContentBox:AddButton({
         Text = "Set as autoload",
         Callback = function()
             if not SelectedConfig then return end writefile(GivenTable.MainFolderName.."/Autoload.lib","return '"..SelectedConfig.."'") CurrentAutoload:SetText("Current Autoload: "..SelectedConfig)
         end
-    })
+    }) end
     SaveManagerContentBox:AddButton({
         Text = "Export (Copy JSON)",
         Callback = function()
@@ -1875,13 +1875,13 @@ function SetupSaveManager(GivenTable)
         Callback = function()
             if not SelectedConfig then return end delfile(GivenTable.MainFolderName.."/"..SelectedConfig) RefreshList()
         end
-    })
+    }) if GivenTable.Autoload then
     SaveManagerContentBox:AddDivider()
     CurrentAutoload = SaveManagerContentBox:AddLabel("Current Autoload: None")
     SaveManagerContentBox:AddButton({
         Text = "Reset autoload",
         Callback = function() if isfile(GivenTable.MainFolderName.."/Autoload.lib") then delfile(GivenTable.MainFolderName.."/Autoload.lib") CurrentAutoload:SetText("Current Autoload: None") end end
-    }) RefreshList()
+    }) end RefreshList()
     if GivenTable.Autoload and isfile(GivenTable.MainFolderName.."/Autoload.lib") then
         local AutoloadConfigName = loadfile(GivenTable.MainFolderName.."/Autoload.lib")()
         if AutoloadConfigName then
