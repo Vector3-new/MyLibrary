@@ -1026,7 +1026,7 @@ function JustALibrary:CreateWindow(GivenName)
                         if WaitForKey then WaitForKey:Disconnect() end WaitForKey = true
                         if not table.find(BlacklistedKeys,Key) then
                             Trigger = Key=="Backspace" and "None" or Key
-                            KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
+                            KeybindHolder.Value = Trigger KeybindButton.Text = Trigger Button.Size = UDim2.new(1,-KeybindFrame.AbsoluteSize.X-5,1,0)
                         end task.wait() WaitForKey = nil
                     end
                     JustALibrary.Elements[Index or "Keybind"] = KeybindHolder
