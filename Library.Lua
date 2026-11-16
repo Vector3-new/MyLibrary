@@ -941,19 +941,97 @@ function JustALibrary:CreateWindow(GivenName)
 
             function ContentBox:AddButton(GivenTable)
                 local ButtonHolder = {}
+                local ButtonFakeFrame = New({
+                    ClassName = "Frame",
+                    Parent = ContentBoxFrame,
+                    Name = "ButtonFrame",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1,0,0,25),
+                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
+                    Visible = true
+                })
                 local Button = New({
                     ClassName = "TextButton",
-                    Parent = ContentBoxFrame,
+                    Parent = ButtonFakeFrame,
                     Name = "Button",
-                    LayoutOrder = #(ContentBoxFrame:GetChildren()),
                     BackgroundTransparency = 0.6,
-                    Size = UDim2.new(1,0,0,25),
+                    Size = UDim2.fromScale(1,1),
                     TextSize = 12,
                     TextColor3 = Color3.fromRGB(255,255,255),
                     Text = GivenTable.Text or "Label",
                     CornerRadius = 8,
                     Visible = true
                 }) Button.MouseButton1Click:Connect(GivenTable.Callback)
+
+                function ButtonHolder:AddKeyPicker(Index,Default)
+                    local KeybindHolder = {Value = "None"}
+                    local KeybindFrame = New({
+                        ClassName = "Frame",
+                        Parent = ButtonFakeFrame,
+                        Name = "KeybindFrame",
+                        BackgroundTransparency = 0.6,
+                        BackgroundColor3 = Color3.fromRGB(0,0,0),
+                        AnchorPoint = Vector2.new(1,0),
+                        AutomaticSize = Enum.AutomaticSize.X,
+                        Size = UDim2.fromOffset(25,25),
+                        Position = UDim2.fromScale(1,0),
+                        CornerRadius = 8,
+                        Visible = true
+                    })
+                    local KeybindButton = New({
+                        ClassName = "TextButton",
+                        Parent = KeybindFrame,
+                        Name = "KeybindButton",
+                        BackgroundTransparency = 1,
+                        AutomaticSize = Enum.AutomaticSize.X,
+                        Size = UDim2.fromScale(1,1),
+                        TextColor3 = Color3.fromRGB(255,255,255),
+                        TextSize = 12,
+                        Text = (not Default or table.find(BlacklistedKeys,Default)) and "None" or Default,
+                        Padding = 5,
+                        Visible = true
+                    })
+                    KeybindButton.UIPadding.PaddingLeft = UDim.new(0,5)
+                    KeybindButton.UIPadding.PaddingRight = UDim.new(0,5)
+                    KeybindButton.UIPadding.PaddingBottom = UDim.new(0,0)
+
+                    local Trigger,WaitForKey = Default or "None"
+                    KeybindHolder.Value = Trigger
+                    UserInputService.InputBegan:Connect(function(Key,GameProcessed)
+                        if not GameProcessed and Button.Interactable and not WaitForKey and Key.KeyCode.Name == Trigger and Trigger ~= "None" then GivenTable.Callback() end
+                    end)
+
+                    KeybindButton.MouseButton1Click:Connect(function()
+                        KeybindButton.Text = "..." Button.Size = UDim2.new(1,-KeybindFrame.AbsoluteSize.X-5,1,0)
+                        WaitForKey = UserInputService.InputBegan:Connect(function(Key,GameProcessed)
+                            if not GameProcessed and Key.UserInputType == Enum.UserInputType.Keyboard and not table.find(BlacklistedKeys,Key.KeyCode.Name) then
+                                Trigger = Key.KeyCode.Name=="Backspace" and "None" or Key.KeyCode.Name
+                                KeybindHolder.Value = Trigger KeybindButton.Text = Trigger Button.Size = UDim2.new(1,-KeybindFrame.AbsoluteSize.X-5,1,0)
+                                WaitForKey:Disconnect() task.wait() WaitForKey = nil
+                            end
+                        end)
+                    end) Button.Size = UDim2.new(1,-KeybindFrame.AbsoluteSize.X-5,1,0)
+
+                    Button:GetPropertyChangedSignal("Interactable"):Connect(function()
+                        if Button.Interactable then
+                            KeybindButton.Interactable = true
+                            TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                        else
+                            KeybindButton.Interactable = false
+                            TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        end
+                    end)
+
+                    function KeybindHolder:SetValue(Key)
+                        if WaitForKey then WaitForKey:Disconnect() end WaitForKey = true
+                        if not table.find(BlacklistedKeys,Key) then
+                            Trigger = Key=="Backspace" and "None" or Key
+                            KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
+                        end task.wait() WaitForKey = nil
+                    end
+                    JustALibrary.Elements[Index or "Keybind"] = KeybindHolder
+                    return KeybindHolder
+                end
 
                 function ButtonHolder:SetText(Text)
                     Button.Text = Text or "Button"
@@ -968,11 +1046,11 @@ function JustALibrary:CreateWindow(GivenName)
                     end
                 end
                 function ButtonHolder:SetVisible(Boolean)
-                    if Boolean then ContentBox.HiddenElements[Button] = nil else ContentBox.HiddenElements[Button] = true end
-                    Button.Visible = Boolean and not IsMinimized
+                    if Boolean then ContentBox.HiddenElements[ButtonFakeFrame] = nil else ContentBox.HiddenElements[ButtonFakeFrame] = true end
+                    ButtonFakeFrame.Visible = Boolean and not IsMinimized
                 end
                 function ButtonHolder:Destroy()
-                    Button:Destroy()
+                    ButtonFakeFrame:Destroy()
                 end
                 return ButtonHolder
             end
@@ -1053,6 +1131,76 @@ function JustALibrary:CreateWindow(GivenName)
                     end
                     GivenTable.Callback(IsToggled)
                 end)
+
+                function ToggleHolder:AddKeyPicker(Index,Default)
+                    local KeybindHolder = {Value = "None"}
+                    local KeybindFrame = New({
+                        ClassName = "Frame",
+                        Parent = ToggleFrame,
+                        Name = "KeybindFrame",
+                        BackgroundTransparency = 0.6,
+                        BackgroundColor3 = Color3.fromRGB(0,0,0),
+                        AnchorPoint = Vector2.new(1,0),
+                        AutomaticSize = Enum.AutomaticSize.X,
+                        Size = UDim2.fromOffset(25,25),
+                        Position = UDim2.new(1,-60,0,0),
+                        CornerRadius = 8,
+                        Visible = true
+                    })
+                    local KeybindButton = New({
+                        ClassName = "TextButton",
+                        Parent = KeybindFrame,
+                        Name = "KeybindButton",
+                        BackgroundTransparency = 1,
+                        AutomaticSize = Enum.AutomaticSize.X,
+                        Size = UDim2.fromScale(1,1),
+                        TextColor3 = Color3.fromRGB(255,255,255),
+                        TextSize = 12,
+                        Text = (not Default or table.find(BlacklistedKeys,Default)) and "None" or Default,
+                        Padding = 5,
+                        Visible = true
+                    })
+                    KeybindButton.UIPadding.PaddingLeft = UDim.new(0,5)
+                    KeybindButton.UIPadding.PaddingRight = UDim.new(0,5)
+                    KeybindButton.UIPadding.PaddingBottom = UDim.new(0,0)
+
+                    local Trigger,WaitForKey = Default or "None"
+                    KeybindHolder.Value = Trigger
+                    UserInputService.InputBegan:Connect(function(Key,GameProcessed)
+                        if not GameProcessed and ToggleButton.Interactable and not WaitForKey and Key.KeyCode.Name == Trigger and Trigger ~= "None" then ToggleHolder:SetValue(not IsToggled) end
+                    end)
+
+                    KeybindButton.MouseButton1Click:Connect(function()
+                        KeybindButton.Text = "..."
+                        WaitForKey = UserInputService.InputBegan:Connect(function(Key,GameProcessed)
+                            if not GameProcessed and Key.UserInputType == Enum.UserInputType.Keyboard and not table.find(BlacklistedKeys,Key.KeyCode.Name) then
+                                Trigger = Key.KeyCode.Name=="Backspace" and "None" or Key.KeyCode.Name
+                                KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
+                                WaitForKey:Disconnect() task.wait() WaitForKey = nil
+                            end
+                        end)
+                    end)
+
+                    ToggleButton:GetPropertyChangedSignal("Interactable"):Connect(function()
+                        if ToggleButton.Interactable then
+                            KeybindButton.Interactable = true
+                            TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                        else
+                            KeybindButton.Interactable = false
+                            TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                        end
+                    end)
+
+                    function KeybindHolder:SetValue(Key)
+                        if WaitForKey then WaitForKey:Disconnect() end WaitForKey = true
+                        if not table.find(BlacklistedKeys,Key) then
+                            Trigger = Key=="Backspace" and "None" or Key
+                            KeybindHolder.Value = Trigger KeybindButton.Text = Trigger
+                        end task.wait() WaitForKey = nil
+                    end
+                    JustALibrary.Elements[Index or "Keybind"] = KeybindHolder
+                    return KeybindHolder
+                end
 
                 function ToggleHolder:SetText(Text)
                     ToggleText.Text = Text or "Toggle"
@@ -1623,12 +1771,10 @@ function JustALibrary:CreateWindow(GivenName)
                         KeybindButton.Interactable = false
                         IsDisabled = true
                         TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
-                        TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
                     else
                         KeybindButton.Interactable = true
                         IsDisabled = false
                         TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
-                        TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                     end
                 end
                 function KeybindHolder:SetVisible(Boolean)
