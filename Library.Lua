@@ -964,6 +964,45 @@ function JustALibrary:CreateWindow(GivenName)
                 }) Button.MouseButton1Click:Connect(GivenTable.Callback)
 
                 function ButtonHolder:AddKeyPicker(Index,Default)
+                    if JustALibrary.IsMobile then
+                        local MobileButtonHolder = {}
+                        local MobileButtonToggleFrame = New({
+                            ClassName = "Frame",
+                            Parent = ButtonFakeFrame,
+                            BackgroundTransparency = 0.6,
+                            AnchorPoint = Vector2.new(1,0),
+                            AutomaticSize = Enum.AutomaticSize.X,
+                            Size = UDim2.fromOffset(25,25),
+                            Position = UDim2.fromScale(1,0),
+                            CornerRadius = 8,
+                            Padding = 3,
+                            Visible = true
+                        })
+                        MobileButtonToggleFrame.UIPadding.PaddingTop = UDim.new(0,3)
+                        MobileButtonToggleFrame.UIPadding.PaddingLeft = UDim.new(0,3)
+                        MobileButtonToggleFrame.UIPadding.PaddingRight = UDim.new(0,3)
+                        local MobileButtonToggleButton = New({
+                            ClassName = "ImageButton",
+                            Parent = MobileButtonToggleFrame,
+                            Name = "Toggle",
+                            Size = UDim2.fromOffset(20,20),
+                            Image = Icons.assets["lucide-external-link"],
+                            Visible = true
+                        }) local IsVisible = false
+                        local MobileButton = JustALibrary:CreateDraggableButton(Button.Text,GivenTable.Callback,UDim2.fromOffset(30,30)) MobileButton:SetVisible(IsVisible)
+                        MobileButtonToggleButton.MouseButton1Click:Connect(function()
+                            IsVisible = not IsVisible
+                            MobileButton:SetVisible(IsVisible)
+                        end) Button.Size = UDim2.new(1,-30,1,0)
+                        Button:GetPropertyChangedSignal("Text"):Connect(function() MobileButton:SetText(Button.Text) end)
+                        Button:GetPropertyChangedSignal("Interactable"):Connect(function() 
+                            MobileButtonToggleButton.Interactable = Button.Interactable
+                            TweenService:Create(MobileButtonToggleButton,TweenInfo.new(0.25),{ImageColor3 = Button.Interactable and Color3.fromRGB(255,255,255) or Color3.fromRGB(125,125,125)}):Play()
+                            MobileButton:SetVisible(Button.Interactable)
+                            IsVisible = Button.Interactable
+                        end)
+                        return MobileButtonHolder
+                    end
                     local KeybindHolder = {Value = "None"}
                     local KeybindFrame = New({
                         ClassName = "Frame",
@@ -1015,10 +1054,10 @@ function JustALibrary:CreateWindow(GivenName)
                     Button:GetPropertyChangedSignal("Interactable"):Connect(function()
                         if Button.Interactable then
                             KeybindButton.Interactable = true
-                            TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                            TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                         else
                             KeybindButton.Interactable = false
-                            TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                            TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
                         end
                     end)
 
@@ -1133,6 +1172,45 @@ function JustALibrary:CreateWindow(GivenName)
                 end)
 
                 function ToggleHolder:AddKeyPicker(Index,Default)
+                    if JustALibrary.IsMobile then
+                        local MobileButtonHolder = {}
+                        local MobileButtonToggleFrame = New({
+                            ClassName = "Frame",
+                            Parent = ToggleFrame,
+                            BackgroundTransparency = 0.6,
+                            AnchorPoint = Vector2.new(1,0),
+                            AutomaticSize = Enum.AutomaticSize.X,
+                            Size = UDim2.fromOffset(25,25),
+                            Position = UDim2.new(1,-60,0,0),
+                            CornerRadius = 8,
+                            Padding = 3,
+                            Visible = true
+                        })
+                        MobileButtonToggleFrame.UIPadding.PaddingTop = UDim.new(0,3)
+                        MobileButtonToggleFrame.UIPadding.PaddingLeft = UDim.new(0,3)
+                        MobileButtonToggleFrame.UIPadding.PaddingRight = UDim.new(0,3)
+                        local MobileButtonToggleButton = New({
+                            ClassName = "ImageButton",
+                            Parent = MobileButtonToggleFrame,
+                            Name = "Toggle",
+                            Size = UDim2.fromOffset(20,20),
+                            Image = Icons.assets["lucide-external-link"],
+                            Visible = true
+                        }) local IsVisible = false
+                        local MobileButton = JustALibrary:CreateDraggableButton(ToggleText.Text,function() ToggleHolder:SetValue(not IsToggled) end,UDim2.fromOffset(30,30)) MobileButton:SetVisible(IsVisible)
+                        MobileButtonToggleButton.MouseButton1Click:Connect(function()
+                            IsVisible = not IsVisible
+                            MobileButton:SetVisible(IsVisible)
+                        end)
+                        ToggleText:GetPropertyChangedSignal("Text"):Connect(function() MobileButton:SetText(ToggleText.Text) end)
+                        ToggleButton:GetPropertyChangedSignal("Interactable"):Connect(function() 
+                            MobileButtonToggleButton.Interactable = ToggleButton.Interactable
+                            TweenService:Create(MobileButtonToggleButton,TweenInfo.new(0.25),{ImageColor3 = ToggleButton.Interactable and Color3.fromRGB(255,255,255) or Color3.fromRGB(125,125,125)}):Play()
+                            MobileButton:SetVisible(ToggleButton.Interactable)
+                            IsVisible = ToggleButton.Interactable
+                        end)
+                        return MobileButtonHolder
+                    end
                     local KeybindHolder = {Value = "None"}
                     local KeybindFrame = New({
                         ClassName = "Frame",
@@ -1184,10 +1262,10 @@ function JustALibrary:CreateWindow(GivenName)
                     ToggleButton:GetPropertyChangedSignal("Interactable"):Connect(function()
                         if ToggleButton.Interactable then
                             KeybindButton.Interactable = true
-                            TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+                            TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(255,255,255)}):Play()
                         else
                             KeybindButton.Interactable = false
-                            TweenService:Create(KeybindName,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
+                            TweenService:Create(KeybindButton,TweenInfo.new(0.25),{TextColor3 = Color3.fromRGB(125,125,125)}):Play()
                         end
                     end)
 
