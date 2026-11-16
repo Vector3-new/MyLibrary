@@ -1,4 +1,4 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vector3-new/MyLibrary/refs/heads/main/Library.Lua"))()
+local Library = loadfile("JustALibrary.Lua")()
 
 -- 1. Create Main Window (accepts a string)
 local MainWindow = Library:CreateWindow("Example")
@@ -62,7 +62,8 @@ local MyButton = LeftBox:AddButton({
             Time = 3
         })
     end
-})
+}):AddKeyPicker("ButtonKeybind")
+-- MyButton:AddKeyPicker(Index,KeyName)
 -- MyButton:SetText("New Button Text")
 -- MyButton:SetDisabled(false)
 -- MyButton:SetVisible(true)
@@ -76,7 +77,8 @@ local MyToggle = LeftBox:AddToggle({
     Callback = function(Value)
         print("Toggle state changed to:",Value)
     end
-})
+}):AddKeyPicker("ToggleKeybind")
+-- MyToggle:AddKeyPicker(Index,KeyName)
 -- MyToggle:SetText("Updated Toggle")
 -- MyToggle:SetValue(true)
 -- MyToggle:SetDisabled(false)
